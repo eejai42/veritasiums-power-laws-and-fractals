@@ -17,6 +17,15 @@ VALUES ('ZipfWords', 'Zipf word frequencies', 'power_law', 1.0, 2.0, 'relative_f
 INSERT INTO systems (system_id, display_name, class, base_scale, scale_factor, measure_name, fractal_dimension, theoretical_log_log_slope)
 VALUES ('ScaleFreeNet', 'Scale-free network degrees', 'power_law', 1.0, 2.0, 'node_count_at_degree', NULL, -2.5);
 
+INSERT INTO systems (system_id, display_name, class, base_scale, scale_factor, measure_name, fractal_dimension, theoretical_log_log_slope)
+VALUES ('Sandpile', 'Sandpile avalanches', 'power_law', 1.0, 2.0, 'relative_frequency_of_avalanches', NULL, -1.0);
+
+INSERT INTO systems (system_id, display_name, class, base_scale, scale_factor, measure_name, fractal_dimension, theoretical_log_log_slope)
+VALUES ('Earthquakes', 'Earthquake energies', 'power_law', 1.0, 2.0, 'relative_frequency_of_quakes', NULL, -1.0);
+
+INSERT INTO systems (system_id, display_name, class, base_scale, scale_factor, measure_name, fractal_dimension, theoretical_log_log_slope)
+VALUES ('ForestFires', 'Forest fire sizes', 'power_law', 1.0, 2.0, 'relative_frequency_of_fires', NULL, -1.3);
+
 -- Insert data for scales
 INSERT INTO scales (scale_id, "system", iteration, measure)
 VALUES ('Sierpinski_0', 'Sierpinski', 0, 1.0);
@@ -66,6 +75,42 @@ VALUES ('ScaleFreeNet_2', 'ScaleFreeNet', 2, 0.03125);
 INSERT INTO scales (scale_id, "system", iteration, measure)
 VALUES ('ScaleFreeNet_3', 'ScaleFreeNet', 3, 0.0055242717);
 
+INSERT INTO scales (scale_id, "system", iteration, measure)
+VALUES ('Sandpile_0', 'Sandpile', 0, 1.0);
+
+INSERT INTO scales (scale_id, "system", iteration, measure)
+VALUES ('Sandpile_1', 'Sandpile', 1, 0.5);
+
+INSERT INTO scales (scale_id, "system", iteration, measure)
+VALUES ('Sandpile_2', 'Sandpile', 2, 0.25);
+
+INSERT INTO scales (scale_id, "system", iteration, measure)
+VALUES ('Sandpile_3', 'Sandpile', 3, 0.125);
+
+INSERT INTO scales (scale_id, "system", iteration, measure)
+VALUES ('Earthquakes_0', 'Earthquakes', 0, 1.0);
+
+INSERT INTO scales (scale_id, "system", iteration, measure)
+VALUES ('Earthquakes_1', 'Earthquakes', 1, 0.5);
+
+INSERT INTO scales (scale_id, "system", iteration, measure)
+VALUES ('Earthquakes_2', 'Earthquakes', 2, 0.25);
+
+INSERT INTO scales (scale_id, "system", iteration, measure)
+VALUES ('Earthquakes_3', 'Earthquakes', 3, 0.125);
+
+INSERT INTO scales (scale_id, "system", iteration, measure)
+VALUES ('ForestFires_0', 'ForestFires', 0, 1.0);
+
+INSERT INTO scales (scale_id, "system", iteration, measure)
+VALUES ('ForestFires_1', 'ForestFires', 1, 0.4061384660);
+
+INSERT INTO scales (scale_id, "system", iteration, measure)
+VALUES ('ForestFires_2', 'ForestFires', 2, 0.1649530609);
+
+INSERT INTO scales (scale_id, "system", iteration, measure)
+VALUES ('ForestFires_3', 'ForestFires', 3, 0.0670201180);
+
 -- Insert data for system_stats
 INSERT INTO system_stats (system_stats_id, "system", analysis_name, status)
 VALUES ('Sierpinski_Stats', 'Sierpinski', 'Sierpinski Triangle Analysis', 'validated');
@@ -78,4 +123,13 @@ VALUES ('ZipfWords_Stats', 'ZipfWords', 'Zipf Word Frequency Analysis', 'validat
 
 INSERT INTO system_stats (system_stats_id, "system", analysis_name, status)
 VALUES ('ScaleFreeNet_Stats', 'ScaleFreeNet', 'Scale-Free Network Analysis', 'validated');
+
+INSERT INTO system_stats (system_stats_id, "system", analysis_name, status)
+VALUES ('Sandpile_Stats', 'Sandpile', 'Sandpile Avalanche Analysis', 'validated');
+
+INSERT INTO system_stats (system_stats_id, "system", analysis_name, status)
+VALUES ('Earthquakes_Stats', 'Earthquakes', 'Earthquake Energy Analysis', 'validated');
+
+INSERT INTO system_stats (system_stats_id, "system", analysis_name, status)
+VALUES ('ForestFires_Stats', 'ForestFires', 'Forest Fire Size Analysis', 'validated');
 

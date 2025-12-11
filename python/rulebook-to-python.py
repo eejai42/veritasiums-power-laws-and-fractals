@@ -50,21 +50,36 @@ class PythonGenerator:
 
     def _generate_init(self):
         """Generate __init__.py"""
-        code = f'''"""
-{self.parser.model_name} - Python Implementation
+        # Build list of class names
+        class_names = [self._to_class_name(name) for name in self.parser.get_table_names()]
 
-Auto-generated from rulebook: {self.timestamp}
+        # Build list of calculate functions
+        calc_funcs = [f'calculate_all_{name}' for name in self.parser.get_table_names()
+                      if self.parser.get_table(name).get_calculated_fields()]
 
-This package provides Python dataclasses for analyzing fractal
-and power-law systems.
-"""
+        code_parts = [
+            f'"""',
+            f'{self.parser.model_name} - Python Implementation',
+            f'',
+            f'Auto-generated from rulebook: {self.timestamp}',
+            f'',
+            f'This package provides Python dataclasses for analyzing fractal',
+            f'and power-law systems.',
+            f'"""',
+            f'',
+            f'from .models import {", ".join(class_names)}',
+            f'from .data import load_sample_data',
+            f'from .utils import build_systems_dict, {", ".join(calc_funcs)}, validate_system',
+            f'',
+            f'__all__ = [',
+            f'    {", ".join(f"\"{name}\"" for name in class_names)},',
+            f'    "load_sample_data",',
+            f'    "build_systems_dict", {", ".join(f"\"{name}\"" for name in calc_funcs)}, "validate_system"',
+            f']',
+            ''
+        ]
 
-from .models import System, Scale, SystemStats
-from .data import load_sample_data
-
-__all__ = ['System', 'Scale', 'SystemStats', 'load_sample_data']
-'''
-        self._write_file('__init__.py', code)
+        self._write_file('__init__.py', '\n'.join(code_parts))
 
     def _generate_models(self):
         """Generate models.py with all table classes"""
@@ -160,9 +175,20 @@ __all__ = ['System', 'Scale', 'SystemStats', 'load_sample_data']
         body_lines.append(f'        if self._{field_name} is None:')
 
         # Translate formula
+        # Build a set of calculated field names in this table
+        calculated_field_names = {cf.name for cf in table.get_calculated_fields()}
+
+        # Also build calculated fields for all tables (for MINIFS/MAXIFS aggregations)
+        all_calculated_fields = {}
+        for tname in self.parser.get_table_names():
+            t = self.parser.get_table(tname)
+            all_calculated_fields[tname] = {cf.name for cf in t.get_calculated_fields()}
+
         context = {
             'table_name': table.name,
-            'is_calculated_field': f.field_type in ['calculated', 'aggregation']
+            'is_calculated_field': f.field_type in ['calculated', 'aggregation'],
+            'calculated_fields': calculated_field_names,
+            'all_calculated_fields': all_calculated_fields
         }
 
         try:
@@ -235,50 +261,73 @@ __all__ = ['System', 'Scale', 'SystemStats', 'load_sample_data']
 
     def _generate_utils(self):
         """Generate utils.py with helper functions"""
-        code = f'''{self._file_header("Utility Functions")}
-from typing import Dict, List
-from .models import System, Scale, SystemStats
+        code_parts = [
+            self._file_header("Utility Functions"),
+            "from typing import Dict, List",
+            "from .models import System, Scale, SystemStats",
+            "",
+            "",
+            "def build_systems_dict(systems: List[System]) -> Dict[str, System]:",
+            "    \"\"\"Build a dictionary of systems keyed by system_id\"\"\"",
+            "    return {s.system_id: s for s in systems}",
+            ""
+        ]
 
+        # Generate calculate_all functions for each table
+        for table_name in self.parser.get_table_names():
+            table = self.parser.get_table(table_name)
+            class_name = self._to_class_name(table.name)
 
-def build_systems_dict(systems: List[System]) -> Dict[str, System]:
-    """Build a dictionary of systems keyed by system_id"""
-    return {{s.system_id: s for s in systems}}
+            # Skip if no calculated fields
+            calc_fields = table.get_calculated_fields()
+            if not calc_fields:
+                continue
 
+            # Determine what parameters the function needs
+            needs_systems_dict = any(self._find_related_table(f, table) == 'systems' for f in calc_fields)
+            needs_scales = any(self._find_child_table(f) == 'scales' for f in calc_fields)
 
-def calculate_all_scales(scales: List[Scale], systems_dict: Dict[str, System]):
-    """Calculate all derived fields for all scales"""
-    for scale in scales:
-        # Calculate in dependency order
-        scale.calculate_base_scale(systems_dict)
-        scale.calculate_scale_factor(systems_dict)
-        scale.calculate_scale_factor_power()
-        scale.calculate_scale(systems_dict)
-        scale.calculate_log_scale(systems_dict)
-        scale.calculate_log_measure()
+            params = [f"{table_name}: List[{class_name}]"]
+            if needs_systems_dict:
+                params.append("systems_dict: Dict[str, System]")
+            if needs_scales:
+                params.append("scales: List[Scale]")
 
+            func_name = f"calculate_all_{table_name}"
+            code_parts.append(f"")
+            code_parts.append(f"def {func_name}({', '.join(params)}):")
+            code_parts.append(f"    \"\"\"Calculate all derived fields for all {table_name}\"\"\"")
+            code_parts.append(f"    for item in {table_name}:")
+            code_parts.append(f"        # Calculate in dependency order")
 
-def calculate_all_stats(stats_list: List[SystemStats], systems_dict: Dict[str, System], scales: List[Scale]):
-    """Calculate all derived fields for all system stats"""
-    for stats in stats_list:
-        # Calculate in dependency order
-        stats.calculate_system_display_name(systems_dict)
-        stats.calculate_theoretical_log_log_slope(systems_dict)
-        stats.calculate_point_count(scales)
-        stats.calculate_min_log_scale(scales)
-        stats.calculate_max_log_scale(scales)
-        stats.calculate_min_log_measure(scales)
-        stats.calculate_max_log_measure(scales)
-        stats.calculate_delta_log_measure()
-        stats.calculate_delta_log_scale()
-        stats.calculate_empirical_log_log_slope()
-        stats.calculate_slope_error()
+            # Generate method calls in dependency order
+            calc_order = table.get_calculation_order()
+            for f in calc_order:
+                method_name = f'calculate_{self._to_snake_case(f.name)}'
 
+                # Determine what parameters this specific method needs
+                method_params = []
+                if f.field_type == 'lookup' and self._find_related_table(f, table):
+                    related_table = self._find_related_table(f, table)
+                    method_params.append(f'{related_table}_dict')
+                elif f.field_type == 'aggregation' and self._find_child_table(f):
+                    child_table = self._find_child_table(f)
+                    method_params.append(child_table)
 
-def validate_system(stats: SystemStats, tolerance: float = 0.001) -> bool:
-    """Check if empirical slope matches theoretical slope within tolerance"""
-    return abs(stats._slope_error or 0) < tolerance
-'''
-        self._write_file('utils.py', code)
+                param_str = f"({', '.join(method_params)})" if method_params else "()"
+                code_parts.append(f"        item.{method_name}{param_str}")
+
+        # Add validation function
+        code_parts.extend([
+            "",
+            "",
+            "def validate_system(stats: SystemStats, tolerance: float = 0.001) -> bool:",
+            "    \"\"\"Check if empirical slope matches theoretical slope within tolerance\"\"\"",
+            "    return abs(stats._slope_error or 0) < tolerance",
+            ""
+        ])
+
+        self._write_file('utils.py', '\n'.join(code_parts))
 
     def _file_header(self, title: str) -> str:
         """Generate file header comment"""
@@ -305,8 +354,21 @@ Regenerate by running: python rulebook-to-python.py
         return table_name.title()
 
     def _to_snake_case(self, name: str) -> str:
-        """Convert to snake_case"""
-        return self.translator._to_snake_case(name)
+        """Convert to snake_case and escape Python keywords"""
+        snake_name = self.translator._to_snake_case(name)
+        return self._escape_python_keyword(snake_name)
+
+    def _escape_python_keyword(self, name: str) -> str:
+        """Escape Python reserved keywords by appending underscore"""
+        python_keywords = {
+            'and', 'as', 'assert', 'break', 'class', 'continue', 'def', 'del',
+            'elif', 'else', 'except', 'finally', 'for', 'from', 'global', 'if',
+            'import', 'in', 'is', 'lambda', 'nonlocal', 'not', 'or', 'pass',
+            'raise', 'return', 'try', 'while', 'with', 'yield', 'True', 'False', 'None'
+        }
+        if name in python_keywords:
+            return f'{name}_'
+        return name
 
     def _get_python_type(self, field: Field) -> str:
         """Get Python type annotation for a field"""
@@ -325,10 +387,25 @@ Regenerate by running: python rulebook-to-python.py
 
     def _find_related_table(self, field: Field, table: Table) -> Optional[str]:
         """Find which table this lookup field relates to"""
-        # Look for relationship field in same table
+        if not field.formula:
+            return None
+
+        # For INDEX formulas like: =INDEX(systems!{{Field}}, MATCH(scales!{{Key}}, systems!{{KeyField}}, 0))
+        # Extract the table name from the INDEX function's first argument
+        import re
+        # Match INDEX(tablename!{{...}}, ...) pattern
+        match = re.search(r'INDEX\s*\(\s*(\w+)!', field.formula, re.IGNORECASE)
+        if match:
+            return match.group(1)
+
+        # Also try to find from relationship fields referenced in the formula
         for f in table.fields:
-            if f.field_type == 'relationship' and f.name in field.get_dependencies():
-                return f.related_to
+            if f.field_type == 'relationship':
+                # Check if the relationship field is mentioned in the formula
+                # Match patterns like scales!{{System}} or MATCH(..., {{System}}, ...)
+                if re.search(rf'\{{\{{{f.name}\}}\}}', field.formula):
+                    return f.related_to
+
         return None
 
     def _find_child_table(self, field: Field) -> Optional[str]:

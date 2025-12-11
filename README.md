@@ -1,8 +1,16 @@
 # Power Laws and Fractals Analysis Engine
 
-A multi-platform analytical framework for modeling, analyzing, and visualizing fractal systems and power-law distributions. This project provides a unified "rulebook" data model that can be implemented across multiple platforms to study self-similar patterns in nature, mathematics, and complex systems.
+A multi-platform analytical framework for modeling, analyzing, and visualizing fractal systems and power-law distributions.
 
-## 🚀 Quick Links
+## 🚀 Quick Start
+
+```bash
+./start.sh
+```
+
+That's it! Pick from Python, PostgreSQL, Jupyter, Go, or the HTML visualizer.
+
+## 📚 Documentation
 
 - **[QUICKSTART.md](QUICKSTART.md)** - Start here to continue development
 - **[PROGRESS.md](PROGRESS.md)** - Current status and completed work

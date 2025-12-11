@@ -1,139 +1,83 @@
-# Python SDK - Rulebook to Python
+# Python SDK - Power Laws & Fractals
 
 A Python implementation of the Power Laws and Fractals analysis engine.
 
-## Status: Planned
+## Quick Start
 
-## Overview
-
-This module will provide a Pythonic API for working with fractal and power-law systems, built on the same rulebook data model as the PostgreSQL implementation.
-
-## Planned Features
-
-### Core Components
-
-1. **System Class**: Object-oriented representation of fractal/power-law systems
-2. **Scale Class**: Measurement points with automatic calculation support
-3. **Stats Class**: Statistical analysis and validation
-4. **Rulebook Parser**: Import/export systems from various formats
-
-### Calculation Engine
-
-- NumPy-based mathematical operations
-- Automatic field dependency resolution
-- Lazy evaluation for performance
-- Vectorized operations for batch processing
-
-### Data Manipulation
-
-- Pandas DataFrames for tabular data
-- Easy filtering, grouping, and aggregation
-- Export to CSV, JSON, Excel formats
-- Import from existing rulebook sources
-
-### Visualization
-
-- Matplotlib integration for static plots
-- Plotly support for interactive visualizations
-- Log-log plot generation
-- Fractal rendering and animation
-- Multi-system comparison charts
-
-## Planned API
-
-```python
-from rulebook import System, Scale, analyze
-
-# Define a system
-sierpinski = System(
-    system_id="Sierpinski",
-    display_name="Sierpinski Triangle",
-    class_type="fractal",
-    base_scale=1.0,
-    scale_factor=0.5,
-    measure_name="black_triangle_count",
-    fractal_dimension=1.585,
-    theoretical_log_log_slope=-1.585
-)
-
-# Add measurement points
-sierpinski.add_scale(iteration=0, measure=1.0)
-sierpinski.add_scale(iteration=1, measure=3.0)
-sierpinski.add_scale(iteration=2, measure=9.0)
-sierpinski.add_scale(iteration=3, measure=27.0)
-
-# Calculate derived fields
-for scale in sierpinski.scales:
-    print(f"Iteration {scale.iteration}: "
-          f"Scale={scale.scale:.4f}, "
-          f"LogScale={scale.log_scale:.4f}, "
-          f"LogMeasure={scale.log_measure:.4f}")
-
-# Perform statistical analysis
-stats = sierpinski.analyze()
-print(f"Empirical slope: {stats.empirical_log_log_slope:.4f}")
-print(f"Theoretical slope: {stats.theoretical_log_log_slope:.4f}")
-print(f"Slope error: {stats.slope_error:.6f}")
-
-# Visualize
-sierpinski.plot_log_log()
-
-# Export to various formats
-sierpinski.to_csv("sierpinski.csv")
-sierpinski.to_json("sierpinski.json")
+```bash
+cd python
+python demo.py
 ```
 
-## Planned Dependencies
+That's it! You'll see all 7 systems validated with their log-log slopes.
 
-- Python 3.8+
-- NumPy: Numerical operations
-- Pandas: Data manipulation
-- Matplotlib: Static visualization
-- Plotly: Interactive visualization
-- Pydantic: Data validation
+## Interactive Exploration
 
-## Planned Directory Structure
+```python
+from rulebook import *
+
+# Load everything
+data = load_sample_data()
+systems = data['systems']
+scales = data['scales']
+stats = data['system_stats']
+
+# Calculate derived fields
+systems_dict = build_systems_dict(systems)
+calculate_all_scales(scales, systems_dict)
+calculate_all_system_stats(stats, systems_dict, scales)
+
+# Explore Sierpinski Triangle
+sierpinski = [s for s in scales if s.system == 'Sierpinski']
+for s in sierpinski:
+    print(f"Iteration {s.iteration}: scale={s._scale:.4f}, measure={s.measure}")
+
+# Check validation
+for st in stats:
+    valid = validate_system(st)
+    print(f"{st._system_display_name}: {'✓' if valid else '✗'}")
+```
+
+## What's Inside
+
+### Systems (7 total)
+
+| System | Type | Theoretical Slope |
+|--------|------|-------------------|
+| Sierpinski Triangle | fractal | -1.585 |
+| Koch Snowflake | fractal | -0.262 |
+| Zipf word frequencies | power_law | -1.0 |
+| Scale-free network | power_law | -2.5 |
+| Sandpile avalanches | power_law | -1.0 |
+| Earthquake energies | power_law | -1.0 |
+| Forest fire sizes | power_law | -1.3 |
+
+### Package Structure
 
 ```
 python/
-├── README.md                    # This file
-├── rulebook-to-python.py        # Placeholder/future converter
-├── setup.py                     # Package setup
-├── requirements.txt             # Dependencies
-├── rulebook/                    # Main package
-│   ├── __init__.py
-│   ├── system.py               # System class
-│   ├── scale.py                # Scale class
-│   ├── stats.py                # Stats class
-│   ├── calculations.py         # Field calculation engine
-│   ├── parser.py               # Rulebook import/export
-│   └── visualize.py            # Plotting utilities
-├── examples/                    # Example scripts
-│   ├── sierpinski.py
-│   ├── koch.py
-│   ├── zipf.py
-│   └── scale_free_network.py
-└── tests/                       # Unit tests
-    ├── test_system.py
-    ├── test_scale.py
-    └── test_calculations.py
+├── demo.py              # Run this first!
+├── README.md            # You are here
+└── rulebook/            # The generated package
+    ├── __init__.py      # Exports everything
+    ├── models.py        # System, Scale, SystemStats dataclasses
+    ├── data.py          # Sample data from ssot.json
+    └── utils.py         # Calculation helpers
 ```
 
-## Implementation Plan
+## Regenerating the Code
 
-1. Core data structures (System, Scale, Stats classes)
-2. Field calculation engine
-3. Statistical analysis functions
-4. Data import/export
-5. Visualization utilities
-6. Documentation and examples
-7. Unit tests
-8. Package distribution
+If you modify `ssot/ERB_veritasium-power-laws-and-fractals.json`, regenerate:
 
-## Future Enhancements
+```bash
+python rulebook-to-python.py
+```
 
-- Integration with SciPy for advanced statistics
-- 3D fractal support using Mayavi
-- Real-time animation of fractal generation
-- Machine learning for pattern detection
-- REST API wrapper using FastAPI
+## Key Concepts
+
+- **Systems**: Fractal or power-law systems with theoretical parameters
+- **Scales**: Measurement points at different iterations/scales
+- **SystemStats**: Statistical validation comparing empirical vs theoretical slopes
+- **Log-Log Slope**: The relationship between log(scale) and log(measure)
+
+All 7 systems validate within 0.001 tolerance - the empirical data matches theory!

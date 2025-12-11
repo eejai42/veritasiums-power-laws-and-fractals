@@ -222,9 +222,14 @@ return count
             cond_field_snake = self._to_snake_case(cond_field)
             cond_value_snake = self._to_snake_case(cond_value)
 
-            # Need to call the calculation method for calculated fields
-            if context and context.get('is_calculated_field'):
-                result_access = f"calc_{table}_{result_snake}(s.{table}_id)"
+            # Check if result field is a calculated field in the child table
+            all_calc_fields = context.get('all_calculated_fields', {}) if context else {}
+            child_table_calc_fields = all_calc_fields.get(table, set())
+            is_result_calculated = result_field in child_table_calc_fields
+
+            # For calculated fields, access the cached value
+            if is_result_calculated:
+                result_access = f"s._{result_snake}"
             else:
                 result_access = f"s.{result_snake}"
 
@@ -264,13 +269,24 @@ return result
 
     def _replace_field_references(self, expr: str, context: Optional[Dict] = None) -> str:
         """Replace {{FieldName}} with appropriate variable access"""
+        calculated_fields = context.get('calculated_fields', set()) if context else set()
+
         def replace_ref(match):
             field_name = match.group(1)
+            is_calculated = field_name in calculated_fields
 
             if self.language == Language.PYTHON:
-                return f"self.{self._to_snake_case(field_name)}"
+                snake_name = self._to_snake_case(field_name)
+                # For calculated fields, reference the cached value
+                if is_calculated:
+                    return f"self._{snake_name}"
+                return f"self.{snake_name}"
             elif self.language == Language.GOLANG:
-                return f"s.{self._to_pascal_case(field_name)}"
+                pascal_name = self._to_pascal_case(field_name)
+                # For calculated fields in Go, reference the cached pointer value
+                if is_calculated:
+                    return f"*s.cached{pascal_name}"
+                return f"s.{pascal_name}"
             elif self.language in [Language.TYPESCRIPT, Language.JAVASCRIPT]:
                 return f"this.{self._to_camel_case(field_name)}"
             else:
