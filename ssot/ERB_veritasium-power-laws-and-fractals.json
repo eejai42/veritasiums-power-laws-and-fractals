@@ -4,11 +4,13 @@
   "Description": "Unifies several classic fractal / power-law phenomena into a single CMCC pattern with clean separation between fractal dimension and log–log slope.",
   "systems": {
     "Description": "Each row is a fractal or power-law system described in a common schema.",
+    "primary_key": ["SystemID"],
     "schema": [
       {
         "name": "SystemID",
         "datatype": "string",
         "type": "raw",
+        "is_primary_key": true,
         "Description": "Primary key for the system."
       },
       {
@@ -99,11 +101,26 @@
   },
   "scales": {
     "Description": "Generic log–log points for each system at multiple iterations / scales.",
+    "primary_key": ["ScaleID"],
+    "foreign_keys": [
+      {
+        "column": "SystemID",
+        "references": "systems.SystemID"
+      }
+    ],
     "schema": [
+      {
+        "name": "ScaleID",
+        "datatype": "string",
+        "type": "raw",
+        "is_primary_key": true,
+        "Description": "Primary key for this scale measurement."
+      },
       {
         "name": "SystemID",
         "datatype": "string",
         "type": "raw",
+        "foreign_key": "systems.SystemID",
         "Description": "FK to systems.SystemID."
       },
       {
@@ -113,208 +130,257 @@
         "Description": "Discrete zoom level or rank index."
       },
       {
-        "name": "BaseScale",
-        "datatype": "number",
-        "type": "lookup",
-        "formula": "=_xlfn.INDEX(systems!BaseScale, _xlfn.MATCH({{SystemID}}, systems!SystemID, 0))",
-        "Description": "Base scale pulled from systems."
-      },
-      {
-        "name": "ScaleFactor",
-        "datatype": "number",
-        "type": "lookup",
-        "formula": "=_xlfn.INDEX(systems!ScaleFactor, _xlfn.MATCH({{SystemID}}, systems!SystemID, 0))",
-        "Description": "Scale factor pulled from systems."
-      },
-      {
-        "name": "Scale",
-        "datatype": "number",
-        "type": "calculated",
-        "formula": "={{BaseScale}}*({{ScaleFactor}}^{{Iteration}})",
-        "Description": "X-axis variable (e.g., length scale, rank, degree)."
-      },
-      {
         "name": "Measure",
         "datatype": "number",
         "type": "raw",
         "Description": "Y-axis measured quantity at this scale."
       },
       {
+        "name": "BaseScale",
+        "datatype": "number",
+        "type": "lookup",
+        "lookup_table": "systems",
+        "lookup_column": "BaseScale",
+        "lookup_key": "SystemID",
+        "formula": "={{systems.BaseScale}}",
+        "Description": "Base scale pulled from parent system."
+      },
+      {
+        "name": "ScaleFactor",
+        "datatype": "number",
+        "type": "lookup",
+        "lookup_table": "systems",
+        "lookup_column": "ScaleFactor",
+        "lookup_key": "SystemID",
+        "formula": "={{systems.ScaleFactor}}",
+        "Description": "Scale factor pulled from parent system."
+      },
+      {
+        "name": "ScaleFactorPower",
+        "datatype": "number",
+        "type": "calculated",
+        "depends_on": ["ScaleFactor", "Iteration"],
+        "formula": "=POWER({{ScaleFactor}}, {{Iteration}})",
+        "Description": "ScaleFactor raised to the Iteration power."
+      },
+      {
+        "name": "Scale",
+        "datatype": "number",
+        "type": "calculated",
+        "depends_on": ["BaseScale", "ScaleFactorPower"],
+        "formula": "={{BaseScale}} * {{ScaleFactorPower}}",
+        "Description": "X-axis variable: BaseScale multiplied by ScaleFactorPower."
+      },
+      {
         "name": "LogScale",
         "datatype": "number",
         "type": "calculated",
-        "formula": "=_xlfn.LOG10({{Scale}})",
+        "depends_on": ["Scale"],
+        "formula": "=LOG10({{Scale}})",
         "Description": "log10 of Scale."
       },
       {
         "name": "LogMeasure",
         "datatype": "number",
         "type": "calculated",
-        "formula": "=_xlfn.LOG10({{Measure}})",
-        "Description": "log10 of Measure (where positive)."
+        "depends_on": ["Measure"],
+        "formula": "=LOG10({{Measure}})",
+        "Description": "log10 of Measure."
       }
     ],
     "data": [
       {
+        "ScaleID": "Sierpinski_0",
         "SystemID": "Sierpinski",
         "Iteration": 0,
+        "Measure": 1.0,
         "BaseScale": 1.0,
         "ScaleFactor": 0.5,
+        "ScaleFactorPower": 1.0,
         "Scale": 1.0,
-        "Measure": 1.0,
         "LogScale": 0.0,
         "LogMeasure": 0.0
       },
       {
+        "ScaleID": "Sierpinski_1",
         "SystemID": "Sierpinski",
         "Iteration": 1,
+        "Measure": 3.0,
         "BaseScale": 1.0,
         "ScaleFactor": 0.5,
+        "ScaleFactorPower": 0.5,
         "Scale": 0.5,
-        "Measure": 3.0,
         "LogScale": -0.30103,
         "LogMeasure": 0.47712
       },
       {
+        "ScaleID": "Sierpinski_2",
         "SystemID": "Sierpinski",
         "Iteration": 2,
+        "Measure": 9.0,
         "BaseScale": 1.0,
         "ScaleFactor": 0.5,
+        "ScaleFactorPower": 0.25,
         "Scale": 0.25,
-        "Measure": 9.0,
         "LogScale": -0.60206,
         "LogMeasure": 0.95424
       },
       {
+        "ScaleID": "Sierpinski_3",
         "SystemID": "Sierpinski",
         "Iteration": 3,
+        "Measure": 27.0,
         "BaseScale": 1.0,
         "ScaleFactor": 0.5,
+        "ScaleFactorPower": 0.125,
         "Scale": 0.125,
-        "Measure": 27.0,
         "LogScale": -0.90309,
         "LogMeasure": 1.43136
       },
 
       {
+        "ScaleID": "Koch_0",
         "SystemID": "Koch",
         "Iteration": 0,
+        "Measure": 1.0,
         "BaseScale": 1.0,
         "ScaleFactor": 0.3333333333,
+        "ScaleFactorPower": 1.0,
         "Scale": 1.0,
-        "Measure": 1.0,
         "LogScale": 0.0,
         "LogMeasure": 0.0
       },
       {
+        "ScaleID": "Koch_1",
         "SystemID": "Koch",
         "Iteration": 1,
+        "Measure": 1.3333333333,
         "BaseScale": 1.0,
         "ScaleFactor": 0.3333333333,
+        "ScaleFactorPower": 0.3333333333,
         "Scale": 0.3333333333,
-        "Measure": 1.3333333333,
         "LogScale": -0.47712,
         "LogMeasure": 0.12494
       },
       {
+        "ScaleID": "Koch_2",
         "SystemID": "Koch",
         "Iteration": 2,
+        "Measure": 1.7777777777,
         "BaseScale": 1.0,
         "ScaleFactor": 0.3333333333,
+        "ScaleFactorPower": 0.1111111111,
         "Scale": 0.1111111111,
-        "Measure": 1.7777777777,
         "LogScale": -0.95424,
         "LogMeasure": 0.24988
       },
       {
+        "ScaleID": "Koch_3",
         "SystemID": "Koch",
         "Iteration": 3,
+        "Measure": 2.3703703703,
         "BaseScale": 1.0,
         "ScaleFactor": 0.3333333333,
+        "ScaleFactorPower": 0.037037037,
         "Scale": 0.037037037,
-        "Measure": 2.3703703703,
         "LogScale": -1.43136,
         "LogMeasure": 0.37482
       },
 
       {
+        "ScaleID": "ZipfWords_0",
         "SystemID": "ZipfWords",
         "Iteration": 0,
+        "Measure": 1.0,
         "BaseScale": 1.0,
         "ScaleFactor": 2.0,
+        "ScaleFactorPower": 1.0,
         "Scale": 1.0,
-        "Measure": 1.0,
         "LogScale": 0.0,
         "LogMeasure": 0.0
       },
       {
+        "ScaleID": "ZipfWords_1",
         "SystemID": "ZipfWords",
         "Iteration": 1,
+        "Measure": 0.5,
         "BaseScale": 1.0,
         "ScaleFactor": 2.0,
+        "ScaleFactorPower": 2.0,
         "Scale": 2.0,
-        "Measure": 0.5,
         "LogScale": 0.30103,
         "LogMeasure": -0.30103
       },
       {
+        "ScaleID": "ZipfWords_2",
         "SystemID": "ZipfWords",
         "Iteration": 2,
+        "Measure": 0.25,
         "BaseScale": 1.0,
         "ScaleFactor": 2.0,
+        "ScaleFactorPower": 4.0,
         "Scale": 4.0,
-        "Measure": 0.25,
         "LogScale": 0.60206,
         "LogMeasure": -0.60206
       },
       {
+        "ScaleID": "ZipfWords_3",
         "SystemID": "ZipfWords",
         "Iteration": 3,
+        "Measure": 0.125,
         "BaseScale": 1.0,
         "ScaleFactor": 2.0,
+        "ScaleFactorPower": 8.0,
         "Scale": 8.0,
-        "Measure": 0.125,
         "LogScale": 0.90309,
         "LogMeasure": -0.90309
       },
 
       {
+        "ScaleID": "ScaleFreeNet_0",
         "SystemID": "ScaleFreeNet",
         "Iteration": 0,
+        "Measure": 1.0,
         "BaseScale": 1.0,
         "ScaleFactor": 2.0,
+        "ScaleFactorPower": 1.0,
         "Scale": 1.0,
-        "Measure": 1.0,
         "LogScale": 0.0,
         "LogMeasure": 0.0
       },
       {
+        "ScaleID": "ScaleFreeNet_1",
         "SystemID": "ScaleFreeNet",
         "Iteration": 1,
+        "Measure": 0.1767766953,
         "BaseScale": 1.0,
         "ScaleFactor": 2.0,
+        "ScaleFactorPower": 2.0,
         "Scale": 2.0,
-        "Measure": 0.1767766953,
         "LogScale": 0.30103,
         "LogMeasure": -0.752575
       },
       {
+        "ScaleID": "ScaleFreeNet_2",
         "SystemID": "ScaleFreeNet",
         "Iteration": 2,
+        "Measure": 0.03125,
         "BaseScale": 1.0,
         "ScaleFactor": 2.0,
+        "ScaleFactorPower": 4.0,
         "Scale": 4.0,
-        "Measure": 0.03125,
         "LogScale": 0.60206,
         "LogMeasure": -1.50515
       },
       {
+        "ScaleID": "ScaleFreeNet_3",
         "SystemID": "ScaleFreeNet",
         "Iteration": 3,
+        "Measure": 0.0055242717,
         "BaseScale": 1.0,
         "ScaleFactor": 2.0,
+        "ScaleFactorPower": 8.0,
         "Scale": 8.0,
-        "Measure": 0.0055242717,
         "LogScale": 0.90309,
         "LogMeasure": -2.257725
       }
@@ -322,103 +388,159 @@
   },
   "system_stats": {
     "Description": "Aggregated log–log slope estimates per system, keeping slope separate from fractal dimension.",
+    "primary_key": ["SystemID"],
+    "foreign_keys": [
+      {
+        "column": "SystemID",
+        "references": "systems.SystemID"
+      }
+    ],
     "schema": [
       {
         "name": "SystemID",
         "datatype": "string",
         "type": "raw",
+        "is_primary_key": true,
+        "foreign_key": "systems.SystemID",
         "Description": "FK to systems.SystemID."
+      },
+      {
+        "name": "TheoreticalLogLogSlope",
+        "datatype": "number",
+        "type": "lookup",
+        "lookup_table": "systems",
+        "lookup_column": "TheoreticalLogLogSlope",
+        "lookup_key": "SystemID",
+        "formula": "={{systems.TheoreticalLogLogSlope}}",
+        "Description": "Theoretical slope from parent system."
       },
       {
         "name": "PointCount",
         "datatype": "integer",
         "type": "aggregation",
-        "formula": "=_xlfn.COUNTIFS(scales!SystemID, {{SystemID}})",
+        "aggregation_function": "COUNT",
+        "aggregation_table": "scales",
+        "aggregation_filter_column": "SystemID",
+        "formula": "=COUNT(scales WHERE SystemID)",
         "Description": "Number of scale measurements for this system."
       },
       {
         "name": "MinLogScale",
         "datatype": "number",
         "type": "aggregation",
-        "formula": "=_xlfn.MINIFS(scales!LogScale, scales!SystemID, {{SystemID}})",
-        "Description": "Minimum log10(Scale) across this system."
+        "aggregation_function": "MIN",
+        "aggregation_table": "scales",
+        "aggregation_column": "LogScale",
+        "aggregation_filter_column": "SystemID",
+        "formula": "=MIN(scales.LogScale WHERE SystemID)",
+        "Description": "Minimum log10(Scale) across child scales."
       },
       {
         "name": "MaxLogScale",
         "datatype": "number",
         "type": "aggregation",
-        "formula": "=_xlfn.MAXIFS(scales!LogScale, scales!SystemID, {{SystemID}})",
-        "Description": "Maximum log10(Scale) across this system."
+        "aggregation_function": "MAX",
+        "aggregation_table": "scales",
+        "aggregation_column": "LogScale",
+        "aggregation_filter_column": "SystemID",
+        "formula": "=MAX(scales.LogScale WHERE SystemID)",
+        "Description": "Maximum log10(Scale) across child scales."
       },
       {
         "name": "MinLogMeasure",
         "datatype": "number",
         "type": "aggregation",
-        "formula": "=_xlfn.MINIFS(scales!LogMeasure, scales!SystemID, {{SystemID}})",
-        "Description": "Minimum log10(Measure) across this system."
+        "aggregation_function": "MIN",
+        "aggregation_table": "scales",
+        "aggregation_column": "LogMeasure",
+        "aggregation_filter_column": "SystemID",
+        "formula": "=MIN(scales.LogMeasure WHERE SystemID)",
+        "Description": "Minimum log10(Measure) across child scales."
       },
       {
         "name": "MaxLogMeasure",
         "datatype": "number",
         "type": "aggregation",
-        "formula": "=_xlfn.MAXIFS(scales!LogMeasure, scales!SystemID, {{SystemID}})",
-        "Description": "Maximum log10(Measure) across this system."
+        "aggregation_function": "MAX",
+        "aggregation_table": "scales",
+        "aggregation_column": "LogMeasure",
+        "aggregation_filter_column": "SystemID",
+        "formula": "=MAX(scales.LogMeasure WHERE SystemID)",
+        "Description": "Maximum log10(Measure) across child scales."
+      },
+      {
+        "name": "DeltaLogMeasure",
+        "datatype": "number",
+        "type": "calculated",
+        "depends_on": ["MinLogMeasure", "MaxLogMeasure"],
+        "formula": "={{MinLogMeasure}} - {{MaxLogMeasure}}",
+        "Description": "Difference between min and max log measure (numerator for slope)."
+      },
+      {
+        "name": "DeltaLogScale",
+        "datatype": "number",
+        "type": "calculated",
+        "depends_on": ["MaxLogScale", "MinLogScale"],
+        "formula": "={{MaxLogScale}} - {{MinLogScale}}",
+        "Description": "Difference between max and min log scale (denominator for slope)."
       },
       {
         "name": "EmpiricalLogLogSlope",
         "datatype": "number",
         "type": "calculated",
-        "formula": "=( {{MinLogMeasure}} - {{MaxLogMeasure}} ) / ( {{MaxLogScale}} - {{MinLogScale}} )",
-        "Description": "Approximate slope of log–log line from the extremes, d(log Measure)/d(log Scale)."
-      },
-      {
-        "name": "TheoreticalLogLogSlope",
-        "datatype": "number",
-        "type": "lookup",
-        "formula": "=_xlfn.INDEX(systems!TheoreticalLogLogSlope, _xlfn.MATCH({{SystemID}}, systems!SystemID, 0))",
-        "Description": "Copied from systems for comparison."
+        "depends_on": ["DeltaLogMeasure", "DeltaLogScale"],
+        "formula": "={{DeltaLogMeasure}} / {{DeltaLogScale}}",
+        "Description": "Slope of log-log line: DeltaLogMeasure divided by DeltaLogScale."
       }
     ],
     "data": [
       {
         "SystemID": "Sierpinski",
+        "TheoreticalLogLogSlope": -1.585,
         "PointCount": 4,
         "MinLogScale": -0.90309,
         "MaxLogScale": 0.0,
         "MinLogMeasure": 0.0,
         "MaxLogMeasure": 1.43136,
-        "EmpiricalLogLogSlope": -1.585,
-        "TheoreticalLogLogSlope": -1.585
+        "DeltaLogMeasure": -1.43136,
+        "DeltaLogScale": 0.90309,
+        "EmpiricalLogLogSlope": -1.585
       },
       {
         "SystemID": "Koch",
+        "TheoreticalLogLogSlope": -0.262,
         "PointCount": 4,
         "MinLogScale": -1.43136,
         "MaxLogScale": 0.0,
         "MinLogMeasure": 0.0,
         "MaxLogMeasure": 0.37482,
-        "EmpiricalLogLogSlope": -0.262,
-        "TheoreticalLogLogSlope": -0.262
+        "DeltaLogMeasure": -0.37482,
+        "DeltaLogScale": 1.43136,
+        "EmpiricalLogLogSlope": -0.262
       },
       {
         "SystemID": "ZipfWords",
+        "TheoreticalLogLogSlope": -1.0,
         "PointCount": 4,
         "MinLogScale": 0.0,
         "MaxLogScale": 0.90309,
         "MinLogMeasure": -0.90309,
         "MaxLogMeasure": 0.0,
-        "EmpiricalLogLogSlope": -1.0,
-        "TheoreticalLogLogSlope": -1.0
+        "DeltaLogMeasure": -0.90309,
+        "DeltaLogScale": 0.90309,
+        "EmpiricalLogLogSlope": -1.0
       },
       {
         "SystemID": "ScaleFreeNet",
+        "TheoreticalLogLogSlope": -2.5,
         "PointCount": 4,
         "MinLogScale": 0.0,
         "MaxLogScale": 0.90309,
         "MinLogMeasure": -2.257725,
         "MaxLogMeasure": 0.0,
-        "EmpiricalLogLogSlope": -2.5,
-        "TheoreticalLogLogSlope": -2.5
+        "DeltaLogMeasure": -2.257725,
+        "DeltaLogScale": 0.90309,
+        "EmpiricalLogLogSlope": -2.5
       }
     ]
   },
