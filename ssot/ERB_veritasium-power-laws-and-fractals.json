@@ -102,12 +102,6 @@
   "scales": {
     "Description": "Generic log–log points for each system at multiple iterations / scales.",
     "primary_key": ["ScaleID"],
-    "foreign_keys": [
-      {
-        "column": "SystemID",
-        "references": "systems.SystemID"
-      }
-    ],
     "schema": [
       {
         "name": "ScaleID",
@@ -117,11 +111,11 @@
         "Description": "Primary key for this scale measurement."
       },
       {
-        "name": "SystemID",
+        "name": "System",
         "datatype": "string",
-        "type": "raw",
-        "foreign_key": "systems.SystemID",
-        "Description": "FK to systems.SystemID."
+        "type": "relationship",
+        "RelatedTo": "systems",
+        "Description": "FK to systems table."
       },
       {
         "name": "Iteration",
@@ -139,27 +133,20 @@
         "name": "BaseScale",
         "datatype": "number",
         "type": "lookup",
-        "lookup_table": "systems",
-        "lookup_column": "BaseScale",
-        "lookup_key": "SystemID",
-        "formula": "={{systems.BaseScale}}",
-        "Description": "Base scale pulled from parent system."
+        "formula": "=INDEX(systems!{{BaseScale}}, MATCH(scales!{{System}}, systems!{{SystemID}}, 0))",
+        "Description": "Base scale looked up from parent system."
       },
       {
         "name": "ScaleFactor",
         "datatype": "number",
         "type": "lookup",
-        "lookup_table": "systems",
-        "lookup_column": "ScaleFactor",
-        "lookup_key": "SystemID",
-        "formula": "={{systems.ScaleFactor}}",
-        "Description": "Scale factor pulled from parent system."
+        "formula": "=INDEX(systems!{{ScaleFactor}}, MATCH(scales!{{System}}, systems!{{SystemID}}, 0))",
+        "Description": "Scale factor looked up from parent system."
       },
       {
         "name": "ScaleFactorPower",
         "datatype": "number",
         "type": "calculated",
-        "depends_on": ["ScaleFactor", "Iteration"],
         "formula": "=POWER({{ScaleFactor}}, {{Iteration}})",
         "Description": "ScaleFactor raised to the Iteration power."
       },
@@ -167,7 +154,6 @@
         "name": "Scale",
         "datatype": "number",
         "type": "calculated",
-        "depends_on": ["BaseScale", "ScaleFactorPower"],
         "formula": "={{BaseScale}} * {{ScaleFactorPower}}",
         "Description": "X-axis variable: BaseScale multiplied by ScaleFactorPower."
       },
@@ -175,7 +161,6 @@
         "name": "LogScale",
         "datatype": "number",
         "type": "calculated",
-        "depends_on": ["Scale"],
         "formula": "=LOG10({{Scale}})",
         "Description": "log10 of Scale."
       },
@@ -183,7 +168,6 @@
         "name": "LogMeasure",
         "datatype": "number",
         "type": "calculated",
-        "depends_on": ["Measure"],
         "formula": "=LOG10({{Measure}})",
         "Description": "log10 of Measure."
       }
@@ -191,7 +175,7 @@
     "data": [
       {
         "ScaleID": "Sierpinski_0",
-        "SystemID": "Sierpinski",
+        "System": "Sierpinski",
         "Iteration": 0,
         "Measure": 1.0,
         "BaseScale": 1.0,
@@ -203,7 +187,7 @@
       },
       {
         "ScaleID": "Sierpinski_1",
-        "SystemID": "Sierpinski",
+        "System": "Sierpinski",
         "Iteration": 1,
         "Measure": 3.0,
         "BaseScale": 1.0,
@@ -215,7 +199,7 @@
       },
       {
         "ScaleID": "Sierpinski_2",
-        "SystemID": "Sierpinski",
+        "System": "Sierpinski",
         "Iteration": 2,
         "Measure": 9.0,
         "BaseScale": 1.0,
@@ -227,7 +211,7 @@
       },
       {
         "ScaleID": "Sierpinski_3",
-        "SystemID": "Sierpinski",
+        "System": "Sierpinski",
         "Iteration": 3,
         "Measure": 27.0,
         "BaseScale": 1.0,
@@ -240,7 +224,7 @@
 
       {
         "ScaleID": "Koch_0",
-        "SystemID": "Koch",
+        "System": "Koch",
         "Iteration": 0,
         "Measure": 1.0,
         "BaseScale": 1.0,
@@ -252,7 +236,7 @@
       },
       {
         "ScaleID": "Koch_1",
-        "SystemID": "Koch",
+        "System": "Koch",
         "Iteration": 1,
         "Measure": 1.3333333333,
         "BaseScale": 1.0,
@@ -264,7 +248,7 @@
       },
       {
         "ScaleID": "Koch_2",
-        "SystemID": "Koch",
+        "System": "Koch",
         "Iteration": 2,
         "Measure": 1.7777777777,
         "BaseScale": 1.0,
@@ -276,7 +260,7 @@
       },
       {
         "ScaleID": "Koch_3",
-        "SystemID": "Koch",
+        "System": "Koch",
         "Iteration": 3,
         "Measure": 2.3703703703,
         "BaseScale": 1.0,
@@ -289,7 +273,7 @@
 
       {
         "ScaleID": "ZipfWords_0",
-        "SystemID": "ZipfWords",
+        "System": "ZipfWords",
         "Iteration": 0,
         "Measure": 1.0,
         "BaseScale": 1.0,
@@ -301,7 +285,7 @@
       },
       {
         "ScaleID": "ZipfWords_1",
-        "SystemID": "ZipfWords",
+        "System": "ZipfWords",
         "Iteration": 1,
         "Measure": 0.5,
         "BaseScale": 1.0,
@@ -313,7 +297,7 @@
       },
       {
         "ScaleID": "ZipfWords_2",
-        "SystemID": "ZipfWords",
+        "System": "ZipfWords",
         "Iteration": 2,
         "Measure": 0.25,
         "BaseScale": 1.0,
@@ -325,7 +309,7 @@
       },
       {
         "ScaleID": "ZipfWords_3",
-        "SystemID": "ZipfWords",
+        "System": "ZipfWords",
         "Iteration": 3,
         "Measure": 0.125,
         "BaseScale": 1.0,
@@ -338,7 +322,7 @@
 
       {
         "ScaleID": "ScaleFreeNet_0",
-        "SystemID": "ScaleFreeNet",
+        "System": "ScaleFreeNet",
         "Iteration": 0,
         "Measure": 1.0,
         "BaseScale": 1.0,
@@ -350,7 +334,7 @@
       },
       {
         "ScaleID": "ScaleFreeNet_1",
-        "SystemID": "ScaleFreeNet",
+        "System": "ScaleFreeNet",
         "Iteration": 1,
         "Measure": 0.1767766953,
         "BaseScale": 1.0,
@@ -362,7 +346,7 @@
       },
       {
         "ScaleID": "ScaleFreeNet_2",
-        "SystemID": "ScaleFreeNet",
+        "System": "ScaleFreeNet",
         "Iteration": 2,
         "Measure": 0.03125,
         "BaseScale": 1.0,
@@ -374,7 +358,7 @@
       },
       {
         "ScaleID": "ScaleFreeNet_3",
-        "SystemID": "ScaleFreeNet",
+        "System": "ScaleFreeNet",
         "Iteration": 3,
         "Measure": 0.0055242717,
         "BaseScale": 1.0,
@@ -387,115 +371,120 @@
     ]
   },
   "system_stats": {
-    "Description": "Aggregated log–log slope estimates per system, keeping slope separate from fractal dimension.",
-    "primary_key": ["SystemID"],
-    "foreign_keys": [
-      {
-        "column": "SystemID",
-        "references": "systems.SystemID"
-      }
-    ],
+    "Description": "Statistical analysis of each system's log-log behavior, with rollups from scales and lookups to systems.",
+    "primary_key": ["SystemStatsID"],
     "schema": [
       {
-        "name": "SystemID",
+        "name": "SystemStatsID",
         "datatype": "string",
         "type": "raw",
         "is_primary_key": true,
-        "foreign_key": "systems.SystemID",
-        "Description": "FK to systems.SystemID."
+        "Description": "Primary key for this stats record."
+      },
+      {
+        "name": "System",
+        "datatype": "string",
+        "type": "relationship",
+        "RelatedTo": "systems",
+        "Description": "FK to systems table."
+      },
+      {
+        "name": "AnalysisName",
+        "datatype": "string",
+        "type": "raw",
+        "Description": "Human-readable name for this analysis run."
+      },
+      {
+        "name": "Status",
+        "datatype": "string",
+        "type": "raw",
+        "Description": "Status of analysis: draft, validated, published."
+      },
+      {
+        "name": "SystemDisplayName",
+        "datatype": "string",
+        "type": "lookup",
+        "formula": "=INDEX(systems!{{DisplayName}}, MATCH(system_stats!{{System}}, systems!{{SystemID}}, 0))",
+        "Description": "Display name looked up from parent system."
       },
       {
         "name": "TheoreticalLogLogSlope",
         "datatype": "number",
         "type": "lookup",
-        "lookup_table": "systems",
-        "lookup_column": "TheoreticalLogLogSlope",
-        "lookup_key": "SystemID",
-        "formula": "={{systems.TheoreticalLogLogSlope}}",
-        "Description": "Theoretical slope from parent system."
+        "formula": "=INDEX(systems!{{TheoreticalLogLogSlope}}, MATCH(system_stats!{{System}}, systems!{{SystemID}}, 0))",
+        "Description": "Theoretical slope looked up from parent system."
       },
       {
         "name": "PointCount",
         "datatype": "integer",
         "type": "aggregation",
-        "aggregation_function": "COUNT",
-        "aggregation_table": "scales",
-        "aggregation_filter_column": "SystemID",
-        "formula": "=COUNT(scales WHERE SystemID)",
-        "Description": "Number of scale measurements for this system."
+        "formula": "=COUNTIF(scales!{{System}}, {{System}})",
+        "Description": "Rollup: Count of scale measurements for this system."
       },
       {
         "name": "MinLogScale",
         "datatype": "number",
         "type": "aggregation",
-        "aggregation_function": "MIN",
-        "aggregation_table": "scales",
-        "aggregation_column": "LogScale",
-        "aggregation_filter_column": "SystemID",
-        "formula": "=MIN(scales.LogScale WHERE SystemID)",
-        "Description": "Minimum log10(Scale) across child scales."
+        "formula": "=MINIFS(scales!{{LogScale}}, scales!{{System}}, {{System}})",
+        "Description": "Rollup: Minimum log10(Scale) across child scales."
       },
       {
         "name": "MaxLogScale",
         "datatype": "number",
         "type": "aggregation",
-        "aggregation_function": "MAX",
-        "aggregation_table": "scales",
-        "aggregation_column": "LogScale",
-        "aggregation_filter_column": "SystemID",
-        "formula": "=MAX(scales.LogScale WHERE SystemID)",
-        "Description": "Maximum log10(Scale) across child scales."
+        "formula": "=MAXIFS(scales!{{LogScale}}, scales!{{System}}, {{System}})",
+        "Description": "Rollup: Maximum log10(Scale) across child scales."
       },
       {
         "name": "MinLogMeasure",
         "datatype": "number",
         "type": "aggregation",
-        "aggregation_function": "MIN",
-        "aggregation_table": "scales",
-        "aggregation_column": "LogMeasure",
-        "aggregation_filter_column": "SystemID",
-        "formula": "=MIN(scales.LogMeasure WHERE SystemID)",
-        "Description": "Minimum log10(Measure) across child scales."
+        "formula": "=MINIFS(scales!{{LogMeasure}}, scales!{{System}}, {{System}})",
+        "Description": "Rollup: Minimum log10(Measure) across child scales."
       },
       {
         "name": "MaxLogMeasure",
         "datatype": "number",
         "type": "aggregation",
-        "aggregation_function": "MAX",
-        "aggregation_table": "scales",
-        "aggregation_column": "LogMeasure",
-        "aggregation_filter_column": "SystemID",
-        "formula": "=MAX(scales.LogMeasure WHERE SystemID)",
-        "Description": "Maximum log10(Measure) across child scales."
+        "formula": "=MAXIFS(scales!{{LogMeasure}}, scales!{{System}}, {{System}})",
+        "Description": "Rollup: Maximum log10(Measure) across child scales."
       },
       {
         "name": "DeltaLogMeasure",
         "datatype": "number",
         "type": "calculated",
-        "depends_on": ["MinLogMeasure", "MaxLogMeasure"],
         "formula": "={{MinLogMeasure}} - {{MaxLogMeasure}}",
-        "Description": "Difference between min and max log measure (numerator for slope)."
+        "Description": "Calculated: Difference between min and max log measure (numerator for slope)."
       },
       {
         "name": "DeltaLogScale",
         "datatype": "number",
         "type": "calculated",
-        "depends_on": ["MaxLogScale", "MinLogScale"],
         "formula": "={{MaxLogScale}} - {{MinLogScale}}",
-        "Description": "Difference between max and min log scale (denominator for slope)."
+        "Description": "Calculated: Difference between max and min log scale (denominator for slope)."
       },
       {
         "name": "EmpiricalLogLogSlope",
         "datatype": "number",
         "type": "calculated",
-        "depends_on": ["DeltaLogMeasure", "DeltaLogScale"],
         "formula": "={{DeltaLogMeasure}} / {{DeltaLogScale}}",
-        "Description": "Slope of log-log line: DeltaLogMeasure divided by DeltaLogScale."
+        "Description": "Calculated: Slope of log-log line from empirical data."
+      },
+      {
+        "name": "SlopeError",
+        "datatype": "number",
+        "type": "calculated",
+        "formula": "={{EmpiricalLogLogSlope}} - {{TheoreticalLogLogSlope}}",
+        "Description": "Calculated: Difference between empirical and theoretical slopes."
       }
     ],
     "data": [
       {
-        "SystemID": "Sierpinski",
+        "SystemStatsID": "Sierpinski_Stats",
+        "System": "Sierpinski",
+        "AnalysisName": "Sierpinski Triangle Analysis",
+        "Status": "validated",
+        "SystemDisplayName": "Sierpinski Triangle",
         "TheoreticalLogLogSlope": -1.585,
         "PointCount": 4,
         "MinLogScale": -0.90309,
@@ -504,10 +493,15 @@
         "MaxLogMeasure": 1.43136,
         "DeltaLogMeasure": -1.43136,
         "DeltaLogScale": 0.90309,
-        "EmpiricalLogLogSlope": -1.585
+        "EmpiricalLogLogSlope": -1.585,
+        "SlopeError": 0.0
       },
       {
-        "SystemID": "Koch",
+        "SystemStatsID": "Koch_Stats",
+        "System": "Koch",
+        "AnalysisName": "Koch Snowflake Analysis",
+        "Status": "validated",
+        "SystemDisplayName": "Koch Snowflake (edge)",
         "TheoreticalLogLogSlope": -0.262,
         "PointCount": 4,
         "MinLogScale": -1.43136,
@@ -516,10 +510,15 @@
         "MaxLogMeasure": 0.37482,
         "DeltaLogMeasure": -0.37482,
         "DeltaLogScale": 1.43136,
-        "EmpiricalLogLogSlope": -0.262
+        "EmpiricalLogLogSlope": -0.262,
+        "SlopeError": 0.0
       },
       {
-        "SystemID": "ZipfWords",
+        "SystemStatsID": "ZipfWords_Stats",
+        "System": "ZipfWords",
+        "AnalysisName": "Zipf Word Frequency Analysis",
+        "Status": "validated",
+        "SystemDisplayName": "Zipf word frequencies",
         "TheoreticalLogLogSlope": -1.0,
         "PointCount": 4,
         "MinLogScale": 0.0,
@@ -528,10 +527,15 @@
         "MaxLogMeasure": 0.0,
         "DeltaLogMeasure": -0.90309,
         "DeltaLogScale": 0.90309,
-        "EmpiricalLogLogSlope": -1.0
+        "EmpiricalLogLogSlope": -1.0,
+        "SlopeError": 0.0
       },
       {
-        "SystemID": "ScaleFreeNet",
+        "SystemStatsID": "ScaleFreeNet_Stats",
+        "System": "ScaleFreeNet",
+        "AnalysisName": "Scale-Free Network Analysis",
+        "Status": "validated",
+        "SystemDisplayName": "Scale-free network degrees",
         "TheoreticalLogLogSlope": -2.5,
         "PointCount": 4,
         "MinLogScale": 0.0,
@@ -540,7 +544,8 @@
         "MaxLogMeasure": 0.0,
         "DeltaLogMeasure": -2.257725,
         "DeltaLogScale": 0.90309,
-        "EmpiricalLogLogSlope": -2.5
+        "EmpiricalLogLogSlope": -2.5,
+        "SlopeError": 0.0
       }
     ]
   },

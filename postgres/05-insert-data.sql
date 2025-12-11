@@ -18,64 +18,64 @@ INSERT INTO systems (system_id, display_name, class, base_scale, scale_factor, m
 VALUES ('ScaleFreeNet', 'Scale-free network degrees', 'power_law', 1.0, 2.0, 'node_count_at_degree', NULL, -2.5);
 
 -- Insert data for scales
-INSERT INTO scales (scale_id, system_id, iteration, measure)
+INSERT INTO scales (scale_id, "system", iteration, measure)
 VALUES ('Sierpinski_0', 'Sierpinski', 0, 1.0);
 
-INSERT INTO scales (scale_id, system_id, iteration, measure)
+INSERT INTO scales (scale_id, "system", iteration, measure)
 VALUES ('Sierpinski_1', 'Sierpinski', 1, 3.0);
 
-INSERT INTO scales (scale_id, system_id, iteration, measure)
+INSERT INTO scales (scale_id, "system", iteration, measure)
 VALUES ('Sierpinski_2', 'Sierpinski', 2, 9.0);
 
-INSERT INTO scales (scale_id, system_id, iteration, measure)
+INSERT INTO scales (scale_id, "system", iteration, measure)
 VALUES ('Sierpinski_3', 'Sierpinski', 3, 27.0);
 
-INSERT INTO scales (scale_id, system_id, iteration, measure)
+INSERT INTO scales (scale_id, "system", iteration, measure)
 VALUES ('Koch_0', 'Koch', 0, 1.0);
 
-INSERT INTO scales (scale_id, system_id, iteration, measure)
+INSERT INTO scales (scale_id, "system", iteration, measure)
 VALUES ('Koch_1', 'Koch', 1, 1.3333333333);
 
-INSERT INTO scales (scale_id, system_id, iteration, measure)
+INSERT INTO scales (scale_id, "system", iteration, measure)
 VALUES ('Koch_2', 'Koch', 2, 1.7777777777);
 
-INSERT INTO scales (scale_id, system_id, iteration, measure)
+INSERT INTO scales (scale_id, "system", iteration, measure)
 VALUES ('Koch_3', 'Koch', 3, 2.3703703703);
 
-INSERT INTO scales (scale_id, system_id, iteration, measure)
+INSERT INTO scales (scale_id, "system", iteration, measure)
 VALUES ('ZipfWords_0', 'ZipfWords', 0, 1.0);
 
-INSERT INTO scales (scale_id, system_id, iteration, measure)
+INSERT INTO scales (scale_id, "system", iteration, measure)
 VALUES ('ZipfWords_1', 'ZipfWords', 1, 0.5);
 
-INSERT INTO scales (scale_id, system_id, iteration, measure)
+INSERT INTO scales (scale_id, "system", iteration, measure)
 VALUES ('ZipfWords_2', 'ZipfWords', 2, 0.25);
 
-INSERT INTO scales (scale_id, system_id, iteration, measure)
+INSERT INTO scales (scale_id, "system", iteration, measure)
 VALUES ('ZipfWords_3', 'ZipfWords', 3, 0.125);
 
-INSERT INTO scales (scale_id, system_id, iteration, measure)
+INSERT INTO scales (scale_id, "system", iteration, measure)
 VALUES ('ScaleFreeNet_0', 'ScaleFreeNet', 0, 1.0);
 
-INSERT INTO scales (scale_id, system_id, iteration, measure)
+INSERT INTO scales (scale_id, "system", iteration, measure)
 VALUES ('ScaleFreeNet_1', 'ScaleFreeNet', 1, 0.1767766953);
 
-INSERT INTO scales (scale_id, system_id, iteration, measure)
+INSERT INTO scales (scale_id, "system", iteration, measure)
 VALUES ('ScaleFreeNet_2', 'ScaleFreeNet', 2, 0.03125);
 
-INSERT INTO scales (scale_id, system_id, iteration, measure)
+INSERT INTO scales (scale_id, "system", iteration, measure)
 VALUES ('ScaleFreeNet_3', 'ScaleFreeNet', 3, 0.0055242717);
 
 -- Insert data for system_stats
-INSERT INTO system_stats (system_id)
-VALUES ('Sierpinski');
+INSERT INTO system_stats (system_stats_id, "system", analysis_name, status)
+VALUES ('Sierpinski_Stats', 'Sierpinski', 'Sierpinski Triangle Analysis', 'validated');
 
-INSERT INTO system_stats (system_id)
-VALUES ('Koch');
+INSERT INTO system_stats (system_stats_id, "system", analysis_name, status)
+VALUES ('Koch_Stats', 'Koch', 'Koch Snowflake Analysis', 'validated');
 
-INSERT INTO system_stats (system_id)
-VALUES ('ZipfWords');
+INSERT INTO system_stats (system_stats_id, "system", analysis_name, status)
+VALUES ('ZipfWords_Stats', 'ZipfWords', 'Zipf Word Frequency Analysis', 'validated');
 
-INSERT INTO system_stats (system_id)
-VALUES ('ScaleFreeNet');
+INSERT INTO system_stats (system_stats_id, "system", analysis_name, status)
+VALUES ('ScaleFreeNet_Stats', 'ScaleFreeNet', 'Scale-Free Network Analysis', 'validated');
 
