@@ -2,6 +2,24 @@
 
 A multi-platform analytical framework for modeling, analyzing, and visualizing fractal systems and power-law distributions. This project provides a unified "rulebook" data model that can be implemented across multiple platforms to study self-similar patterns in nature, mathematics, and complex systems.
 
+## 🚀 Quick Links
+
+- **[QUICKSTART.md](QUICKSTART.md)** - Start here to continue development
+- **[PROGRESS.md](PROGRESS.md)** - Current status and completed work
+- **[IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md)** - Technical architecture
+
+## 📊 Current Status
+
+| Platform | Status | Location | Generator |
+|----------|--------|----------|-----------|
+| **PostgreSQL** | ✅ COMPLETE | [postgres/](postgres/) | External tool |
+| **Python** | ✅ COMPLETE | [python/rulebook/](python/rulebook/) | [rulebook-to-python.py](python/rulebook-to-python.py) |
+| **Golang** | 📋 Planned | [golang/](golang/) | To be built |
+| **Visualizer** | 📋 Planned | [visualizer/](visualizer/) | To be built |
+| **Jupyter** | 📋 Planned | [jupyter/](jupyter/) | To be built |
+
+**Meta-Programming Approach**: One canonical rulebook → Multiple platform-specific implementations via code generators.
+
 ## Overview
 
 This project implements a computational engine for analyzing systems that exhibit power-law behavior and fractal characteristics. Inspired by concepts from the Veritasium video on power laws and fractals, it provides tools to:
