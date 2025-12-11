@@ -2,36 +2,64 @@
 """
 Power Laws & Fractals - PostgreSQL Test Runner
 
-Demonstrates:
-1. Connecting to PostgreSQL database
-2. Loading initial mock data  
-3. Projecting future iterations
-4. Inserting projected data
-5. Visualizing existing vs projected data
+Follows the unified testing protocol:
+1. Initialize database with base-data.json (systems + base scales)
+2. Insert test-input.json scales (raw facts only)
+3. Query vw_scales to get ALL computed values from PostgreSQL (all 8 iterations)
+4. Output results to test-results/postgres-results.json
+5. Validate against answer-key.json
+6. Display with color-coded actual vs projected and ASCII plots
 
-Requires: psycopg2 (pip install psycopg2-binary)
-Database: postgresql://postgres@localhost:5432/demo
+Requires: PostgreSQL running on localhost:5432 with database 'demo'
 """
 
+import json
 import subprocess
 import sys
 import math
+from pathlib import Path
+from datetime import datetime, timezone
+from typing import Dict, List, Tuple, Optional
+
+# Paths
+SCRIPT_DIR = Path(__file__).parent
+PROJECT_ROOT = SCRIPT_DIR.parent
+TEST_DATA_DIR = PROJECT_ROOT / 'test-data'
+TEST_RESULTS_DIR = PROJECT_ROOT / 'test-results'
 
 # ANSI colors
 GREEN = '\033[92m'
 YELLOW = '\033[93m'
 CYAN = '\033[96m'
-MAGENTA = '\033[95m'
 RED = '\033[91m'
 DIM = '\033[2m'
 RESET = '\033[0m'
 BOLD = '\033[1m'
+MAGENTA = '\033[95m'
+BLUE = '\033[94m'
+WHITE = '\033[97m'
+BG_DARK = '\033[48;5;236m'
 
 # Database connection
 DB_CONN = "postgresql://postgres@localhost:5432/demo"
 
+# Tolerance for validation
+TOLERANCE = 0.0001
 
-def run_sql(query, fetch=True):
+# ASCII plot characters
+PLOT_CHARS = {
+    'actual': '●',
+    'projected': '◌',
+    'line': '─',
+    'theoretical': '╌',
+    'axis_v': '│',
+    'axis_h': '─',
+    'corner': '└',
+    'cross': '┼'
+}
+
+
+def run_sql(query: str, fetch: bool = True) -> List[List[str]]:
     """Run SQL query using psql and return results"""
     cmd = ['psql', DB_CONN, '-t', '-A', '-F', '|', '-c', query]
     try:
@@ -51,264 +79,444 @@ def run_sql(query, fetch=True):
         sys.exit(1)
 
 
-def reset_database():
-    """Reset database to initial state"""
-    print(f"  Resetting database...")
-    script_dir = subprocess.run(['dirname', sys.argv[0]], capture_output=True, text=True).stdout.strip()
-    if not script_dir:
-        script_dir = '.'
-    
-    result = subprocess.run(
-        ['bash', f'{script_dir}/init-db.sh', DB_CONN],
-        capture_output=True, text=True
-    )
-    if result.returncode != 0:
-        print(f"{RED}Failed to reset database: {result.stderr}{RESET}")
+def run_sql_file(filepath: Path) -> bool:
+    """Execute a SQL file"""
+    cmd = ['psql', DB_CONN, '-f', str(filepath), '-v', 'ON_ERROR_STOP=1']
+    try:
+        result = subprocess.run(cmd, capture_output=True, text=True)
+        return result.returncode == 0
+    except Exception as e:
+        print(f"{RED}Error running SQL file: {e}{RESET}")
         return False
+
+
+def load_json(path: Path) -> Dict:
+    """Load JSON file"""
+    with open(path, 'r') as f:
+        return json.load(f)
+
+
+def save_json(path: Path, data: Dict):
+    """Save JSON file"""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with open(path, 'w') as f:
+        json.dump(data, f, indent=2)
+
+
+def init_database() -> bool:
+    """Initialize database with schema"""
+    print(f"  Initializing database schema...")
+    
+    # Run schema files in order
+    sql_files = [
+        SCRIPT_DIR / '01-drop-and-create-tables.sql',
+        SCRIPT_DIR / '02-create-functions.sql',
+        SCRIPT_DIR / '03-create-views.sql',
+    ]
+    
+    for sql_file in sql_files:
+        if not sql_file.exists():
+            print(f"  {RED}SQL file not found: {sql_file.name}{RESET}")
+            return False
+        if not run_sql_file(sql_file):
+            print(f"  {RED}Failed to run: {sql_file.name}{RESET}")
+            return False
+    
     return True
 
 
-def get_systems():
-    """Get all systems from database"""
-    rows = run_sql("""
-        SELECT system_id, display_name, class, scale_factor, 
-               fractal_dimension, theoretical_log_log_slope, base_scale
-        FROM vw_systems
-        ORDER BY system_id
-    """)
-    systems = []
-    for row in rows:
-        systems.append({
-            'system_id': row[0],
-            'display_name': row[1],
-            'class': row[2],
-            'scale_factor': float(row[3]) if row[3] else 1.0,
-            'fractal_dimension': float(row[4]) if row[4] else None,
-            'theoretical_slope': float(row[5]) if row[5] else 0,
-            'base_scale': float(row[6]) if row[6] else 1.0
-        })
-    return systems
+def insert_systems(systems: List[Dict]) -> bool:
+    """Insert systems from base data"""
+    print(f"  Inserting {len(systems)} systems...")
+    
+    for s in systems:
+        # Handle NULL for fractal_dimension
+        fd = 'NULL' if s.get('FractalDimension') is None else s['FractalDimension']
+        
+        query = f"""
+            INSERT INTO systems (system_id, display_name, class, base_scale, scale_factor, 
+                                measure_name, fractal_dimension, theoretical_log_log_slope)
+            VALUES ('{s['SystemID']}', '{s['DisplayName']}', '{s['Class']}', 
+                   {s['BaseScale']}, {s['ScaleFactor']}, '{s['MeasureName']}', 
+                   {fd}, {s['TheoreticalLogLogSlope']})
+            ON CONFLICT (system_id) DO NOTHING
+        """
+        run_sql(query, fetch=False)
+    
+    return True
 
 
-def get_scales(system_id=None):
-    """Get scales with calculated fields from database"""
-    where = f"WHERE system = '{system_id}'" if system_id else ""
-    rows = run_sql(f"""
-        SELECT scale_id, system, iteration, measure, scale, log_scale, log_measure
+def insert_base_scales(scales: List[Dict]) -> bool:
+    """Insert base scales from base data"""
+    print(f"  Inserting {len(scales)} base scales...")
+    
+    for s in scales:
+        is_projected = 'true' if s.get('IsProjected', False) else 'false'
+        query = f"""
+            INSERT INTO scales (scale_id, "system", iteration, measure, is_projected)
+            VALUES ('{s['ScaleID']}', '{s['System']}', {s['Iteration']}, {s['Measure']}, {is_projected})
+            ON CONFLICT (scale_id) DO NOTHING
+        """
+        run_sql(query, fetch=False)
+    
+    return True
+
+
+def insert_test_scales(scales: List[Dict]) -> bool:
+    """Insert test scales (raw facts only)"""
+    print(f"  Inserting {len(scales)} test scales...")
+    
+    for s in scales:
+        is_projected = 'true' if s.get('IsProjected', True) else 'false'
+        query = f"""
+            INSERT INTO scales (scale_id, "system", iteration, measure, is_projected)
+            VALUES ('{s['ScaleID']}', '{s['System']}', {s['Iteration']}, {s['Measure']}, {is_projected})
+            ON CONFLICT (scale_id) DO NOTHING
+        """
+        run_sql(query, fetch=False)
+    
+    return True
+
+
+def query_all_scales() -> List[Dict]:
+    """Query ALL computed values from vw_scales view"""
+    
+    query = """
+        SELECT scale_id, "system", iteration, measure, 
+               base_scale, scale_factor, scale_factor_power, 
+               scale, log_scale, log_measure, is_projected
         FROM vw_scales
-        {where}
-        ORDER BY system, iteration
-    """)
+        ORDER BY "system", iteration
+    """
+    
+    rows = run_sql(query)
+    
     scales = []
     for row in rows:
         scales.append({
-            'scale_id': row[0],
-            'system': row[1],
-            'iteration': int(row[2]),
-            'measure': float(row[3]) if row[3] else 0,
-            'scale': float(row[4]) if row[4] else 0,
-            'log_scale': float(row[5]) if row[5] else 0,
-            'log_measure': float(row[6]) if row[6] else 0,
-            'is_projected': False
+            'ScaleID': row[0],
+            'System': row[1],
+            'Iteration': int(row[2]) if row[2] else 0,
+            'Measure': float(row[3]) if row[3] else 0,
+            'BaseScale': round(float(row[4]), 5) if row[4] else None,
+            'ScaleFactor': round(float(row[5]), 5) if row[5] else None,
+            'ScaleFactorPower': round(float(row[6]), 5) if row[6] else None,
+            'Scale': round(float(row[7]), 5) if row[7] else None,
+            'LogScale': round(float(row[8]), 5) if row[8] else None,
+            'LogMeasure': round(float(row[9]), 5) if row[9] else None,
+            'IsProjected': row[10] == 't' if row[10] else False
         })
+    
     return scales
 
 
-def get_system_stats():
-    """Get system stats with calculated fields"""
-    rows = run_sql("""
-        SELECT system_stats_id, system, system_display_name, 
-               theoretical_log_log_slope, empirical_log_log_slope, slope_error,
-               point_count
-        FROM vw_system_stats
-        ORDER BY system
-    """)
-    stats = []
-    for row in rows:
-        stats.append({
-            'system_stats_id': row[0],
-            'system': row[1],
-            'display_name': row[2],
-            'theoretical_slope': float(row[3]) if row[3] else 0,
-            'empirical_slope': float(row[4]) if row[4] else 0,
-            'slope_error': float(row[5]) if row[5] else 0,
-            'point_count': int(row[6]) if row[6] else 0
-        })
-    return stats
-
-
-def project_future_scales(systems, num_future=4):
-    """Generate future scale points"""
-    projected = []
+def query_test_scales(test_scale_ids: List[str]) -> List[Dict]:
+    """Query computed values for test scales only (for validation)"""
     
-    for system in systems:
-        scales = get_scales(system['system_id'])
-        if not scales:
+    ids_str = "', '".join(test_scale_ids)
+    
+    query = f"""
+        SELECT scale_id, "system", iteration, measure, 
+               base_scale, scale_factor, scale_factor_power, 
+               scale, log_scale, log_measure, is_projected
+        FROM vw_scales
+        WHERE scale_id IN ('{ids_str}')
+        ORDER BY scale_id
+    """
+    
+    rows = run_sql(query)
+    
+    scales = []
+    for row in rows:
+        scales.append({
+            'ScaleID': row[0],
+            'System': row[1],
+            'Iteration': int(row[2]) if row[2] else 0,
+            'Measure': float(row[3]) if row[3] else 0,
+            'BaseScale': round(float(row[4]), 5) if row[4] else None,
+            'ScaleFactor': round(float(row[5]), 5) if row[5] else None,
+            'ScaleFactorPower': round(float(row[6]), 5) if row[6] else None,
+            'Scale': round(float(row[7]), 5) if row[7] else None,
+            'LogScale': round(float(row[8]), 5) if row[8] else None,
+            'LogMeasure': round(float(row[9]), 5) if row[9] else None,
+            'IsProjected': row[10] == 't' if row[10] else True
+        })
+    
+    return scales
+
+
+def compare_values(expected, actual, tolerance: float = TOLERANCE) -> bool:
+    """Compare two values with tolerance for floats"""
+    if expected is None and actual is None:
+        return True
+    if expected is None or actual is None:
+        return False
+    if isinstance(expected, (int, float)) and isinstance(actual, (int, float)):
+        return abs(expected - actual) < tolerance
+    return expected == actual
+
+
+def validate_results(computed_scales: List[Dict], answer_key: Dict) -> Tuple[int, int, List]:
+    """Validate computed scales against answer key"""
+    expected_by_id = {s['ScaleID']: s for s in answer_key.get('scales', [])}
+    
+    pass_count = 0
+    fail_count = 0
+    failures = []
+    
+    computed_fields = ['BaseScale', 'ScaleFactor', 'ScaleFactorPower', 'Scale', 'LogScale', 'LogMeasure']
+    
+    for scale in computed_scales:
+        expected = expected_by_id.get(scale['ScaleID'])
+        if not expected:
+            # Not a test scale - skip validation
             continue
         
-        max_iteration = max(s['iteration'] for s in scales)
-        last_measure = [s['measure'] for s in scales if s['iteration'] == max_iteration][0]
+        mismatches = []
         
-        for i in range(1, num_future + 1):
-            new_iteration = max_iteration + i
+        for field in computed_fields:
+            exp_val = expected.get(field)
+            act_val = scale.get(field)
             
-            if system['class'] == 'fractal' and system['fractal_dimension']:
-                growth_factor = (1 / system['scale_factor']) ** system['fractal_dimension']
-                new_measure = last_measure * (growth_factor ** i)
-            else:
-                # Power law: measure scales as scale_factor^slope per iteration
-                new_measure = last_measure * (system['scale_factor'] ** (system['theoretical_slope'] * i))
-            
-            scale = system['base_scale'] * (system['scale_factor'] ** new_iteration)
-            log_scale = math.log10(scale) if scale > 0 else 0
-            log_measure = math.log10(new_measure) if new_measure > 0 else 0
-            
-            projected.append({
-                'scale_id': f"{system['system_id']}_{new_iteration}",
-                'system': system['system_id'],
-                'iteration': new_iteration,
-                'measure': new_measure,
-                'scale': scale,
-                'log_scale': log_scale,
-                'log_measure': log_measure,
-                'is_projected': True
-            })
+            if not compare_values(exp_val, act_val):
+                mismatches.append(f"{field}: expected {exp_val}, got {act_val}")
+        
+        if mismatches:
+            fail_count += 1
+            failures.append((scale['ScaleID'], mismatches))
+        else:
+            pass_count += 1
     
-    return projected
+    return pass_count, fail_count, failures
 
 
-def insert_projected_scales(projected):
-    """Insert projected scales into database"""
-    for p in projected:
-        run_sql(f"""
-            INSERT INTO scales (scale_id, system, iteration, measure)
-            VALUES ('{p['scale_id']}', '{p['system']}', {p['iteration']}, {p['measure']})
-            ON CONFLICT (scale_id) DO NOTHING
-        """, fetch=False)
-
-
-def print_data_table(system, existing_scales, projected_scales):
-    """Print a table of existing and projected data"""
-    print(f"\n{BOLD}{system['display_name']}{RESET}")
-    print(f"{'─' * 75}")
-    print(f"  {'Iter':>4}  {'Measure':>14}  {'Scale':>12}  {'Log(Scale)':>10}  {'Log(Measure)':>12}  {'Status'}")
-    print(f"{'─' * 75}")
+def render_ascii_plot(scales: List[Dict], system: Dict, width: int = 50, height: int = 12) -> str:
+    """Render an ASCII plot for log-log data"""
     
-    for s in sorted(existing_scales, key=lambda x: x['iteration']):
-        print(f"  {s['iteration']:>4}  {s['measure']:>14.6f}  {s['scale']:>12.8f}  {s['log_scale']:>10.4f}  {s['log_measure']:>12.4f}  {GREEN}existing{RESET}")
+    if not scales:
+        return "  (No data)"
     
-    for s in sorted(projected_scales, key=lambda x: x['iteration']):
-        print(f"  {s['iteration']:>4}  {s['measure']:>14.6f}  {s['scale']:>12.8f}  {s['log_scale']:>10.4f}  {s['log_measure']:>12.4f}  {YELLOW}projected{RESET}")
+    # Get data points
+    points = [(s['LogScale'], s['LogMeasure'], s['IsProjected']) for s in scales if s['LogScale'] is not None and s['LogMeasure'] is not None]
     
-    print(f"{'─' * 75}")
-
-
-def visualize_log_log(system, existing_scales, projected_scales):
-    """Create ASCII log-log plot"""
-    all_points = existing_scales + projected_scales
-    if not all_points:
-        return
+    if not points:
+        return "  (No valid data points)"
     
-    width = 50
-    height = 10
+    # Calculate bounds
+    x_vals = [p[0] for p in points]
+    y_vals = [p[1] for p in points]
     
-    min_x = min(p['log_scale'] for p in all_points)
-    max_x = max(p['log_scale'] for p in all_points)
-    min_y = min(p['log_measure'] for p in all_points)
-    max_y = max(p['log_measure'] for p in all_points)
+    x_min, x_max = min(x_vals), max(x_vals)
+    y_min, y_max = min(y_vals), max(y_vals)
     
-    x_range = max_x - min_x if max_x != min_x else 1
-    y_range = max_y - min_y if max_y != min_y else 1
+    # Add padding
+    x_range = x_max - x_min if x_max != x_min else 1
+    y_range = y_max - y_min if y_max != y_min else 1
     
-    print(f"\n  {DIM}Log-Log Plot:{RESET}")
-    
+    # Create plot grid
     grid = [[' ' for _ in range(width)] for _ in range(height)]
     
-    for p in all_points:
-        x = int((p['log_scale'] - min_x) / x_range * (width - 1)) if x_range else width // 2
-        y = int((p['log_measure'] - min_y) / y_range * (height - 1)) if y_range else height // 2
-        y = height - 1 - y
-        
-        x = max(0, min(width - 1, x))
-        y = max(0, min(height - 1, y))
-        
-        grid[y][x] = '○' if p['is_projected'] else '●'
+    # Map coordinates to grid
+    def to_grid(x, y):
+        gx = int((x - x_min) / x_range * (width - 1)) if x_range else width // 2
+        gy = height - 1 - int((y - y_min) / y_range * (height - 1)) if y_range else height // 2
+        return max(0, min(width - 1, gx)), max(0, min(height - 1, gy))
     
-    print(f"  {max_y:+.2f} ┤{''.join(grid[0])}")
-    for row in grid[1:]:
-        print(f"        │{''.join(row)}")
-    print(f"        └{'─' * width}┘")
-    print(f"        {min_x:+.2f}{' ' * (width - 12)}{max_x:+.2f}")
+    # Draw theoretical slope line
+    slope = system.get('TheoreticalLogLogSlope', 0)
+    if slope != 0:
+        # Line passes through first point with given slope
+        x0, y0 = x_vals[0], y_vals[0]
+        for i in range(width):
+            x = x_min + (i / (width - 1)) * x_range
+            y = y0 + slope * (x - x0)
+            if y_min <= y <= y_max:
+                gx, gy = to_grid(x, y)
+                if grid[gy][gx] == ' ':
+                    grid[gy][gx] = f'{DIM}·{RESET}'
     
-    print(f"\n  {GREEN}●{RESET} Existing  {YELLOW}○{RESET} Projected")
+    # Plot data points
+    for x, y, is_projected in points:
+        gx, gy = to_grid(x, y)
+        if is_projected:
+            grid[gy][gx] = f'{MAGENTA}{PLOT_CHARS["projected"]}{RESET}'
+        else:
+            grid[gy][gx] = f'{GREEN}{PLOT_CHARS["actual"]}{RESET}'
+    
+    # Build output
+    lines = []
+    
+    # Y-axis label
+    lines.append(f"  {DIM}log(Measure){RESET}")
+    
+    # Top y value
+    lines.append(f"  {y_max:>7.2f} ┤")
+    
+    # Grid rows
+    for i, row in enumerate(grid):
+        prefix = "        │" if i != len(grid) - 1 else f"  {y_min:>7.2f} ┤"
+        lines.append(prefix + ''.join(row))
+    
+    # X-axis
+    lines.append(f"         └{'─' * width}")
+    lines.append(f"         {x_min:<7.2f}{' ' * (width - 14)}{x_max:>7.2f}")
+    lines.append(f"  {DIM}{'log(Scale)':^{width + 9}}{RESET}")
+    
+    # Legend
+    lines.append(f"  {GREEN}●{RESET} Actual   {MAGENTA}◌{RESET} Projected   {DIM}·{RESET} Theoretical (slope={slope})")
+    
+    return '\n'.join(lines)
+
+
+def print_console_output(all_scales: List[Dict], base_data: Dict,
+                         pass_count: int, fail_count: int, failures: List):
+    """Print results to console with all 8 rows and colors"""
+    print(f"\n{'=' * 80}")
+    print(f"  {BOLD}🐘 POWER LAWS & FRACTALS - PostgreSQL Test Runner{RESET}")
+    print(f"{'=' * 80}")
+    
+    # Build systems lookup
+    systems = {s['SystemID']: s for s in base_data.get('systems', [])}
+    
+    # Group scales by system
+    by_system = {}
+    for scale in all_scales:
+        if scale['System'] not in by_system:
+            by_system[scale['System']] = []
+        by_system[scale['System']].append(scale)
+    
+    print(f"\n{CYAN}All Computed Values (from PostgreSQL views):{RESET}")
+    print(f"  {GREEN}● Green{RESET} = Actual Data (iterations 0-3)")
+    print(f"  {MAGENTA}◌ Magenta{RESET} = Projected/Computed (iterations 4-7)")
+    print(f"{'─' * 80}")
+    
+    for system_id in sorted(by_system.keys()):
+        scales = by_system[system_id]
+        system = systems.get(system_id, {})
+        icon = "🔺" if system.get('Class') == "fractal" else "📈"
+        
+        print(f"\n{icon} {BOLD}{system.get('DisplayName', system_id)}{RESET}")
+        print(f"  {DIM}Theoretical slope: {system.get('TheoreticalLogLogSlope', 'N/A')}{RESET}")
+        
+        # Header
+        print(f"\n  {'Iter':>4}  {'Measure':>12}  {'Scale':>14}  {'LogScale':>10}  {'LogMeasure':>12}  {'Type':>10}")
+        print(f"  {'─' * 70}")
+        
+        # Data rows with colors
+        for s in sorted(scales, key=lambda x: x['Iteration']):
+            is_proj = s.get('IsProjected', False)
+            color = MAGENTA if is_proj else GREEN
+            marker = "◌" if is_proj else "●"
+            type_label = "projected" if is_proj else "actual"
+            
+            print(f"  {color}{s['Iteration']:>4}  {s['Measure']:>12.6f}  {s['Scale']:>14.8f}  {s['LogScale']:>10.5f}  {s['LogMeasure']:>12.5f}  {marker} {type_label}{RESET}")
+        
+        print(f"\n  {DIM}Row count: {len(scales)}{RESET}")
+        
+        # ASCII Plot
+        print(f"\n{CYAN}  Log-Log Plot:{RESET}")
+        plot = render_ascii_plot(scales, system)
+        print(plot)
+    
+    # Validation results
+    print(f"\n{'=' * 80}")
+    print(f"{CYAN}Validation Results (projected scales vs answer-key):{RESET}")
+    print(f"{'─' * 80}")
+    
+    if fail_count == 0:
+        print(f"  {GREEN}✓ All {pass_count} projected scales validated successfully!{RESET}")
+    else:
+        print(f"  {YELLOW}⚠ {pass_count} passed, {fail_count} failed{RESET}")
+        for scale_id, mismatches in failures[:5]:
+            print(f"    • {scale_id}:")
+            if isinstance(mismatches, list):
+                for m in mismatches:
+                    print(f"      - {m}")
+            else:
+                print(f"      - {mismatches}")
+    
+    # Summary stats
+    total_scales = len(all_scales)
+    systems_count = len(by_system)
+    
+    print(f"\n{'=' * 80}")
+    print(f"  {BOLD}Summary:{RESET}")
+    print(f"    Systems: {systems_count}")
+    print(f"    Total scales: {total_scales} ({total_scales // systems_count} per system)")
+    print(f"    Actual (0-3): {sum(1 for s in all_scales if not s.get('IsProjected', False))}")
+    print(f"    Projected (4-7): {sum(1 for s in all_scales if s.get('IsProjected', False))}")
+    print(f"{'=' * 80}")
+    print(f"  {GREEN}✓ PostgreSQL test run complete!{RESET}")
+    print(f"{'=' * 80}\n")
 
 
 def main():
-    print(f"\n{'=' * 75}")
-    print(f"  {BOLD}🐘 POWER LAWS & FRACTALS - PostgreSQL Test Runner{RESET}")
-    print(f"{'=' * 75}")
+    """Main test runner"""
+    # Check if test data exists
+    base_data_path = TEST_DATA_DIR / 'base-data.json'
+    test_input_path = TEST_DATA_DIR / 'test-input.json'
+    answer_key_path = TEST_DATA_DIR / 'answer-key.json'
     
-    # Step 1: Reset database
-    print(f"\n{CYAN}Step 1: Resetting database to initial state...{RESET}")
-    if not reset_database():
-        print(f"{RED}Failed to reset database. Is PostgreSQL running?{RESET}")
+    if not base_data_path.exists() or not test_input_path.exists():
+        print(f"{RED}Error: Test data not found. Run generate-test-data.py first.{RESET}")
+        sys.exit(1)
+    
+    # Load data
+    base_data = load_json(base_data_path)
+    test_input = load_json(test_input_path)
+    
+    print(f"\n{CYAN}Initializing PostgreSQL database...{RESET}")
+    
+    # Initialize database schema
+    if not init_database():
+        print(f"{RED}Failed to initialize database. Is PostgreSQL running?{RESET}")
         print(f"{DIM}Start with: docker run -d -p 5432:5432 -e POSTGRES_HOST_AUTH_METHOD=trust postgres{RESET}")
-        return
-    print(f"  {GREEN}✓ Database reset complete{RESET}")
+        sys.exit(1)
     
-    # Step 2: Load initial data
-    print(f"\n{CYAN}Step 2: Loading initial mock data from database...{RESET}")
-    systems = get_systems()
-    all_scales = get_scales()
-    print(f"  Loaded {len(systems)} systems, {len(all_scales)} scale points")
+    # Insert systems
+    if not insert_systems(base_data.get('systems', [])):
+        print(f"{RED}Failed to insert systems{RESET}")
+        sys.exit(1)
     
-    # Step 3: Validate existing data
-    print(f"\n{CYAN}Step 3: Validating existing data...{RESET}")
-    stats = get_system_stats()
-    for st in stats:
-        valid = abs(st['slope_error']) < 0.001
-        status = f"{GREEN}✓ PASS{RESET}" if valid else f"{YELLOW}✗ FAIL{RESET}"
-        print(f"  {st['display_name']:35} {status} (error: {st['slope_error']:.6f})")
+    # Insert base scales (iterations 0-3)
+    if not insert_base_scales(base_data.get('scales', [])):
+        print(f"{RED}Failed to insert base scales{RESET}")
+        sys.exit(1)
     
-    # Step 4: Project future data
-    print(f"\n{CYAN}Step 4: Projecting future iterations...{RESET}")
-    projected = project_future_scales(systems, num_future=4)
-    print(f"  Generated {len(projected)} projected points")
+    # Insert test scales (iterations 4-7)
+    if not insert_test_scales(test_input.get('scales', [])):
+        print(f"{RED}Failed to insert test scales{RESET}")
+        sys.exit(1)
     
-    # Step 5: Insert projected data
-    print(f"\n{CYAN}Step 5: Inserting projected data into database...{RESET}")
-    insert_projected_scales(projected)
-    print(f"  {GREEN}✓ Inserted {len(projected)} new scale points{RESET}")
+    print(f"  {GREEN}✓ Database initialized with test data{RESET}")
     
-    # Step 6: Re-fetch and visualize
-    print(f"\n{CYAN}Step 6: Visualization (existing vs projected){RESET}")
-    print(f"{'=' * 75}")
+    # Query ALL computed values from view (all 8 iterations)
+    print(f"\n{CYAN}Querying ALL computed values from vw_scales...{RESET}")
+    all_scales = query_all_scales()
+    print(f"  Retrieved {len(all_scales)} computed scales (all iterations)")
     
-    for system in systems[:2]:
-        existing = [s for s in all_scales if s['system'] == system['system_id']]
-        proj = [s for s in projected if s['system'] == system['system_id']]
-        print_data_table(system, existing, proj)
-        visualize_log_log(system, existing, proj)
+    # Save full results (all 8 iterations per system)
+    full_results = {
+        'platform': 'postgres',
+        'timestamp': datetime.now(timezone.utc).isoformat(),
+        'scales': all_scales
+    }
     
-    # Summary
-    print(f"\n{BOLD}Summary - All Systems:{RESET}")
-    print(f"{'─' * 75}")
+    full_results_path = TEST_RESULTS_DIR / 'postgres-results.json'
+    save_json(full_results_path, full_results)
     
-    # Re-fetch stats after insert
-    new_stats = get_system_stats()
-    for system in systems:
-        existing_count = len([s for s in all_scales if s['system'] == system['system_id']])
-        projected_count = len([s for s in projected if s['system'] == system['system_id']])
-        new_stat = next((s for s in new_stats if s['system'] == system['system_id']), None)
-        new_count = new_stat['point_count'] if new_stat else 0
-        icon = "🔺" if system['class'] == 'fractal' else "📈"
-        print(f"  {icon} {system['display_name']:35} {GREEN}{existing_count} existing{RESET} + {YELLOW}{projected_count} projected{RESET} = {CYAN}{new_count} total{RESET}")
+    # Validate only the projected scales against answer key
+    answer_key = load_json(answer_key_path)
+    test_scale_ids = [s['ScaleID'] for s in test_input.get('scales', [])]
+    test_scales = [s for s in all_scales if s['ScaleID'] in test_scale_ids]
+    pass_count, fail_count, failures = validate_results(test_scales, answer_key)
     
-    print(f"\n{'=' * 75}")
-    print(f"  {GREEN}✓ PostgreSQL test run complete!{RESET}")
-    print(f"{'=' * 75}\n")
+    # Print console output with all data
+    print_console_output(all_scales, base_data, pass_count, fail_count, failures)
+    
+    # Exit with appropriate code
+    sys.exit(0 if fail_count == 0 else 1)
 
 
 if __name__ == '__main__':
     main()
-

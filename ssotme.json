@@ -16,5 +16,13 @@
       "CommandLine": "rulebook-to-postgres -i ../ssot/ERB_veritasium-power-laws-and-fractals.json",
       "IsDisabled": false
     }
-  ]
+  ],
+  "Description": "Unifies several classic fractal / power-law phenomena into a single CMCC pattern with clean separation between fractal dimension and log\u2013log slope.",
+  "current_error": {
+    "timestamp": "2025-12-11T23:00:33.044066+00:00",
+    "message": "Isolation phase failed: Excel file missing or invalid: None",
+    "details": "Final state: CREATING_WORKSPACE, Phase: None"
+  },
+  "sync_status": "error",
+  "last_error": "2025-12-11T23:00:33.044070+00:00"
 }

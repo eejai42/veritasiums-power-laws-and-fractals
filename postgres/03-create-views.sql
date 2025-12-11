@@ -32,7 +32,8 @@ SELECT
   calc_scales_scale_factor_power(t.scale_id) AS scale_factor_power,
   calc_scales_scale(t.scale_id) AS scale,
   calc_scales_log_scale(t.scale_id) AS log_scale,
-  calc_scales_log_measure(t.scale_id) AS log_measure
+  calc_scales_log_measure(t.scale_id) AS log_measure,
+  t.is_projected
 FROM scales t;
 
 -- system_stats View

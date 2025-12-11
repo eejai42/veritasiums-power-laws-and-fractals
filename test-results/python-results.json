@@ -1,7 +1,6 @@
 {
-  "description": "Expected results for test validation (all computed values)",
-  "generated": "2025-12-11T23:59:04.436656+00:00",
-  "source": "ssot/ERB_veritasium-power-laws-and-fractals.json",
+  "platform": "python",
+  "timestamp": "2025-12-11T23:59:07.650312+00:00",
   "scales": [
     {
       "ScaleID": "Sierpinski_4",
@@ -36,8 +35,8 @@
       "Measure": 711,
       "BaseScale": 1,
       "ScaleFactor": 0.5,
-      "ScaleFactorPower": 0.015625,
-      "Scale": 0.015625,
+      "ScaleFactorPower": 0.01562,
+      "Scale": 0.01562,
       "LogScale": -1.80618,
       "LogMeasure": 2.85187,
       "IsProjected": true
@@ -49,8 +48,8 @@
       "Measure": 2225,
       "BaseScale": 1,
       "ScaleFactor": 0.5,
-      "ScaleFactorPower": 0.0078125,
-      "Scale": 0.0078125,
+      "ScaleFactorPower": 0.00781,
+      "Scale": 0.00781,
       "LogScale": -2.10721,
       "LogMeasure": 3.34733,
       "IsProjected": true
@@ -61,9 +60,9 @@
       "Iteration": 4,
       "Measure": 3.22,
       "BaseScale": 1,
-      "ScaleFactor": 0.3333333333,
-      "ScaleFactorPower": 0.012345679,
-      "Scale": 0.012345679,
+      "ScaleFactor": 0.33333,
+      "ScaleFactorPower": 0.01235,
+      "Scale": 0.01235,
       "LogScale": -1.90849,
       "LogMeasure": 0.50786,
       "IsProjected": true
@@ -74,9 +73,9 @@
       "Iteration": 5,
       "Measure": 4.15,
       "BaseScale": 1,
-      "ScaleFactor": 0.3333333333,
-      "ScaleFactorPower": 0.004115226,
-      "Scale": 0.004115226,
+      "ScaleFactor": 0.33333,
+      "ScaleFactorPower": 0.00412,
+      "Scale": 0.00412,
       "LogScale": -2.38561,
       "LogMeasure": 0.61805,
       "IsProjected": true
@@ -87,9 +86,9 @@
       "Iteration": 6,
       "Measure": 5.71,
       "BaseScale": 1,
-      "ScaleFactor": 0.3333333333,
-      "ScaleFactorPower": 0.001371742,
-      "Scale": 0.001371742,
+      "ScaleFactor": 0.33333,
+      "ScaleFactorPower": 0.00137,
+      "Scale": 0.00137,
       "LogScale": -2.86273,
       "LogMeasure": 0.75664,
       "IsProjected": true
@@ -100,9 +99,9 @@
       "Iteration": 7,
       "Measure": 7.38,
       "BaseScale": 1,
-      "ScaleFactor": 0.3333333333,
-      "ScaleFactorPower": 0.000457247,
-      "Scale": 0.000457247,
+      "ScaleFactor": 0.33333,
+      "ScaleFactorPower": 0.00046,
+      "Scale": 0.00046,
       "LogScale": -3.33985,
       "LogMeasure": 0.86806,
       "IsProjected": true
@@ -114,10 +113,10 @@
       "Measure": 0.0638,
       "BaseScale": 1,
       "ScaleFactor": 2,
-      "ScaleFactorPower": 16,
-      "Scale": 16,
+      "ScaleFactorPower": 16.0,
+      "Scale": 16.0,
       "LogScale": 1.20412,
-      "LogMeasure": -1.19524,
+      "LogMeasure": -1.19518,
       "IsProjected": true
     },
     {
@@ -127,10 +126,10 @@
       "Measure": 0.0305,
       "BaseScale": 1,
       "ScaleFactor": 2,
-      "ScaleFactorPower": 32,
-      "Scale": 32,
+      "ScaleFactorPower": 32.0,
+      "Scale": 32.0,
       "LogScale": 1.50515,
-      "LogMeasure": -1.51572,
+      "LogMeasure": -1.5157,
       "IsProjected": true
     },
     {
@@ -140,8 +139,8 @@
       "Measure": 0.0161,
       "BaseScale": 1,
       "ScaleFactor": 2,
-      "ScaleFactorPower": 64,
-      "Scale": 64,
+      "ScaleFactorPower": 64.0,
+      "Scale": 64.0,
       "LogScale": 1.80618,
       "LogMeasure": -1.79317,
       "IsProjected": true
@@ -153,8 +152,8 @@
       "Measure": 0.0076,
       "BaseScale": 1,
       "ScaleFactor": 2,
-      "ScaleFactorPower": 128,
-      "Scale": 128,
+      "ScaleFactorPower": 128.0,
+      "Scale": 128.0,
       "LogScale": 2.10721,
       "LogMeasure": -2.11919,
       "IsProjected": true
@@ -166,8 +165,8 @@
       "Measure": 0.00102,
       "BaseScale": 1,
       "ScaleFactor": 2,
-      "ScaleFactorPower": 16,
-      "Scale": 16,
+      "ScaleFactorPower": 16.0,
+      "Scale": 16.0,
       "LogScale": 1.20412,
       "LogMeasure": -2.9914,
       "IsProjected": true
@@ -179,8 +178,8 @@
       "Measure": 0.000168,
       "BaseScale": 1,
       "ScaleFactor": 2,
-      "ScaleFactorPower": 32,
-      "Scale": 32,
+      "ScaleFactorPower": 32.0,
+      "Scale": 32.0,
       "LogScale": 1.50515,
       "LogMeasure": -3.77469,
       "IsProjected": true
@@ -192,10 +191,10 @@
       "Measure": 3.18e-05,
       "BaseScale": 1,
       "ScaleFactor": 2,
-      "ScaleFactorPower": 64,
-      "Scale": 64,
+      "ScaleFactorPower": 64.0,
+      "Scale": 64.0,
       "LogScale": 1.80618,
-      "LogMeasure": -4.4976,
+      "LogMeasure": -4.49757,
       "IsProjected": true
     },
     {
@@ -205,10 +204,10 @@
       "Measure": 5.21e-06,
       "BaseScale": 1,
       "ScaleFactor": 2,
-      "ScaleFactorPower": 128,
-      "Scale": 128,
+      "ScaleFactorPower": 128.0,
+      "Scale": 128.0,
       "LogScale": 2.10721,
-      "LogMeasure": -5.28318,
+      "LogMeasure": -5.28316,
       "IsProjected": true
     },
     {
@@ -218,10 +217,10 @@
       "Measure": 0.0612,
       "BaseScale": 1,
       "ScaleFactor": 2,
-      "ScaleFactorPower": 16,
-      "Scale": 16,
+      "ScaleFactorPower": 16.0,
+      "Scale": 16.0,
       "LogScale": 1.20412,
-      "LogMeasure": -1.2133,
+      "LogMeasure": -1.21325,
       "IsProjected": true
     },
     {
@@ -231,8 +230,8 @@
       "Measure": 0.0319,
       "BaseScale": 1,
       "ScaleFactor": 2,
-      "ScaleFactorPower": 32,
-      "Scale": 32,
+      "ScaleFactorPower": 32.0,
+      "Scale": 32.0,
       "LogScale": 1.50515,
       "LogMeasure": -1.49621,
       "IsProjected": true
@@ -244,8 +243,8 @@
       "Measure": 0.0152,
       "BaseScale": 1,
       "ScaleFactor": 2,
-      "ScaleFactorPower": 64,
-      "Scale": 64,
+      "ScaleFactorPower": 64.0,
+      "Scale": 64.0,
       "LogScale": 1.80618,
       "LogMeasure": -1.81816,
       "IsProjected": true
@@ -257,10 +256,10 @@
       "Measure": 0.00798,
       "BaseScale": 1,
       "ScaleFactor": 2,
-      "ScaleFactorPower": 128,
-      "Scale": 128,
+      "ScaleFactorPower": 128.0,
+      "Scale": 128.0,
       "LogScale": 2.10721,
-      "LogMeasure": -2.09806,
+      "LogMeasure": -2.098,
       "IsProjected": true
     },
     {
@@ -270,10 +269,10 @@
       "Measure": 0.0641,
       "BaseScale": 1,
       "ScaleFactor": 2,
-      "ScaleFactorPower": 16,
-      "Scale": 16,
+      "ScaleFactorPower": 16.0,
+      "Scale": 16.0,
       "LogScale": 1.20412,
-      "LogMeasure": -1.19318,
+      "LogMeasure": -1.19314,
       "IsProjected": true
     },
     {
@@ -283,8 +282,8 @@
       "Measure": 0.0308,
       "BaseScale": 1,
       "ScaleFactor": 2,
-      "ScaleFactorPower": 32,
-      "Scale": 32,
+      "ScaleFactorPower": 32.0,
+      "Scale": 32.0,
       "LogScale": 1.50515,
       "LogMeasure": -1.51145,
       "IsProjected": true
@@ -296,8 +295,8 @@
       "Measure": 0.0159,
       "BaseScale": 1,
       "ScaleFactor": 2,
-      "ScaleFactorPower": 64,
-      "Scale": 64,
+      "ScaleFactorPower": 64.0,
+      "Scale": 64.0,
       "LogScale": 1.80618,
       "LogMeasure": -1.7986,
       "IsProjected": true
@@ -309,10 +308,10 @@
       "Measure": 0.00762,
       "BaseScale": 1,
       "ScaleFactor": 2,
-      "ScaleFactorPower": 128,
-      "Scale": 128,
+      "ScaleFactorPower": 128.0,
+      "Scale": 128.0,
       "LogScale": 2.10721,
-      "LogMeasure": -2.11808,
+      "LogMeasure": -2.11805,
       "IsProjected": true
     },
     {
@@ -322,8 +321,8 @@
       "Measure": 0.0281,
       "BaseScale": 1,
       "ScaleFactor": 2,
-      "ScaleFactorPower": 16,
-      "Scale": 16,
+      "ScaleFactorPower": 16.0,
+      "Scale": 16.0,
       "LogScale": 1.20412,
       "LogMeasure": -1.55129,
       "IsProjected": true
@@ -335,8 +334,8 @@
       "Measure": 0.0107,
       "BaseScale": 1,
       "ScaleFactor": 2,
-      "ScaleFactorPower": 32,
-      "Scale": 32,
+      "ScaleFactorPower": 32.0,
+      "Scale": 32.0,
       "LogScale": 1.50515,
       "LogMeasure": -1.97062,
       "IsProjected": true
@@ -348,10 +347,10 @@
       "Measure": 0.00461,
       "BaseScale": 1,
       "ScaleFactor": 2,
-      "ScaleFactorPower": 64,
-      "Scale": 64,
+      "ScaleFactorPower": 64.0,
+      "Scale": 64.0,
       "LogScale": 1.80618,
-      "LogMeasure": -2.33628,
+      "LogMeasure": -2.3363,
       "IsProjected": true
     },
     {
@@ -361,10 +360,10 @@
       "Measure": 0.00177,
       "BaseScale": 1,
       "ScaleFactor": 2,
-      "ScaleFactorPower": 128,
-      "Scale": 128,
+      "ScaleFactorPower": 128.0,
+      "Scale": 128.0,
       "LogScale": 2.10721,
-      "LogMeasure": -2.752,
+      "LogMeasure": -2.75203,
       "IsProjected": true
     }
   ]

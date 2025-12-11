@@ -1,3 +1,3 @@
-module github.com/yourorg/fractal-analysis
+module erb-power-laws
 
 go 1.21

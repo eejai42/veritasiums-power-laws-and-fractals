@@ -58,7 +58,8 @@ CREATE TABLE scales (
   scale_id                            TEXT                 PRIMARY KEY,
   "system"                            TEXT                ,
   iteration                           INTEGER             ,
-  measure                             NUMERIC             
+  measure                             NUMERIC             ,
+  is_projected                        BOOLEAN              DEFAULT false
 );
 
 -- system_stats: Statistical analysis of each system's log-log behavior, with rollups from scales and lookups to systems.
