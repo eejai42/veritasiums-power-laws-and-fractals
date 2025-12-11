@@ -1,0 +1,20 @@
+{
+  "ShowHidden": false,
+  "ShowAllFiles": false,
+  "Name": "ERB_veritasium-power-laws-and-fractals",
+  "ProjectSettings": [
+    {
+      "Name": "project-name",
+      "Value": "ERB_veritasium-power-laws-and-fractals"
+    }
+  ],
+  "ProjectTranspilers": [
+    {
+      "IsSSoTTranspiler": false,
+      "Name": "rulebooktopostgres",
+      "RelativePath": "/postgres",
+      "CommandLine": "rulebook-to-postgres -i ../ssot/ERB_veritasium-power-laws-and-fractals.json",
+      "IsDisabled": false
+    }
+  ]
+}
