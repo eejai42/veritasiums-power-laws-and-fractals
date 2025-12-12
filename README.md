@@ -1,32 +1,35 @@
-# Power Laws & Fractals  
+# Power Laws & Fractals
+
 ### Why You’ve Probably Been Playing the Game of Life Wrong
 
 Most of the games we think we’re playing in life are “nice” games:
 
-- work hard → move up a bit  
-- publish regularly → build a solid career  
-- post consistently → slowly grow an audience  
+* work hard → move up a bit
+* publish regularly → build a solid career
+* post consistently → slowly grow an audience
 
 That’s what a **normal** (Gaussian) world feels like: lots of small nudges, very few wild swings.
 
 But a lot of the real world is not that game.
 
-In a **power-law** world, most of the probability mass lives in the tail. A few earthquakes, a few videos, a few research papers, a few fires, a few hubs in a network can dominate the entire outcome. The “average” is almost a lie. :contentReference[oaicite:0]{index=0}  
+In a **power-law** world, most of the probability mass lives in the tail. A few earthquakes, a few videos, a few research papers, a few fires, a few hubs in a network can dominate the entire outcome. The “average” is almost a lie. ([Zenodo][1])
 
-Veritasium’s *Power Laws* video is one of the cleanest explanations of this idea. This repository is what happens if you watch that video, pause halfway, and ask:
+Veritasium’s *Power Laws* video is one of the cleanest explanations of this idea. I watched it, got obsessed in the productive way, and wanted to see what it would look like to treat those claims like something you can actually run end-to-end:
 
-> “Okay, but if this is really how the world works…  
+> “Okay, but if this is really how the world works…
 > how would I actually *check* those claims, end-to-end, without hand-waving?”
 
 This project is aimed at people who explain science for a living:
 
-- science YouTubers and podcasters,  
-- writers and newsletter authors,  
-- teachers and lecturers,  
-- technically-inclined viewers who don’t want to stop at “look, it’s a straight line.”
+* science YouTubers and podcasters,
+* writers and newsletter authors,
+* teachers and lecturers,
+* technically-inclined viewers who don’t want to stop at “look, it’s a straight line.”
 
-We start in the same world as the video—Zipf, earthquakes, forest fires, sandpiles, scale-free networks, Sierpinski, Koch—and then build something the video can’t:  
-a **small, reproducible, multi-language lab** where those stories can be tested, not just plotted. :contentReference[oaicite:1]{index=1}  
+We start in the same world as the video—Zipf, earthquakes, forest fires, sandpiles, scale-free networks, Sierpinski, Koch—and then build a companion thing the video doesn’t try to be:
+a **small, reproducible, multi-language lab** where those stories can be tested, not just plotted. ([Zenodo][1])
+
+(If you’re curious why this “one rulebook → many runtimes” approach is even plausible, it leans on the **Conceptual Model Completeness Conjecture (CMCC)**—I’ll touch it briefly at the very end.)
 
 We’ll hint at that up front, then bring the receipts in the middle of this README.
 
@@ -34,44 +37,55 @@ We’ll hint at that up front, then bring the receipts in the middle of this REA
 
 ## Table of Contents
 
-1. [Why This Exists (Who This Is For)](#1-why-this-exists-who-this-is-for)  
-2. [The Veritasium Move: Straight Lines in Log–Log Space](#2-the-veritasium-move-straight-lines-in-loglog-space)  
-3. [Where That Story Starts to Creak](#3-where-that-story-starts-to-creak)  
-4. [What This Repo Actually Is (For a Science Communicator)](#4-what-this-repo-actually-is-for-a-science-communicator)  
-5. [The Receipts: One Source of Truth, Explicit Formulas](#5-the-receipts-one-source-of-truth-explicit-formulas)  
-6. [Executing the Same Claim in Python, PostgreSQL, and Go](#6-executing-the-same-claim-in-python-postgresql-and-go)  
-7. [The Test Harness: Base Data, Answer Keys, and Running It](#7-the-test-harness-base-data-answer-keys-and-running-it)  
-8. [Measurement Models, Noise, and Where Power Laws Break](#8-measurement-models-noise-and-where-power-laws-break)  
-9. [Extending the Question to New Domains](#9-extending-the-question-to-new-domains)  
-10. [What This Is (and Is Not)](#10-what-this-is-and-is-not)  
+1. [Why This Exists (Who This Is For)](#1-why-this-exists-who-this-is-for)
+
+2. [The Veritasium Move: Straight Lines in Log–Log Space](#2-the-veritasium-move-straight-lines-in-loglog-space)
+
+3. [Where That Story Starts to Creak](#3-where-that-story-starts-to-creak)
+
+4. [What This Repo Actually Is (For a Science Communicator)](#4-what-this-repo-actually-is-for-a-science-communicator)
+
+5. [The Receipts: One Source of Truth, Explicit Formulas](#5-the-receipts-one-source-of-truth-explicit-formulas)
+
+6. [Executing the Same Claim in Python, PostgreSQL, and Go](#6-executing-the-same-claim-in-python-postgresql-and-go)
+
+7. [The Test Harness: Base Data, Answer Keys, and Running It](#7-the-test-harness-base-data-answer-keys-and-running-it)
+
+8. [Measurement Models, Noise, and Where Power Laws Break](#8-measurement-models-noise-and-where-power-laws-break)
+
+9. [Extending the Question to New Domains](#9-extending-the-question-to-new-domains)
+
+10. [What This Is (and Is Not)](#10-what-this-is-and-is-not)
+
+11. [CMCC (Briefly): Why “One Rulebook → Many Runtimes” Works](#11-cmcc-briefly-why-one-rulebook--many-runtimes-works)
 
 ---
 
 ## 1. Why This Exists (Who This Is For)
 
-This repository is a **direct response** to Veritasium’s *Power Laws* video. :contentReference[oaicite:2]{index=2}  
+This repository is inspired by (and meant as a continuation of) Veritasium’s *Power Laws* video. 
 
 The video does a hard thing well: it shows that the **same mathematical pattern** keeps appearing in wildly different places:
 
-- word frequencies (Zipf law),  
-- earthquakes (Gutenberg–Richter),  
-- forest fires,  
-- sandpile avalanches,  
-- scale-free networks,  
-- geometric fractals like Sierpinski and Koch.   
+* word frequencies (Zipf law),
+* earthquakes (Gutenberg–Richter),
+* forest fires,
+* sandpile avalanches,
+* scale-free networks,
+* geometric fractals like Sierpinski and Koch.
 
 The beats are familiar:
 
-1. You take messy counts over many orders of magnitude.  
-2. You plot them in log–log space.  
-3. A curve straightens into a line.  
+1. You take messy counts over many orders of magnitude.
+2. You plot them in log–log space.
+3. A curve straightens into a line.
 4. The slope of that line becomes your “one number to rule them all.”
 
 If you’re a science communicator, this is gold: it compresses a lot of complexity into a single visual and a single exponent.
 
-But if you keep thinking about it, an annoying follow-up question appears:
+But if you keep thinking about it, a natural follow-up question appears:
 
-> “If this is really how the world works,  
+> “If this is really how the world works,
 > what would it take to treat those log–log lines like *lab results*, not just plots?”
 
 This repo is built for that moment.
@@ -82,31 +96,31 @@ This repo is built for that moment.
 
 The central move in the video is simple and powerful:
 
-1. Take a distribution that spans orders of magnitude.  
-2. Transform both axes to log₁₀.  
+1. Take a distribution that spans orders of magnitude.
+2. Transform both axes to log₁₀.
 3. Watch a messy curve become “basically a straight line.”
 
 In that picture:
 
-- the x-axis is typically some notion of **scale** (rank, size, degree, iteration),  
-- the y-axis is some **measure** (frequency, count, energy, perimeter, etc.),  
-- and the line’s **slope** is your power-law exponent.
+* the x-axis is typically some notion of **scale** (rank, size, degree, iteration),
+* the y-axis is some **measure** (frequency, count, energy, perimeter, etc.),
+* and the line’s **slope** is your power-law exponent.
 
 This move works, visually, for:
 
-- the rank-frequency distribution of words (ZipfWords),  
-- the count of nodes by degree in a scale-free network (ScaleFreeNet),  
-- distributions of earthquake energies and forest fire sizes,  
-- the number of black triangles in Sierpinski and the perimeter of the Koch snowflake as iteration increases.   
+* the rank-frequency distribution of words (ZipfWords),
+* the count of nodes by degree in a scale-free network (ScaleFreeNet),
+* distributions of earthquake energies and forest fire sizes,
+* the number of black triangles in Sierpinski and the perimeter of the Koch snowflake as iteration increases.
 
 It’s compelling because it suggests something like:
 
 > “These systems have different mechanisms, but they share the *same kind* of scaling structure.”
 
-This repo leans into that shared structure.  
-It uses a **common log–log “machine”** to model all of those systems side by side.   
+This repo leans into that shared structure.
+It uses a **common log–log “machine”** to model all of those systems side by side.
 
-But it also asks:  
+But it also asks:
 **When is that line actually telling the truth, and when is it just fooling our eyes?**
 
 ---
@@ -115,23 +129,23 @@ But it also asks:
 
 If you’ve ever tried to fit a power law to real data, you know what lives behind the scenes:
 
-- the line only looks straight over *some* range,  
-- the tail is short because the world is finite,  
-- small events are censored or under-reported,  
-- rounding and binning distort the low end,  
-- estimated slopes change when you slide the window. :contentReference[oaicite:6]{index=6}  
+* the line only looks straight over *some* range,
+* the tail is short because the world is finite,
+* small events are censored or under-reported,
+* rounding and binning distort the low end,
+* estimated slopes change when you slide the window. 
 
 In other words:
 
-> The straight line is not the phenomenon.  
+> The straight line is not the phenomenon.
 > It’s a **fixed point**.
 
 The *phenomenon* is the **neighborhood around that fixed point** in log–log space:
 
-- how tightly observations cluster,  
-- how they deviate,  
-- where they bend,  
-- how robust the slope is to noise, cutoffs, and discretization.
+* how tightly observations cluster,
+* how they deviate,
+* where they bend,
+* how robust the slope is to noise, cutoffs, and discretization.
 
 If you only ever show the line, you’re leaving the most interesting part of the story—and the part that might be wrong—off screen.
 
@@ -141,9 +155,9 @@ For someone who wants to be able to say “yes, we checked this properly,” it�
 
 This repo is structured to turn that “fixed point vs neighborhood” idea into an actual **computational object**:
 
-- the fixed point = theoretical slope definition,  
-- the neighborhood = observed data (idealized and measured),  
-- the validation = fitted slopes, residual geometry, quality metrics.   
+* the fixed point = theoretical slope definition,
+* the neighborhood = observed data (idealized and measured),
+* the validation = fitted slopes, residual geometry, quality metrics.
 
 ---
 
@@ -151,41 +165,45 @@ This repo is structured to turn that “fixed point vs neighborhood” idea into
 
 Short version:
 
-> This repository turns the power-law stories from Veritasium’s *Power Laws* video into a **small, reproducible, multi-platform lab** where those stories can be tested, not just plotted.   
+> This repository turns the power-law stories from Veritasium’s *Power Laws* video into a **small, reproducible, multi-platform lab** where those stories can be tested, not just plotted.
 
 Specifically, it gives you:
 
-- **The same cast of systems as the video (plus a bit of structure around them):**  
-  - Sierpinski Triangle (fractal)  
-  - Koch Snowflake (fractal)  
-  - Zipf word frequencies  
-  - Scale-free network degrees  
-  - Sandpile avalanches  
-  - Earthquake energies  
-  - Forest fire sizes   
+* **The same cast of systems as the video (plus a bit of structure around them):**
 
-- **A clear separation between:**
-  - theoretical slopes (“what the math derivation predicts”),  
-  - idealized log–log points (“what the toy model says should happen”),  
-  - noisy measured data (“what a seismometer / corpus / sensor might actually record”),  
-  - inferred fits and residuals (“what happens when we actually run the regression”).   
+  * Sierpinski Triangle (fractal)
+  * Koch Snowflake (fractal)
+  * Zipf word frequencies
+  * Scale-free network degrees
+  * Sandpile avalanches
+  * Earthquake energies
+  * Forest fire sizes
 
-- **A single, canonical definition of the math**, written once in a JSON “Entity Rule Book” (ERB), and then auto-translated into:
-  - Python models and calculations,  
-  - PostgreSQL tables, functions, and views,  
-  - Go structs and execution logic.   
+* **A clear separation between:**
 
-- **A test harness** that:
-  - generates test datasets from that single definition,  
-  - runs all three platforms,  
-  - compares their derived results to a canonical answer key,  
-  - and produces a single HTML report summarizing everything.   
+  * theoretical slopes (“what the math derivation predicts”),
+  * idealized log–log points (“what the toy model says should happen”),
+  * noisy measured data (“what a seismometer / corpus / sensor might actually record”),
+  * inferred fits and residuals (“what happens when we actually run the regression”).
+
+* **A single, canonical definition of the math**, written once in a JSON “Entity Rule Book” (ERB), and then auto-translated into:
+
+  * Python models and calculations,
+  * PostgreSQL tables, functions, and views,
+  * Go structs and execution logic.
+
+* **A test harness** that:
+
+  * generates test datasets from that single definition,
+  * runs all three platforms,
+  * compares their derived results to a canonical answer key,
+  * and produces a single HTML report summarizing everything.
 
 From a communicator’s perspective, this means:
 
-- you can still use log–log plots and straight lines as storytelling tools,  
-- but you know there is an actual, executable, cross-checked model backing them up,  
-- and if someone asks “how do you *know* those slopes are right?”, there is a concrete answer.
+* you can still use log–log plots and straight lines as storytelling tools,
+* but you know there is an actual, executable, cross-checked model backing them up,
+* and if someone asks “how do you *know* those slopes are right?”, there is a concrete answer.
 
 The rest of this README explains how that works.
 
@@ -201,14 +219,14 @@ At the heart of the repo is:
 
 ```text
 ssot/ERB_veritasium-power-laws-and-fractals.json
-````
+```
 
 This file defines the **entire** model:
 
 * tables: `systems`, `scales`, `observed_scales`, `inference_runs`, `system_stats`, `measurement_models`, `scale_regimes` and more,
 * columns (fields) for each table,
 * relationships between tables,
-* and, critically, the **formulas** that connect fields. 
+* and, critically, the **formulas** that connect fields.
 
 Every field is tagged as one of:
 
@@ -247,6 +265,8 @@ Example (simplified) from the ERB:
 Those formulas are the **source of truth** for every platform.
 
 ### 5.2 CMCC: raw → lookup → calculated → aggregated
+
+This “raw / lookup / calculated / aggregated” shape is the same five-primitive decomposition CMCC points at (Schema, Data, Lookups, Aggregations, Formulas)—we’re using it here purely as a practical organizing principle. ([Zenodo][1])
 
 Because each field has a type, you get a clean pipeline:
 
@@ -365,7 +385,7 @@ and see the same numbers that drive the plots, directly inside PostgreSQL.
 
 * Lives in `golang/`
 * Generated core in `golang/pkg/rulebook/`
-* Test runner: `golang/run-tests.go` 
+* Test runner: `golang/run-tests.go`
 
 The Go runner:
 
@@ -384,7 +404,7 @@ All three engines are wired into a single test protocol.
 
 ### 7.1 Test data split: base vs projected
 
-A script, `generate-test-data.py`, reads the ERB and creates three JSON files in `test-data/`: 
+A script, `generate-test-data.py`, reads the ERB and creates three JSON files in `test-data/`:
 
 * `base-data.json`
 
@@ -525,13 +545,13 @@ The whole point of the ERB + generator + test harness stack is that adding a new
 
    * give it a SystemID, DisplayName, class (`fractal` vs `power_law`),
    * declare `BaseScale`, `ScaleFactor`, `MeasureName`,
-   * specify a theoretical log–log slope. 
+   * specify a theoretical log–log slope.
 
 2. **Add idealized `scales`** if you have a clean construction.
 
 3. **Add noisy `observed_scales`** if you have real or simulated data.
 
-4. **Add an `inference_runs` row** describing the fit (OLS/log–log, number of points, etc.). 
+4. **Add an `inference_runs` row** describing the fit (OLS/log–log, number of points, etc.).
 
 5. Regenerate test data + code, run the orchestrator, and inspect the new system in the report.
 
@@ -569,3 +589,24 @@ For science communicators, that means:
 If we’ve been “playing the game of life wrong” by assuming we live in a Gaussian world,
 this repo is one small attempt to show what it looks like to **take the power-law world seriously**—
 not just in animations and plots, but in code, queries, and tests anyone can rerun.
+
+---
+
+## 11. CMCC (Briefly): Why “One Rulebook → Many Runtimes” Works
+
+This repo isn’t *about* CMCC. But the reason the ERB approach works as cleanly as it does is basically the CMCC bet:
+
+> A lot of domain logic can be expressed declaratively using a small set of primitives—**schema, data, lookups, aggregations, and formulas**—so the “meaning” lives in a rulebook you can translate, not in hand-copied implementations. ([Zenodo][1])
+
+In this repository, that shows up as:
+
+* **Schema + Data**: the ERB declares entities/fields, and the test JSON files carry the ground facts.
+* **Lookups**: explicit inheritance / parent references (the Excel-ish `INDEX/MATCH` style fields).
+* **Calculated fields**: the pure formulas (`POWER`, `LOG10`, etc.) that generate derived columns.
+* **Aggregations**: rollups for fitted slopes, ranges, residual summaries, and quality metrics.
+
+Nothing here requires you to buy any big universality claims to benefit from the structure—but CMCC is a useful lens for explaining *why* the “single source of truth” stays coherent across Python, SQL, and Go.
+
+*(Edits applied to your provided README.md.)* 
+
+[1]: https://zenodo.org/records/14761025?utm_source=chatgpt.com "The Conceptual Model Completeness Conjecture (CMCC) ..."
