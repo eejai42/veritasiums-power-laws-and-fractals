@@ -6,110 +6,194 @@
 
 -- Insert data for systems
 INSERT INTO systems (system_id, display_name, class, base_scale, scale_factor, measure_name, fractal_dimension, theoretical_log_log_slope)
-VALUES ('Sierpinski', 'Sierpinski Triangle', 'fractal', 1.0, 0.5, 'black_triangle_count', 1.585, -1.585);
+VALUES ('Sierpinski', 'Sierpinski Triangle', 'fractal', 1, 0.5, 'black_triangle_count', 1.585, -1.585);
 
 INSERT INTO systems (system_id, display_name, class, base_scale, scale_factor, measure_name, fractal_dimension, theoretical_log_log_slope)
-VALUES ('Koch', 'Koch Snowflake (edge)', 'fractal', 1.0, 0.3333333333, 'edge_length_total', 1.262, -0.262);
+VALUES ('Koch', 'Koch Snowflake (edge)', 'fractal', 1, 0.3333333333, 'edge_length_total', 1.262, -0.262);
 
 INSERT INTO systems (system_id, display_name, class, base_scale, scale_factor, measure_name, fractal_dimension, theoretical_log_log_slope)
-VALUES ('ZipfWords', 'Zipf word frequencies', 'power_law', 1.0, 2.0, 'relative_frequency', NULL, -1.0);
+VALUES ('ZipfWords', 'Zipf word frequencies', 'power_law', 1, 2, 'relative_frequency', NULL, -1);
 
 INSERT INTO systems (system_id, display_name, class, base_scale, scale_factor, measure_name, fractal_dimension, theoretical_log_log_slope)
-VALUES ('ScaleFreeNet', 'Scale-free network degrees', 'power_law', 1.0, 2.0, 'node_count_at_degree', NULL, -2.5);
+VALUES ('ScaleFreeNet', 'Scale-free network degrees', 'power_law', 1, 2, 'node_count_at_degree', NULL, -2.5);
 
 INSERT INTO systems (system_id, display_name, class, base_scale, scale_factor, measure_name, fractal_dimension, theoretical_log_log_slope)
-VALUES ('Sandpile', 'Sandpile avalanches', 'power_law', 1.0, 2.0, 'relative_frequency_of_avalanches', NULL, -1.0);
+VALUES ('Sandpile', 'Sandpile avalanches', 'power_law', 1, 2, 'relative_frequency_of_avalanches', NULL, -1);
 
 INSERT INTO systems (system_id, display_name, class, base_scale, scale_factor, measure_name, fractal_dimension, theoretical_log_log_slope)
-VALUES ('Earthquakes', 'Earthquake energies', 'power_law', 1.0, 2.0, 'relative_frequency_of_quakes', NULL, -1.0);
+VALUES ('Earthquakes', 'Earthquake energies', 'power_law', 1, 2, 'relative_frequency_of_quakes', NULL, -1);
 
 INSERT INTO systems (system_id, display_name, class, base_scale, scale_factor, measure_name, fractal_dimension, theoretical_log_log_slope)
-VALUES ('ForestFires', 'Forest fire sizes', 'power_law', 1.0, 2.0, 'relative_frequency_of_fires', NULL, -1.3);
+VALUES ('ForestFires', 'Forest fire sizes', 'power_law', 1, 2, 'relative_frequency_of_fires', NULL, -1.3);
 
 -- Insert data for scales
-INSERT INTO scales (scale_id, "system", iteration, measure)
-VALUES ('Sierpinski_0', 'Sierpinski', 0, 1.0);
+INSERT INTO scales (scale_id, "system", iteration, measure, is_projected, data_regime, measurement_model)
+VALUES ('Sierpinski_0', 'Sierpinski', 0, 1, FALSE, 'ideal', NULL);
 
-INSERT INTO scales (scale_id, "system", iteration, measure)
-VALUES ('Sierpinski_1', 'Sierpinski', 1, 3.0);
+INSERT INTO scales (scale_id, "system", iteration, measure, is_projected, data_regime, measurement_model)
+VALUES ('Sierpinski_1', 'Sierpinski', 1, 3, FALSE, 'ideal', NULL);
 
-INSERT INTO scales (scale_id, "system", iteration, measure)
-VALUES ('Sierpinski_2', 'Sierpinski', 2, 9.0);
+INSERT INTO scales (scale_id, "system", iteration, measure, is_projected, data_regime, measurement_model)
+VALUES ('Sierpinski_2', 'Sierpinski', 2, 9, FALSE, 'ideal', NULL);
 
-INSERT INTO scales (scale_id, "system", iteration, measure)
-VALUES ('Sierpinski_3', 'Sierpinski', 3, 27.0);
+INSERT INTO scales (scale_id, "system", iteration, measure, is_projected, data_regime, measurement_model)
+VALUES ('Sierpinski_3', 'Sierpinski', 3, 27, FALSE, 'ideal', NULL);
 
-INSERT INTO scales (scale_id, "system", iteration, measure)
-VALUES ('Koch_0', 'Koch', 0, 1.0);
+INSERT INTO scales (scale_id, "system", iteration, measure, is_projected, data_regime, measurement_model)
+VALUES ('Sierpinski_4', 'Sierpinski', 4, 82.5, TRUE, 'ideal', NULL);
 
-INSERT INTO scales (scale_id, "system", iteration, measure)
-VALUES ('Koch_1', 'Koch', 1, 1.3333333333);
+INSERT INTO scales (scale_id, "system", iteration, measure, is_projected, data_regime, measurement_model)
+VALUES ('Sierpinski_5', 'Sierpinski', 5, 246.2, TRUE, 'ideal', NULL);
 
-INSERT INTO scales (scale_id, "system", iteration, measure)
-VALUES ('Koch_2', 'Koch', 2, 1.7777777777);
+INSERT INTO scales (scale_id, "system", iteration, measure, is_projected, data_regime, measurement_model)
+VALUES ('Sierpinski_6', 'Sierpinski', 6, 711, TRUE, 'ideal', NULL);
 
-INSERT INTO scales (scale_id, "system", iteration, measure)
-VALUES ('Koch_3', 'Koch', 3, 2.3703703703);
+INSERT INTO scales (scale_id, "system", iteration, measure, is_projected, data_regime, measurement_model)
+VALUES ('Sierpinski_7', 'Sierpinski', 7, 2225, TRUE, 'ideal', NULL);
 
-INSERT INTO scales (scale_id, "system", iteration, measure)
-VALUES ('ZipfWords_0', 'ZipfWords', 0, 1.0);
+INSERT INTO scales (scale_id, "system", iteration, measure, is_projected, data_regime, measurement_model)
+VALUES ('Koch_0', 'Koch', 0, 1, FALSE, 'ideal', NULL);
 
-INSERT INTO scales (scale_id, "system", iteration, measure)
-VALUES ('ZipfWords_1', 'ZipfWords', 1, 0.5);
+INSERT INTO scales (scale_id, "system", iteration, measure, is_projected, data_regime, measurement_model)
+VALUES ('Koch_1', 'Koch', 1, 1.3333333333, FALSE, 'ideal', NULL);
 
-INSERT INTO scales (scale_id, "system", iteration, measure)
-VALUES ('ZipfWords_2', 'ZipfWords', 2, 0.25);
+INSERT INTO scales (scale_id, "system", iteration, measure, is_projected, data_regime, measurement_model)
+VALUES ('Koch_2', 'Koch', 2, 1.7777777777, FALSE, 'ideal', NULL);
 
-INSERT INTO scales (scale_id, "system", iteration, measure)
-VALUES ('ZipfWords_3', 'ZipfWords', 3, 0.125);
+INSERT INTO scales (scale_id, "system", iteration, measure, is_projected, data_regime, measurement_model)
+VALUES ('Koch_3', 'Koch', 3, 2.3703703703, FALSE, 'ideal', NULL);
 
-INSERT INTO scales (scale_id, "system", iteration, measure)
-VALUES ('ScaleFreeNet_0', 'ScaleFreeNet', 0, 1.0);
+INSERT INTO scales (scale_id, "system", iteration, measure, is_projected, data_regime, measurement_model)
+VALUES ('Koch_4', 'Koch', 4, 3.22, TRUE, 'ideal', NULL);
 
-INSERT INTO scales (scale_id, "system", iteration, measure)
-VALUES ('ScaleFreeNet_1', 'ScaleFreeNet', 1, 0.1767766953);
+INSERT INTO scales (scale_id, "system", iteration, measure, is_projected, data_regime, measurement_model)
+VALUES ('Koch_5', 'Koch', 5, 4.15, TRUE, 'ideal', NULL);
 
-INSERT INTO scales (scale_id, "system", iteration, measure)
-VALUES ('ScaleFreeNet_2', 'ScaleFreeNet', 2, 0.03125);
+INSERT INTO scales (scale_id, "system", iteration, measure, is_projected, data_regime, measurement_model)
+VALUES ('Koch_6', 'Koch', 6, 5.71, TRUE, 'ideal', NULL);
 
-INSERT INTO scales (scale_id, "system", iteration, measure)
-VALUES ('ScaleFreeNet_3', 'ScaleFreeNet', 3, 0.0055242717);
+INSERT INTO scales (scale_id, "system", iteration, measure, is_projected, data_regime, measurement_model)
+VALUES ('Koch_7', 'Koch', 7, 7.38, TRUE, 'ideal', NULL);
 
-INSERT INTO scales (scale_id, "system", iteration, measure)
-VALUES ('Sandpile_0', 'Sandpile', 0, 1.0);
+INSERT INTO scales (scale_id, "system", iteration, measure, is_projected, data_regime, measurement_model)
+VALUES ('ZipfWords_0', 'ZipfWords', 0, 1, FALSE, 'ideal', NULL);
 
-INSERT INTO scales (scale_id, "system", iteration, measure)
-VALUES ('Sandpile_1', 'Sandpile', 1, 0.5);
+INSERT INTO scales (scale_id, "system", iteration, measure, is_projected, data_regime, measurement_model)
+VALUES ('ZipfWords_1', 'ZipfWords', 1, 0.5, FALSE, 'ideal', NULL);
 
-INSERT INTO scales (scale_id, "system", iteration, measure)
-VALUES ('Sandpile_2', 'Sandpile', 2, 0.25);
+INSERT INTO scales (scale_id, "system", iteration, measure, is_projected, data_regime, measurement_model)
+VALUES ('ZipfWords_2', 'ZipfWords', 2, 0.25, FALSE, 'ideal', NULL);
 
-INSERT INTO scales (scale_id, "system", iteration, measure)
-VALUES ('Sandpile_3', 'Sandpile', 3, 0.125);
+INSERT INTO scales (scale_id, "system", iteration, measure, is_projected, data_regime, measurement_model)
+VALUES ('ZipfWords_3', 'ZipfWords', 3, 0.125, FALSE, 'ideal', NULL);
 
-INSERT INTO scales (scale_id, "system", iteration, measure)
-VALUES ('Earthquakes_0', 'Earthquakes', 0, 1.0);
+INSERT INTO scales (scale_id, "system", iteration, measure, is_projected, data_regime, measurement_model)
+VALUES ('ZipfWords_4', 'ZipfWords', 4, 0.0638, TRUE, 'ideal', NULL);
 
-INSERT INTO scales (scale_id, "system", iteration, measure)
-VALUES ('Earthquakes_1', 'Earthquakes', 1, 0.5);
+INSERT INTO scales (scale_id, "system", iteration, measure, is_projected, data_regime, measurement_model)
+VALUES ('ZipfWords_5', 'ZipfWords', 5, 0.0305, TRUE, 'ideal', NULL);
 
-INSERT INTO scales (scale_id, "system", iteration, measure)
-VALUES ('Earthquakes_2', 'Earthquakes', 2, 0.25);
+INSERT INTO scales (scale_id, "system", iteration, measure, is_projected, data_regime, measurement_model)
+VALUES ('ZipfWords_6', 'ZipfWords', 6, 0.0161, TRUE, 'ideal', NULL);
 
-INSERT INTO scales (scale_id, "system", iteration, measure)
-VALUES ('Earthquakes_3', 'Earthquakes', 3, 0.125);
+INSERT INTO scales (scale_id, "system", iteration, measure, is_projected, data_regime, measurement_model)
+VALUES ('ZipfWords_7', 'ZipfWords', 7, 0.0076, TRUE, 'ideal', NULL);
 
-INSERT INTO scales (scale_id, "system", iteration, measure)
-VALUES ('ForestFires_0', 'ForestFires', 0, 1.0);
+INSERT INTO scales (scale_id, "system", iteration, measure, is_projected, data_regime, measurement_model)
+VALUES ('ScaleFreeNet_0', 'ScaleFreeNet', 0, 1, FALSE, 'ideal', NULL);
 
-INSERT INTO scales (scale_id, "system", iteration, measure)
-VALUES ('ForestFires_1', 'ForestFires', 1, 0.4061384660);
+INSERT INTO scales (scale_id, "system", iteration, measure, is_projected, data_regime, measurement_model)
+VALUES ('ScaleFreeNet_1', 'ScaleFreeNet', 1, 0.1767766953, FALSE, 'ideal', NULL);
 
-INSERT INTO scales (scale_id, "system", iteration, measure)
-VALUES ('ForestFires_2', 'ForestFires', 2, 0.1649530609);
+INSERT INTO scales (scale_id, "system", iteration, measure, is_projected, data_regime, measurement_model)
+VALUES ('ScaleFreeNet_2', 'ScaleFreeNet', 2, 0.03125, FALSE, 'ideal', NULL);
 
-INSERT INTO scales (scale_id, "system", iteration, measure)
-VALUES ('ForestFires_3', 'ForestFires', 3, 0.0670201180);
+INSERT INTO scales (scale_id, "system", iteration, measure, is_projected, data_regime, measurement_model)
+VALUES ('ScaleFreeNet_3', 'ScaleFreeNet', 3, 0.0055242717, FALSE, 'ideal', NULL);
+
+INSERT INTO scales (scale_id, "system", iteration, measure, is_projected, data_regime, measurement_model)
+VALUES ('ScaleFreeNet_4', 'ScaleFreeNet', 4, 0.00102, TRUE, 'ideal', NULL);
+
+INSERT INTO scales (scale_id, "system", iteration, measure, is_projected, data_regime, measurement_model)
+VALUES ('ScaleFreeNet_5', 'ScaleFreeNet', 5, 0.000168, TRUE, 'ideal', NULL);
+
+INSERT INTO scales (scale_id, "system", iteration, measure, is_projected, data_regime, measurement_model)
+VALUES ('ScaleFreeNet_6', 'ScaleFreeNet', 6, 3.18e-05, TRUE, 'ideal', NULL);
+
+INSERT INTO scales (scale_id, "system", iteration, measure, is_projected, data_regime, measurement_model)
+VALUES ('ScaleFreeNet_7', 'ScaleFreeNet', 7, 5.21e-06, TRUE, 'ideal', NULL);
+
+INSERT INTO scales (scale_id, "system", iteration, measure, is_projected, data_regime, measurement_model)
+VALUES ('Sandpile_0', 'Sandpile', 0, 1, FALSE, 'ideal', NULL);
+
+INSERT INTO scales (scale_id, "system", iteration, measure, is_projected, data_regime, measurement_model)
+VALUES ('Sandpile_1', 'Sandpile', 1, 0.5, FALSE, 'ideal', NULL);
+
+INSERT INTO scales (scale_id, "system", iteration, measure, is_projected, data_regime, measurement_model)
+VALUES ('Sandpile_2', 'Sandpile', 2, 0.25, FALSE, 'ideal', NULL);
+
+INSERT INTO scales (scale_id, "system", iteration, measure, is_projected, data_regime, measurement_model)
+VALUES ('Sandpile_3', 'Sandpile', 3, 0.125, FALSE, 'ideal', NULL);
+
+INSERT INTO scales (scale_id, "system", iteration, measure, is_projected, data_regime, measurement_model)
+VALUES ('Sandpile_4', 'Sandpile', 4, 0.0612, TRUE, 'ideal', NULL);
+
+INSERT INTO scales (scale_id, "system", iteration, measure, is_projected, data_regime, measurement_model)
+VALUES ('Sandpile_5', 'Sandpile', 5, 0.0319, TRUE, 'ideal', NULL);
+
+INSERT INTO scales (scale_id, "system", iteration, measure, is_projected, data_regime, measurement_model)
+VALUES ('Sandpile_6', 'Sandpile', 6, 0.0152, TRUE, 'ideal', NULL);
+
+INSERT INTO scales (scale_id, "system", iteration, measure, is_projected, data_regime, measurement_model)
+VALUES ('Sandpile_7', 'Sandpile', 7, 0.00798, TRUE, 'ideal', NULL);
+
+INSERT INTO scales (scale_id, "system", iteration, measure, is_projected, data_regime, measurement_model)
+VALUES ('Earthquakes_0', 'Earthquakes', 0, 1, FALSE, 'ideal', NULL);
+
+INSERT INTO scales (scale_id, "system", iteration, measure, is_projected, data_regime, measurement_model)
+VALUES ('Earthquakes_1', 'Earthquakes', 1, 0.5, FALSE, 'ideal', NULL);
+
+INSERT INTO scales (scale_id, "system", iteration, measure, is_projected, data_regime, measurement_model)
+VALUES ('Earthquakes_2', 'Earthquakes', 2, 0.25, FALSE, 'ideal', NULL);
+
+INSERT INTO scales (scale_id, "system", iteration, measure, is_projected, data_regime, measurement_model)
+VALUES ('Earthquakes_3', 'Earthquakes', 3, 0.125, FALSE, 'ideal', NULL);
+
+INSERT INTO scales (scale_id, "system", iteration, measure, is_projected, data_regime, measurement_model)
+VALUES ('Earthquakes_4', 'Earthquakes', 4, 0.0641, TRUE, 'ideal', NULL);
+
+INSERT INTO scales (scale_id, "system", iteration, measure, is_projected, data_regime, measurement_model)
+VALUES ('Earthquakes_5', 'Earthquakes', 5, 0.0308, TRUE, 'ideal', NULL);
+
+INSERT INTO scales (scale_id, "system", iteration, measure, is_projected, data_regime, measurement_model)
+VALUES ('Earthquakes_6', 'Earthquakes', 6, 0.0159, TRUE, 'ideal', NULL);
+
+INSERT INTO scales (scale_id, "system", iteration, measure, is_projected, data_regime, measurement_model)
+VALUES ('Earthquakes_7', 'Earthquakes', 7, 0.00762, TRUE, 'ideal', NULL);
+
+INSERT INTO scales (scale_id, "system", iteration, measure, is_projected, data_regime, measurement_model)
+VALUES ('ForestFires_0', 'ForestFires', 0, 1, FALSE, 'ideal', NULL);
+
+INSERT INTO scales (scale_id, "system", iteration, measure, is_projected, data_regime, measurement_model)
+VALUES ('ForestFires_1', 'ForestFires', 1, 0.406138466, FALSE, 'ideal', NULL);
+
+INSERT INTO scales (scale_id, "system", iteration, measure, is_projected, data_regime, measurement_model)
+VALUES ('ForestFires_2', 'ForestFires', 2, 0.1649530609, FALSE, 'ideal', NULL);
+
+INSERT INTO scales (scale_id, "system", iteration, measure, is_projected, data_regime, measurement_model)
+VALUES ('ForestFires_3', 'ForestFires', 3, 0.067020118, FALSE, 'ideal', NULL);
+
+INSERT INTO scales (scale_id, "system", iteration, measure, is_projected, data_regime, measurement_model)
+VALUES ('ForestFires_4', 'ForestFires', 4, 0.0281, TRUE, 'ideal', NULL);
+
+INSERT INTO scales (scale_id, "system", iteration, measure, is_projected, data_regime, measurement_model)
+VALUES ('ForestFires_5', 'ForestFires', 5, 0.0107, TRUE, 'ideal', NULL);
+
+INSERT INTO scales (scale_id, "system", iteration, measure, is_projected, data_regime, measurement_model)
+VALUES ('ForestFires_6', 'ForestFires', 6, 0.00461, TRUE, 'ideal', NULL);
+
+INSERT INTO scales (scale_id, "system", iteration, measure, is_projected, data_regime, measurement_model)
+VALUES ('ForestFires_7', 'ForestFires', 7, 0.00177, TRUE, 'ideal', NULL);
 
 -- Insert data for system_stats
 INSERT INTO system_stats (system_stats_id, "system", analysis_name, status)
@@ -132,4 +216,217 @@ VALUES ('Earthquakes_Stats', 'Earthquakes', 'Earthquake Energy Analysis', 'valid
 
 INSERT INTO system_stats (system_stats_id, "system", analysis_name, status)
 VALUES ('ForestFires_Stats', 'ForestFires', 'Forest Fire Size Analysis', 'validated');
+
+-- Insert data for measurement_models
+INSERT INTO measurement_models (measurement_model_id, "system", data_regime, noise_type, noise_sigma, cutoff_min_scale, cutoff_max_scale, discretization_type, discretization_param)
+VALUES ('Sierpinski_MM1', 'Sierpinski', 'measured', 'lognormal', 0.12, 1.0, 0.0078125, 'rounding', 'decimals=4');
+
+INSERT INTO measurement_models (measurement_model_id, "system", data_regime, noise_type, noise_sigma, cutoff_min_scale, cutoff_max_scale, discretization_type, discretization_param)
+VALUES ('Koch_MM1', 'Koch', 'measured', 'lognormal', 0.12, 1.0, 0.0004572473705075444, 'rounding', 'decimals=4');
+
+INSERT INTO measurement_models (measurement_model_id, "system", data_regime, noise_type, noise_sigma, cutoff_min_scale, cutoff_max_scale, discretization_type, discretization_param)
+VALUES ('ZipfWords_MM1', 'ZipfWords', 'measured', 'lognormal', 0.18, 1, 128, 'rounding', 'decimals=4');
+
+INSERT INTO measurement_models (measurement_model_id, "system", data_regime, noise_type, noise_sigma, cutoff_min_scale, cutoff_max_scale, discretization_type, discretization_param)
+VALUES ('ScaleFreeNet_MM1', 'ScaleFreeNet', 'measured', 'lognormal', 0.18, 1, 128, 'rounding', 'decimals=4');
+
+INSERT INTO measurement_models (measurement_model_id, "system", data_regime, noise_type, noise_sigma, cutoff_min_scale, cutoff_max_scale, discretization_type, discretization_param)
+VALUES ('Sandpile_MM1', 'Sandpile', 'measured', 'lognormal', 0.18, 1, 128, 'rounding', 'decimals=4');
+
+INSERT INTO measurement_models (measurement_model_id, "system", data_regime, noise_type, noise_sigma, cutoff_min_scale, cutoff_max_scale, discretization_type, discretization_param)
+VALUES ('Earthquakes_MM1', 'Earthquakes', 'measured', 'lognormal', 0.18, 1, 128, 'rounding', 'decimals=4');
+
+INSERT INTO measurement_models (measurement_model_id, "system", data_regime, noise_type, noise_sigma, cutoff_min_scale, cutoff_max_scale, discretization_type, discretization_param)
+VALUES ('ForestFires_MM1', 'ForestFires', 'measured', 'lognormal', 0.18, 1, 128, 'rounding', 'decimals=4');
+
+-- Insert data for observed_scales
+INSERT INTO observed_scales (observed_scale_id, "system", measurement_model, iteration, measure, data_regime)
+VALUES ('Sierpinski_OBS_0', 'Sierpinski', 'Sierpinski_MM1', 0, 1.0001, 'measured');
+
+INSERT INTO observed_scales (observed_scale_id, "system", measurement_model, iteration, measure, data_regime)
+VALUES ('Sierpinski_OBS_1', 'Sierpinski', 'Sierpinski_MM1', 1, 3.1095, 'measured');
+
+INSERT INTO observed_scales (observed_scale_id, "system", measurement_model, iteration, measure, data_regime)
+VALUES ('Sierpinski_OBS_2', 'Sierpinski', 'Sierpinski_MM1', 2, 8.7087, 'measured');
+
+INSERT INTO observed_scales (observed_scale_id, "system", measurement_model, iteration, measure, data_regime)
+VALUES ('Sierpinski_OBS_3', 'Sierpinski', 'Sierpinski_MM1', 3, 24.2633, 'measured');
+
+INSERT INTO observed_scales (observed_scale_id, "system", measurement_model, iteration, measure, data_regime)
+VALUES ('Sierpinski_OBS_4', 'Sierpinski', 'Sierpinski_MM1', 4, 78.1194, 'measured');
+
+INSERT INTO observed_scales (observed_scale_id, "system", measurement_model, iteration, measure, data_regime)
+VALUES ('Sierpinski_OBS_5', 'Sierpinski', 'Sierpinski_MM1', 5, 218.5788, 'measured');
+
+INSERT INTO observed_scales (observed_scale_id, "system", measurement_model, iteration, measure, data_regime)
+VALUES ('Sierpinski_OBS_6', 'Sierpinski', 'Sierpinski_MM1', 6, 716.15, 'measured');
+
+INSERT INTO observed_scales (observed_scale_id, "system", measurement_model, iteration, measure, data_regime)
+VALUES ('Sierpinski_OBS_7', 'Sierpinski', 'Sierpinski_MM1', 7, 2613.2189, 'measured');
+
+INSERT INTO observed_scales (observed_scale_id, "system", measurement_model, iteration, measure, data_regime)
+VALUES ('Koch_OBS_0', 'Koch', 'Koch_MM1', 0, 0.9426, 'measured');
+
+INSERT INTO observed_scales (observed_scale_id, "system", measurement_model, iteration, measure, data_regime)
+VALUES ('Koch_OBS_1', 'Koch', 'Koch_MM1', 1, 1.2377, 'measured');
+
+INSERT INTO observed_scales (observed_scale_id, "system", measurement_model, iteration, measure, data_regime)
+VALUES ('Koch_OBS_2', 'Koch', 'Koch_MM1', 2, 1.8854, 'measured');
+
+INSERT INTO observed_scales (observed_scale_id, "system", measurement_model, iteration, measure, data_regime)
+VALUES ('Koch_OBS_3', 'Koch', 'Koch_MM1', 3, 2.4741, 'measured');
+
+INSERT INTO observed_scales (observed_scale_id, "system", measurement_model, iteration, measure, data_regime)
+VALUES ('Koch_OBS_4', 'Koch', 'Koch_MM1', 4, 3.261, 'measured');
+
+INSERT INTO observed_scales (observed_scale_id, "system", measurement_model, iteration, measure, data_regime)
+VALUES ('Koch_OBS_5', 'Koch', 'Koch_MM1', 5, 3.7116, 'measured');
+
+INSERT INTO observed_scales (observed_scale_id, "system", measurement_model, iteration, measure, data_regime)
+VALUES ('Koch_OBS_6', 'Koch', 'Koch_MM1', 6, 5.69, 'measured');
+
+INSERT INTO observed_scales (observed_scale_id, "system", measurement_model, iteration, measure, data_regime)
+VALUES ('Koch_OBS_7', 'Koch', 'Koch_MM1', 7, 8.0222, 'measured');
+
+INSERT INTO observed_scales (observed_scale_id, "system", measurement_model, iteration, measure, data_regime)
+VALUES ('ZipfWords_OBS_0', 'ZipfWords', 'ZipfWords_MM1', 0, 0.7851, 'measured');
+
+INSERT INTO observed_scales (observed_scale_id, "system", measurement_model, iteration, measure, data_regime)
+VALUES ('ZipfWords_OBS_1', 'ZipfWords', 'ZipfWords_MM1', 1, 0.4605, 'measured');
+
+INSERT INTO observed_scales (observed_scale_id, "system", measurement_model, iteration, measure, data_regime)
+VALUES ('ZipfWords_OBS_2', 'ZipfWords', 'ZipfWords_MM1', 2, 0.1775, 'measured');
+
+INSERT INTO observed_scales (observed_scale_id, "system", measurement_model, iteration, measure, data_regime)
+VALUES ('ZipfWords_OBS_3', 'ZipfWords', 'ZipfWords_MM1', 3, 0.0991, 'measured');
+
+INSERT INTO observed_scales (observed_scale_id, "system", measurement_model, iteration, measure, data_regime)
+VALUES ('ZipfWords_OBS_4', 'ZipfWords', 'ZipfWords_MM1', 4, 0.0458, 'measured');
+
+INSERT INTO observed_scales (observed_scale_id, "system", measurement_model, iteration, measure, data_regime)
+VALUES ('ZipfWords_OBS_5', 'ZipfWords', 'ZipfWords_MM1', 5, 0.0292, 'measured');
+
+INSERT INTO observed_scales (observed_scale_id, "system", measurement_model, iteration, measure, data_regime)
+VALUES ('ZipfWords_OBS_6', 'ZipfWords', 'ZipfWords_MM1', 6, 0.0128, 'measured');
+
+INSERT INTO observed_scales (observed_scale_id, "system", measurement_model, iteration, measure, data_regime)
+VALUES ('ZipfWords_OBS_7', 'ZipfWords', 'ZipfWords_MM1', 7, 0.008, 'measured');
+
+INSERT INTO observed_scales (observed_scale_id, "system", measurement_model, iteration, measure, data_regime)
+VALUES ('ScaleFreeNet_OBS_0', 'ScaleFreeNet', 'ScaleFreeNet_MM1', 0, 1.0286, 'measured');
+
+INSERT INTO observed_scales (observed_scale_id, "system", measurement_model, iteration, measure, data_regime)
+VALUES ('ScaleFreeNet_OBS_1', 'ScaleFreeNet', 'ScaleFreeNet_MM1', 1, 0.1709, 'measured');
+
+INSERT INTO observed_scales (observed_scale_id, "system", measurement_model, iteration, measure, data_regime)
+VALUES ('ScaleFreeNet_OBS_2', 'ScaleFreeNet', 'ScaleFreeNet_MM1', 2, 0.0199, 'measured');
+
+INSERT INTO observed_scales (observed_scale_id, "system", measurement_model, iteration, measure, data_regime)
+VALUES ('ScaleFreeNet_OBS_3', 'ScaleFreeNet', 'ScaleFreeNet_MM1', 3, 0.005, 'measured');
+
+INSERT INTO observed_scales (observed_scale_id, "system", measurement_model, iteration, measure, data_regime)
+VALUES ('ScaleFreeNet_OBS_4', 'ScaleFreeNet', 'ScaleFreeNet_MM1', 4, 0.001, 'measured');
+
+INSERT INTO observed_scales (observed_scale_id, "system", measurement_model, iteration, measure, data_regime)
+VALUES ('ScaleFreeNet_OBS_5', 'ScaleFreeNet', 'ScaleFreeNet_MM1', 5, 0.0002, 'measured');
+
+INSERT INTO observed_scales (observed_scale_id, "system", measurement_model, iteration, measure, data_regime)
+VALUES ('ScaleFreeNet_OBS_6', 'ScaleFreeNet', 'ScaleFreeNet_MM1', 6, 2.4144143656495023e-05, 'measured');
+
+INSERT INTO observed_scales (observed_scale_id, "system", measurement_model, iteration, measure, data_regime)
+VALUES ('ScaleFreeNet_OBS_7', 'ScaleFreeNet', 'ScaleFreeNet_MM1', 7, 4.780687028940912e-06, 'measured');
+
+INSERT INTO observed_scales (observed_scale_id, "system", measurement_model, iteration, measure, data_regime)
+VALUES ('Sandpile_OBS_0', 'Sandpile', 'Sandpile_MM1', 0, 0.8385, 'measured');
+
+INSERT INTO observed_scales (observed_scale_id, "system", measurement_model, iteration, measure, data_regime)
+VALUES ('Sandpile_OBS_1', 'Sandpile', 'Sandpile_MM1', 1, 0.4323, 'measured');
+
+INSERT INTO observed_scales (observed_scale_id, "system", measurement_model, iteration, measure, data_regime)
+VALUES ('Sandpile_OBS_2', 'Sandpile', 'Sandpile_MM1', 2, 0.3026, 'measured');
+
+INSERT INTO observed_scales (observed_scale_id, "system", measurement_model, iteration, measure, data_regime)
+VALUES ('Sandpile_OBS_3', 'Sandpile', 'Sandpile_MM1', 3, 0.1081, 'measured');
+
+INSERT INTO observed_scales (observed_scale_id, "system", measurement_model, iteration, measure, data_regime)
+VALUES ('Sandpile_OBS_4', 'Sandpile', 'Sandpile_MM1', 4, 0.0608, 'measured');
+
+INSERT INTO observed_scales (observed_scale_id, "system", measurement_model, iteration, measure, data_regime)
+VALUES ('Sandpile_OBS_5', 'Sandpile', 'Sandpile_MM1', 5, 0.0374, 'measured');
+
+INSERT INTO observed_scales (observed_scale_id, "system", measurement_model, iteration, measure, data_regime)
+VALUES ('Sandpile_OBS_6', 'Sandpile', 'Sandpile_MM1', 6, 0.0137, 'measured');
+
+INSERT INTO observed_scales (observed_scale_id, "system", measurement_model, iteration, measure, data_regime)
+VALUES ('Sandpile_OBS_7', 'Sandpile', 'Sandpile_MM1', 7, 0.0078, 'measured');
+
+INSERT INTO observed_scales (observed_scale_id, "system", measurement_model, iteration, measure, data_regime)
+VALUES ('Earthquakes_OBS_0', 'Earthquakes', 'Earthquakes_MM1', 0, 1.0201, 'measured');
+
+INSERT INTO observed_scales (observed_scale_id, "system", measurement_model, iteration, measure, data_regime)
+VALUES ('Earthquakes_OBS_1', 'Earthquakes', 'Earthquakes_MM1', 1, 0.5058, 'measured');
+
+INSERT INTO observed_scales (observed_scale_id, "system", measurement_model, iteration, measure, data_regime)
+VALUES ('Earthquakes_OBS_2', 'Earthquakes', 'Earthquakes_MM1', 2, 0.2005, 'measured');
+
+INSERT INTO observed_scales (observed_scale_id, "system", measurement_model, iteration, measure, data_regime)
+VALUES ('Earthquakes_OBS_3', 'Earthquakes', 'Earthquakes_MM1', 3, 0.1267, 'measured');
+
+INSERT INTO observed_scales (observed_scale_id, "system", measurement_model, iteration, measure, data_regime)
+VALUES ('Earthquakes_OBS_4', 'Earthquakes', 'Earthquakes_MM1', 4, 0.0819, 'measured');
+
+INSERT INTO observed_scales (observed_scale_id, "system", measurement_model, iteration, measure, data_regime)
+VALUES ('Earthquakes_OBS_5', 'Earthquakes', 'Earthquakes_MM1', 5, 0.0233, 'measured');
+
+INSERT INTO observed_scales (observed_scale_id, "system", measurement_model, iteration, measure, data_regime)
+VALUES ('Earthquakes_OBS_6', 'Earthquakes', 'Earthquakes_MM1', 6, 0.0186, 'measured');
+
+INSERT INTO observed_scales (observed_scale_id, "system", measurement_model, iteration, measure, data_regime)
+VALUES ('Earthquakes_OBS_7', 'Earthquakes', 'Earthquakes_MM1', 7, 0.0078, 'measured');
+
+INSERT INTO observed_scales (observed_scale_id, "system", measurement_model, iteration, measure, data_regime)
+VALUES ('ForestFires_OBS_0', 'ForestFires', 'ForestFires_MM1', 0, 0.891, 'measured');
+
+INSERT INTO observed_scales (observed_scale_id, "system", measurement_model, iteration, measure, data_regime)
+VALUES ('ForestFires_OBS_1', 'ForestFires', 'ForestFires_MM1', 1, 0.5822, 'measured');
+
+INSERT INTO observed_scales (observed_scale_id, "system", measurement_model, iteration, measure, data_regime)
+VALUES ('ForestFires_OBS_2', 'ForestFires', 'ForestFires_MM1', 2, 0.1892, 'measured');
+
+INSERT INTO observed_scales (observed_scale_id, "system", measurement_model, iteration, measure, data_regime)
+VALUES ('ForestFires_OBS_3', 'ForestFires', 'ForestFires_MM1', 3, 0.054, 'measured');
+
+INSERT INTO observed_scales (observed_scale_id, "system", measurement_model, iteration, measure, data_regime)
+VALUES ('ForestFires_OBS_4', 'ForestFires', 'ForestFires_MM1', 4, 0.0285, 'measured');
+
+INSERT INTO observed_scales (observed_scale_id, "system", measurement_model, iteration, measure, data_regime)
+VALUES ('ForestFires_OBS_5', 'ForestFires', 'ForestFires_MM1', 5, 0.0119, 'measured');
+
+INSERT INTO observed_scales (observed_scale_id, "system", measurement_model, iteration, measure, data_regime)
+VALUES ('ForestFires_OBS_6', 'ForestFires', 'ForestFires_MM1', 6, 0.0045, 'measured');
+
+INSERT INTO observed_scales (observed_scale_id, "system", measurement_model, iteration, measure, data_regime)
+VALUES ('ForestFires_OBS_7', 'ForestFires', 'ForestFires_MM1', 7, 0.002, 'measured');
+
+-- Insert data for inference_runs
+INSERT INTO inference_runs (inference_run_id, "system", data_regime, measurement_model, fit_method, fitted_slope, fitted_intercept, r2, residual_rms, residual_max_abs, orthogonal_rms)
+VALUES ('Sierpinski_INF_OLS_LOG10', 'Sierpinski', 'measured', 'Sierpinski_MM1', 'OLS_loglog', -1.599205, -0.019658, 0.998968, 0.035459, 0.066978, 0.0188);
+
+INSERT INTO inference_runs (inference_run_id, "system", data_regime, measurement_model, fit_method, fitted_slope, fitted_intercept, r2, residual_rms, residual_max_abs, orthogonal_rms)
+VALUES ('Koch_INF_OLS_LOG10', 'Koch', 'measured', 'Koch_MM1', 'OLS_loglog', -0.270086, -0.016264, 0.991272, 0.027705, 0.058497, 0.026747);
+
+INSERT INTO inference_runs (inference_run_id, "system", data_regime, measurement_model, fit_method, fitted_slope, fitted_intercept, r2, residual_rms, residual_max_abs, orthogonal_rms)
+VALUES ('ZipfWords_INF_OLS_LOG10', 'ZipfWords', 'measured', 'ZipfWords_MM1', 'OLS_loglog', -0.965319, -0.115438, 0.995247, 0.046013, 0.069258, 0.033105);
+
+INSERT INTO inference_runs (inference_run_id, "system", data_regime, measurement_model, fit_method, fitted_slope, fitted_intercept, r2, residual_rms, residual_max_abs, orthogonal_rms)
+VALUES ('ScaleFreeNet_INF_OLS_LOG10', 'ScaleFreeNet', 'measured', 'ScaleFreeNet_MM1', 'OLS_loglog', -2.502179, -0.037924, 0.998115, 0.074995, 0.156764, 0.027831);
+
+INSERT INTO inference_runs (inference_run_id, "system", data_regime, measurement_model, fit_method, fitted_slope, fitted_intercept, r2, residual_rms, residual_max_abs, orthogonal_rms)
+VALUES ('Sandpile_INF_OLS_LOG10', 'Sandpile', 'measured', 'Sandpile_MM1', 'OLS_loglog', -0.976376, -0.038839, 0.992746, 0.057567, 0.107546, 0.041189);
+
+INSERT INTO inference_runs (inference_run_id, "system", data_regime, measurement_model, fit_method, fitted_slope, fitted_intercept, r2, residual_rms, residual_max_abs, orthogonal_rms)
+VALUES ('Earthquakes_INF_OLS_LOG10', 'Earthquakes', 'measured', 'Earthquakes_MM1', 'OLS_loglog', -0.987955, -0.014117, 0.988159, 0.074595, 0.131502, 0.053065);
+
+INSERT INTO inference_runs (inference_run_id, "system", data_regime, measurement_model, fit_method, fitted_slope, fitted_intercept, r2, residual_rms, residual_max_abs, orthogonal_rms)
+VALUES ('ForestFires_INF_OLS_LOG10', 'ForestFires', 'measured', 'ForestFires_MM1', 'OLS_loglog', -1.304367, 0.025399, 0.994038, 0.069674, 0.132325, 0.042392);
 

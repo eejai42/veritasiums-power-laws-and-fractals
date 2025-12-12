@@ -210,6 +210,19 @@
         "datatype": "boolean",
         "type": "raw",
         "Description": "True if this data point is a projection/estimate rather than measured data."
+      },
+      {
+        "name": "DataRegime",
+        "datatype": "string",
+        "type": "raw",
+        "Description": "Data regime for this point: 'ideal' (constructed/projection) or 'measured' (noisy real-world measurement)."
+      },
+      {
+        "name": "MeasurementModel",
+        "datatype": "string",
+        "type": "relationship",
+        "RelatedTo": "measurement_models",
+        "Description": "Optional FK to measurement_models describing noise/cutoff/discretization used to generate or interpret this point."
       }
     ],
     "data": [
@@ -224,7 +237,9 @@
         "Scale": 1,
         "LogScale": 0,
         "LogMeasure": 0,
-        "IsProjected": false
+        "IsProjected": false,
+        "DataRegime": "ideal",
+        "MeasurementModel": null
       },
       {
         "ScaleID": "Sierpinski_1",
@@ -237,7 +252,9 @@
         "Scale": 0.5,
         "LogScale": -0.30103,
         "LogMeasure": 0.47712,
-        "IsProjected": false
+        "IsProjected": false,
+        "DataRegime": "ideal",
+        "MeasurementModel": null
       },
       {
         "ScaleID": "Sierpinski_2",
@@ -250,7 +267,9 @@
         "Scale": 0.25,
         "LogScale": -0.60206,
         "LogMeasure": 0.95424,
-        "IsProjected": false
+        "IsProjected": false,
+        "DataRegime": "ideal",
+        "MeasurementModel": null
       },
       {
         "ScaleID": "Sierpinski_3",
@@ -263,7 +282,9 @@
         "Scale": 0.125,
         "LogScale": -0.90309,
         "LogMeasure": 1.43136,
-        "IsProjected": false
+        "IsProjected": false,
+        "DataRegime": "ideal",
+        "MeasurementModel": null
       },
       {
         "ScaleID": "Sierpinski_4",
@@ -276,7 +297,9 @@
         "Scale": 0.0625,
         "LogScale": -1.20412,
         "LogMeasure": 1.91645,
-        "IsProjected": true
+        "IsProjected": true,
+        "DataRegime": "ideal",
+        "MeasurementModel": null
       },
       {
         "ScaleID": "Sierpinski_5",
@@ -289,7 +312,9 @@
         "Scale": 0.03125,
         "LogScale": -1.50515,
         "LogMeasure": 2.39129,
-        "IsProjected": true
+        "IsProjected": true,
+        "DataRegime": "ideal",
+        "MeasurementModel": null
       },
       {
         "ScaleID": "Sierpinski_6",
@@ -302,7 +327,9 @@
         "Scale": 0.015625,
         "LogScale": -1.80618,
         "LogMeasure": 2.85187,
-        "IsProjected": true
+        "IsProjected": true,
+        "DataRegime": "ideal",
+        "MeasurementModel": null
       },
       {
         "ScaleID": "Sierpinski_7",
@@ -315,7 +342,9 @@
         "Scale": 0.0078125,
         "LogScale": -2.10721,
         "LogMeasure": 3.34733,
-        "IsProjected": true
+        "IsProjected": true,
+        "DataRegime": "ideal",
+        "MeasurementModel": null
       },
       {
         "ScaleID": "Koch_0",
@@ -328,7 +357,9 @@
         "Scale": 1,
         "LogScale": 0,
         "LogMeasure": 0,
-        "IsProjected": false
+        "IsProjected": false,
+        "DataRegime": "ideal",
+        "MeasurementModel": null
       },
       {
         "ScaleID": "Koch_1",
@@ -341,7 +372,9 @@
         "Scale": 0.3333333333,
         "LogScale": -0.47712,
         "LogMeasure": 0.12494,
-        "IsProjected": false
+        "IsProjected": false,
+        "DataRegime": "ideal",
+        "MeasurementModel": null
       },
       {
         "ScaleID": "Koch_2",
@@ -354,7 +387,9 @@
         "Scale": 0.1111111111,
         "LogScale": -0.95424,
         "LogMeasure": 0.24988,
-        "IsProjected": false
+        "IsProjected": false,
+        "DataRegime": "ideal",
+        "MeasurementModel": null
       },
       {
         "ScaleID": "Koch_3",
@@ -367,7 +402,9 @@
         "Scale": 0.037037037,
         "LogScale": -1.43136,
         "LogMeasure": 0.37482,
-        "IsProjected": false
+        "IsProjected": false,
+        "DataRegime": "ideal",
+        "MeasurementModel": null
       },
       {
         "ScaleID": "Koch_4",
@@ -380,7 +417,9 @@
         "Scale": 0.012345679,
         "LogScale": -1.90849,
         "LogMeasure": 0.50786,
-        "IsProjected": true
+        "IsProjected": true,
+        "DataRegime": "ideal",
+        "MeasurementModel": null
       },
       {
         "ScaleID": "Koch_5",
@@ -393,7 +432,9 @@
         "Scale": 0.004115226,
         "LogScale": -2.38561,
         "LogMeasure": 0.61805,
-        "IsProjected": true
+        "IsProjected": true,
+        "DataRegime": "ideal",
+        "MeasurementModel": null
       },
       {
         "ScaleID": "Koch_6",
@@ -406,7 +447,9 @@
         "Scale": 0.001371742,
         "LogScale": -2.86273,
         "LogMeasure": 0.75664,
-        "IsProjected": true
+        "IsProjected": true,
+        "DataRegime": "ideal",
+        "MeasurementModel": null
       },
       {
         "ScaleID": "Koch_7",
@@ -419,7 +462,9 @@
         "Scale": 0.000457247,
         "LogScale": -3.33985,
         "LogMeasure": 0.86806,
-        "IsProjected": true
+        "IsProjected": true,
+        "DataRegime": "ideal",
+        "MeasurementModel": null
       },
       {
         "ScaleID": "ZipfWords_0",
@@ -432,7 +477,9 @@
         "Scale": 1,
         "LogScale": 0,
         "LogMeasure": 0,
-        "IsProjected": false
+        "IsProjected": false,
+        "DataRegime": "ideal",
+        "MeasurementModel": null
       },
       {
         "ScaleID": "ZipfWords_1",
@@ -445,7 +492,9 @@
         "Scale": 2,
         "LogScale": 0.30103,
         "LogMeasure": -0.30103,
-        "IsProjected": false
+        "IsProjected": false,
+        "DataRegime": "ideal",
+        "MeasurementModel": null
       },
       {
         "ScaleID": "ZipfWords_2",
@@ -458,7 +507,9 @@
         "Scale": 4,
         "LogScale": 0.60206,
         "LogMeasure": -0.60206,
-        "IsProjected": false
+        "IsProjected": false,
+        "DataRegime": "ideal",
+        "MeasurementModel": null
       },
       {
         "ScaleID": "ZipfWords_3",
@@ -471,7 +522,9 @@
         "Scale": 8,
         "LogScale": 0.90309,
         "LogMeasure": -0.90309,
-        "IsProjected": false
+        "IsProjected": false,
+        "DataRegime": "ideal",
+        "MeasurementModel": null
       },
       {
         "ScaleID": "ZipfWords_4",
@@ -484,7 +537,9 @@
         "Scale": 16,
         "LogScale": 1.20412,
         "LogMeasure": -1.19524,
-        "IsProjected": true
+        "IsProjected": true,
+        "DataRegime": "ideal",
+        "MeasurementModel": null
       },
       {
         "ScaleID": "ZipfWords_5",
@@ -497,7 +552,9 @@
         "Scale": 32,
         "LogScale": 1.50515,
         "LogMeasure": -1.51572,
-        "IsProjected": true
+        "IsProjected": true,
+        "DataRegime": "ideal",
+        "MeasurementModel": null
       },
       {
         "ScaleID": "ZipfWords_6",
@@ -510,7 +567,9 @@
         "Scale": 64,
         "LogScale": 1.80618,
         "LogMeasure": -1.79317,
-        "IsProjected": true
+        "IsProjected": true,
+        "DataRegime": "ideal",
+        "MeasurementModel": null
       },
       {
         "ScaleID": "ZipfWords_7",
@@ -523,7 +582,9 @@
         "Scale": 128,
         "LogScale": 2.10721,
         "LogMeasure": -2.11919,
-        "IsProjected": true
+        "IsProjected": true,
+        "DataRegime": "ideal",
+        "MeasurementModel": null
       },
       {
         "ScaleID": "ScaleFreeNet_0",
@@ -536,7 +597,9 @@
         "Scale": 1,
         "LogScale": 0,
         "LogMeasure": 0,
-        "IsProjected": false
+        "IsProjected": false,
+        "DataRegime": "ideal",
+        "MeasurementModel": null
       },
       {
         "ScaleID": "ScaleFreeNet_1",
@@ -549,7 +612,9 @@
         "Scale": 2,
         "LogScale": 0.30103,
         "LogMeasure": -0.752575,
-        "IsProjected": false
+        "IsProjected": false,
+        "DataRegime": "ideal",
+        "MeasurementModel": null
       },
       {
         "ScaleID": "ScaleFreeNet_2",
@@ -562,7 +627,9 @@
         "Scale": 4,
         "LogScale": 0.60206,
         "LogMeasure": -1.50515,
-        "IsProjected": false
+        "IsProjected": false,
+        "DataRegime": "ideal",
+        "MeasurementModel": null
       },
       {
         "ScaleID": "ScaleFreeNet_3",
@@ -575,7 +642,9 @@
         "Scale": 8,
         "LogScale": 0.90309,
         "LogMeasure": -2.257725,
-        "IsProjected": false
+        "IsProjected": false,
+        "DataRegime": "ideal",
+        "MeasurementModel": null
       },
       {
         "ScaleID": "ScaleFreeNet_4",
@@ -588,7 +657,9 @@
         "Scale": 16,
         "LogScale": 1.20412,
         "LogMeasure": -2.9914,
-        "IsProjected": true
+        "IsProjected": true,
+        "DataRegime": "ideal",
+        "MeasurementModel": null
       },
       {
         "ScaleID": "ScaleFreeNet_5",
@@ -601,7 +672,9 @@
         "Scale": 32,
         "LogScale": 1.50515,
         "LogMeasure": -3.77469,
-        "IsProjected": true
+        "IsProjected": true,
+        "DataRegime": "ideal",
+        "MeasurementModel": null
       },
       {
         "ScaleID": "ScaleFreeNet_6",
@@ -614,7 +687,9 @@
         "Scale": 64,
         "LogScale": 1.80618,
         "LogMeasure": -4.4976,
-        "IsProjected": true
+        "IsProjected": true,
+        "DataRegime": "ideal",
+        "MeasurementModel": null
       },
       {
         "ScaleID": "ScaleFreeNet_7",
@@ -627,7 +702,9 @@
         "Scale": 128,
         "LogScale": 2.10721,
         "LogMeasure": -5.28318,
-        "IsProjected": true
+        "IsProjected": true,
+        "DataRegime": "ideal",
+        "MeasurementModel": null
       },
       {
         "ScaleID": "Sandpile_0",
@@ -640,7 +717,9 @@
         "Scale": 1,
         "LogScale": 0,
         "LogMeasure": 0,
-        "IsProjected": false
+        "IsProjected": false,
+        "DataRegime": "ideal",
+        "MeasurementModel": null
       },
       {
         "ScaleID": "Sandpile_1",
@@ -653,7 +732,9 @@
         "Scale": 2,
         "LogScale": 0.30103,
         "LogMeasure": -0.30103,
-        "IsProjected": false
+        "IsProjected": false,
+        "DataRegime": "ideal",
+        "MeasurementModel": null
       },
       {
         "ScaleID": "Sandpile_2",
@@ -666,7 +747,9 @@
         "Scale": 4,
         "LogScale": 0.60206,
         "LogMeasure": -0.60206,
-        "IsProjected": false
+        "IsProjected": false,
+        "DataRegime": "ideal",
+        "MeasurementModel": null
       },
       {
         "ScaleID": "Sandpile_3",
@@ -679,7 +762,9 @@
         "Scale": 8,
         "LogScale": 0.90309,
         "LogMeasure": -0.90309,
-        "IsProjected": false
+        "IsProjected": false,
+        "DataRegime": "ideal",
+        "MeasurementModel": null
       },
       {
         "ScaleID": "Sandpile_4",
@@ -692,7 +777,9 @@
         "Scale": 16,
         "LogScale": 1.20412,
         "LogMeasure": -1.2133,
-        "IsProjected": true
+        "IsProjected": true,
+        "DataRegime": "ideal",
+        "MeasurementModel": null
       },
       {
         "ScaleID": "Sandpile_5",
@@ -705,7 +792,9 @@
         "Scale": 32,
         "LogScale": 1.50515,
         "LogMeasure": -1.49621,
-        "IsProjected": true
+        "IsProjected": true,
+        "DataRegime": "ideal",
+        "MeasurementModel": null
       },
       {
         "ScaleID": "Sandpile_6",
@@ -718,7 +807,9 @@
         "Scale": 64,
         "LogScale": 1.80618,
         "LogMeasure": -1.81816,
-        "IsProjected": true
+        "IsProjected": true,
+        "DataRegime": "ideal",
+        "MeasurementModel": null
       },
       {
         "ScaleID": "Sandpile_7",
@@ -731,7 +822,9 @@
         "Scale": 128,
         "LogScale": 2.10721,
         "LogMeasure": -2.09806,
-        "IsProjected": true
+        "IsProjected": true,
+        "DataRegime": "ideal",
+        "MeasurementModel": null
       },
       {
         "ScaleID": "Earthquakes_0",
@@ -744,7 +837,9 @@
         "Scale": 1,
         "LogScale": 0,
         "LogMeasure": 0,
-        "IsProjected": false
+        "IsProjected": false,
+        "DataRegime": "ideal",
+        "MeasurementModel": null
       },
       {
         "ScaleID": "Earthquakes_1",
@@ -757,7 +852,9 @@
         "Scale": 2,
         "LogScale": 0.30103,
         "LogMeasure": -0.30103,
-        "IsProjected": false
+        "IsProjected": false,
+        "DataRegime": "ideal",
+        "MeasurementModel": null
       },
       {
         "ScaleID": "Earthquakes_2",
@@ -770,7 +867,9 @@
         "Scale": 4,
         "LogScale": 0.60206,
         "LogMeasure": -0.60206,
-        "IsProjected": false
+        "IsProjected": false,
+        "DataRegime": "ideal",
+        "MeasurementModel": null
       },
       {
         "ScaleID": "Earthquakes_3",
@@ -783,7 +882,9 @@
         "Scale": 8,
         "LogScale": 0.90309,
         "LogMeasure": -0.90309,
-        "IsProjected": false
+        "IsProjected": false,
+        "DataRegime": "ideal",
+        "MeasurementModel": null
       },
       {
         "ScaleID": "Earthquakes_4",
@@ -796,7 +897,9 @@
         "Scale": 16,
         "LogScale": 1.20412,
         "LogMeasure": -1.19318,
-        "IsProjected": true
+        "IsProjected": true,
+        "DataRegime": "ideal",
+        "MeasurementModel": null
       },
       {
         "ScaleID": "Earthquakes_5",
@@ -809,7 +912,9 @@
         "Scale": 32,
         "LogScale": 1.50515,
         "LogMeasure": -1.51145,
-        "IsProjected": true
+        "IsProjected": true,
+        "DataRegime": "ideal",
+        "MeasurementModel": null
       },
       {
         "ScaleID": "Earthquakes_6",
@@ -822,7 +927,9 @@
         "Scale": 64,
         "LogScale": 1.80618,
         "LogMeasure": -1.7986,
-        "IsProjected": true
+        "IsProjected": true,
+        "DataRegime": "ideal",
+        "MeasurementModel": null
       },
       {
         "ScaleID": "Earthquakes_7",
@@ -835,7 +942,9 @@
         "Scale": 128,
         "LogScale": 2.10721,
         "LogMeasure": -2.11808,
-        "IsProjected": true
+        "IsProjected": true,
+        "DataRegime": "ideal",
+        "MeasurementModel": null
       },
       {
         "ScaleID": "ForestFires_0",
@@ -848,7 +957,9 @@
         "Scale": 1,
         "LogScale": 0,
         "LogMeasure": 0,
-        "IsProjected": false
+        "IsProjected": false,
+        "DataRegime": "ideal",
+        "MeasurementModel": null
       },
       {
         "ScaleID": "ForestFires_1",
@@ -861,7 +972,9 @@
         "Scale": 2,
         "LogScale": 0.30103,
         "LogMeasure": -0.39134,
-        "IsProjected": false
+        "IsProjected": false,
+        "DataRegime": "ideal",
+        "MeasurementModel": null
       },
       {
         "ScaleID": "ForestFires_2",
@@ -874,7 +987,9 @@
         "Scale": 4,
         "LogScale": 0.60206,
         "LogMeasure": -0.78268,
-        "IsProjected": false
+        "IsProjected": false,
+        "DataRegime": "ideal",
+        "MeasurementModel": null
       },
       {
         "ScaleID": "ForestFires_3",
@@ -887,7 +1002,9 @@
         "Scale": 8,
         "LogScale": 0.90309,
         "LogMeasure": -1.17402,
-        "IsProjected": false
+        "IsProjected": false,
+        "DataRegime": "ideal",
+        "MeasurementModel": null
       },
       {
         "ScaleID": "ForestFires_4",
@@ -900,7 +1017,9 @@
         "Scale": 16,
         "LogScale": 1.20412,
         "LogMeasure": -1.55129,
-        "IsProjected": true
+        "IsProjected": true,
+        "DataRegime": "ideal",
+        "MeasurementModel": null
       },
       {
         "ScaleID": "ForestFires_5",
@@ -913,7 +1032,9 @@
         "Scale": 32,
         "LogScale": 1.50515,
         "LogMeasure": -1.97062,
-        "IsProjected": true
+        "IsProjected": true,
+        "DataRegime": "ideal",
+        "MeasurementModel": null
       },
       {
         "ScaleID": "ForestFires_6",
@@ -926,7 +1047,9 @@
         "Scale": 64,
         "LogScale": 1.80618,
         "LogMeasure": -2.33628,
-        "IsProjected": true
+        "IsProjected": true,
+        "DataRegime": "ideal",
+        "MeasurementModel": null
       },
       {
         "ScaleID": "ForestFires_7",
@@ -939,7 +1062,9 @@
         "Scale": 128,
         "LogScale": 2.10721,
         "LogMeasure": -2.752,
-        "IsProjected": true
+        "IsProjected": true,
+        "DataRegime": "ideal",
+        "MeasurementModel": null
       }
     ]
   },
@@ -1180,5 +1305,1249 @@
     "name": "ERB_veritasium-power-laws-and-fractals",
     "description": "Unifies several classic fractal / power-law phenomena into a single CMCC pattern with clean separation between fractal dimension and log\u2013log slope.",
     "version": "1.0.0"
+  },
+  "measurement_models": {
+    "Description": "Measurement/de-idealization specs used to produce or interpret real-world (noisy, finite-size, discretized) scale records.",
+    "primary_key": [
+      "MeasurementModelID"
+    ],
+    "schema": [
+      {
+        "name": "MeasurementModelID",
+        "datatype": "string",
+        "type": "raw",
+        "is_primary_key": true,
+        "Description": "Primary key for this measurement model."
+      },
+      {
+        "name": "System",
+        "datatype": "string",
+        "type": "relationship",
+        "RelatedTo": "systems",
+        "Description": "FK to systems table (measurement model is typically system-specific)."
+      },
+      {
+        "name": "DataRegime",
+        "datatype": "string",
+        "type": "raw",
+        "Description": "Regime this model describes. Usually 'measured'."
+      },
+      {
+        "name": "NoiseType",
+        "datatype": "string",
+        "type": "raw",
+        "Description": "Noise model applied to measures (e.g., lognormal multiplicative)."
+      },
+      {
+        "name": "NoiseSigma",
+        "datatype": "number",
+        "type": "raw",
+        "Description": "Noise strength parameter (e.g., sigma in log space for lognormal)."
+      },
+      {
+        "name": "CutoffMinScale",
+        "datatype": "number",
+        "type": "raw",
+        "Description": "Minimum scale included (finite-size / censoring lower bound)."
+      },
+      {
+        "name": "CutoffMaxScale",
+        "datatype": "number",
+        "type": "raw",
+        "Description": "Maximum scale included (finite-size / censoring upper bound)."
+      },
+      {
+        "name": "DiscretizationType",
+        "datatype": "string",
+        "type": "raw",
+        "Description": "How observations are discretized (none, rounding, binning, log-binning)."
+      },
+      {
+        "name": "DiscretizationParam",
+        "datatype": "string",
+        "type": "raw",
+        "Description": "Parameterization of discretization (e.g., decimals=2 or binwidth=log2)."
+      }
+    ],
+    "data": [
+      {
+        "MeasurementModelID": "Sierpinski_MM1",
+        "System": "Sierpinski",
+        "DataRegime": "measured",
+        "NoiseType": "lognormal",
+        "NoiseSigma": 0.12,
+        "CutoffMinScale": 1.0,
+        "CutoffMaxScale": 0.0078125,
+        "DiscretizationType": "rounding",
+        "DiscretizationParam": "decimals=4"
+      },
+      {
+        "MeasurementModelID": "Koch_MM1",
+        "System": "Koch",
+        "DataRegime": "measured",
+        "NoiseType": "lognormal",
+        "NoiseSigma": 0.12,
+        "CutoffMinScale": 1.0,
+        "CutoffMaxScale": 0.0004572473705075444,
+        "DiscretizationType": "rounding",
+        "DiscretizationParam": "decimals=4"
+      },
+      {
+        "MeasurementModelID": "ZipfWords_MM1",
+        "System": "ZipfWords",
+        "DataRegime": "measured",
+        "NoiseType": "lognormal",
+        "NoiseSigma": 0.18,
+        "CutoffMinScale": 1,
+        "CutoffMaxScale": 128,
+        "DiscretizationType": "rounding",
+        "DiscretizationParam": "decimals=4"
+      },
+      {
+        "MeasurementModelID": "ScaleFreeNet_MM1",
+        "System": "ScaleFreeNet",
+        "DataRegime": "measured",
+        "NoiseType": "lognormal",
+        "NoiseSigma": 0.18,
+        "CutoffMinScale": 1,
+        "CutoffMaxScale": 128,
+        "DiscretizationType": "rounding",
+        "DiscretizationParam": "decimals=4"
+      },
+      {
+        "MeasurementModelID": "Sandpile_MM1",
+        "System": "Sandpile",
+        "DataRegime": "measured",
+        "NoiseType": "lognormal",
+        "NoiseSigma": 0.18,
+        "CutoffMinScale": 1,
+        "CutoffMaxScale": 128,
+        "DiscretizationType": "rounding",
+        "DiscretizationParam": "decimals=4"
+      },
+      {
+        "MeasurementModelID": "Earthquakes_MM1",
+        "System": "Earthquakes",
+        "DataRegime": "measured",
+        "NoiseType": "lognormal",
+        "NoiseSigma": 0.18,
+        "CutoffMinScale": 1,
+        "CutoffMaxScale": 128,
+        "DiscretizationType": "rounding",
+        "DiscretizationParam": "decimals=4"
+      },
+      {
+        "MeasurementModelID": "ForestFires_MM1",
+        "System": "ForestFires",
+        "DataRegime": "measured",
+        "NoiseType": "lognormal",
+        "NoiseSigma": 0.18,
+        "CutoffMinScale": 1,
+        "CutoffMaxScale": 128,
+        "DiscretizationType": "rounding",
+        "DiscretizationParam": "decimals=4"
+      }
+    ]
+  },
+  "observed_scales": {
+    "Description": "Noisy, finite-range, discretized observations of each system's scaling law. Mirrors scales but with DataRegime='measured'.",
+    "primary_key": [
+      "ObservedScaleID"
+    ],
+    "schema": [
+      {
+        "name": "ObservedScaleID",
+        "datatype": "string",
+        "type": "raw",
+        "is_primary_key": true,
+        "Description": "Primary key for this observed scale measurement."
+      },
+      {
+        "name": "System",
+        "datatype": "string",
+        "type": "relationship",
+        "RelatedTo": "systems",
+        "Description": "FK to systems table."
+      },
+      {
+        "name": "MeasurementModel",
+        "datatype": "string",
+        "type": "relationship",
+        "RelatedTo": "measurement_models",
+        "Description": "FK to measurement model used/assumed for this observation set."
+      },
+      {
+        "name": "Iteration",
+        "datatype": "integer",
+        "type": "raw",
+        "Description": "Discrete zoom level or rank index."
+      },
+      {
+        "name": "Measure",
+        "datatype": "number",
+        "type": "raw",
+        "Description": "Observed (noisy) Y-axis quantity at this scale."
+      },
+      {
+        "name": "BaseScale",
+        "datatype": "number",
+        "type": "lookup",
+        "formula": "=INDEX(systems!{{BaseScale}}, MATCH(observed_scales!{{System}}, systems!{{SystemID}}, 0))",
+        "Description": "Base scale looked up from parent system."
+      },
+      {
+        "name": "ScaleFactor",
+        "datatype": "number",
+        "type": "lookup",
+        "formula": "=INDEX(systems!{{ScaleFactor}}, MATCH(observed_scales!{{System}}, systems!{{SystemID}}, 0))",
+        "Description": "Scale factor looked up from parent system."
+      },
+      {
+        "name": "ScaleFactorPower",
+        "datatype": "number",
+        "type": "calculated",
+        "formula": "=POWER({{ScaleFactor}}, {{Iteration}})",
+        "Description": "ScaleFactor raised to the Iteration power."
+      },
+      {
+        "name": "Scale",
+        "datatype": "number",
+        "type": "calculated",
+        "formula": "={{BaseScale}} * {{ScaleFactorPower}}",
+        "Description": "X-axis variable: BaseScale multiplied by ScaleFactorPower."
+      },
+      {
+        "name": "LogScale",
+        "datatype": "number",
+        "type": "calculated",
+        "formula": "=LOG10({{Scale}})",
+        "Description": "log10 of Scale."
+      },
+      {
+        "name": "LogMeasure",
+        "datatype": "number",
+        "type": "calculated",
+        "formula": "=LOG10({{Measure}})",
+        "Description": "log10 of Measure."
+      },
+      {
+        "name": "DataRegime",
+        "datatype": "string",
+        "type": "raw",
+        "Description": "Data regime. For observed_scales this is 'measured'."
+      }
+    ],
+    "data": [
+      {
+        "ObservedScaleID": "Sierpinski_OBS_0",
+        "System": "Sierpinski",
+        "MeasurementModel": "Sierpinski_MM1",
+        "Iteration": 0,
+        "Measure": 1.0001,
+        "BaseScale": 1,
+        "ScaleFactor": 0.5,
+        "ScaleFactorPower": 1,
+        "Scale": 1,
+        "LogScale": 0,
+        "LogMeasure": 4e-05,
+        "DataRegime": "measured"
+      },
+      {
+        "ObservedScaleID": "Sierpinski_OBS_1",
+        "System": "Sierpinski",
+        "MeasurementModel": "Sierpinski_MM1",
+        "Iteration": 1,
+        "Measure": 3.1095,
+        "BaseScale": 1,
+        "ScaleFactor": 0.5,
+        "ScaleFactorPower": 0.5,
+        "Scale": 0.5,
+        "LogScale": -0.30103,
+        "LogMeasure": 0.49269,
+        "DataRegime": "measured"
+      },
+      {
+        "ObservedScaleID": "Sierpinski_OBS_2",
+        "System": "Sierpinski",
+        "MeasurementModel": "Sierpinski_MM1",
+        "Iteration": 2,
+        "Measure": 8.7087,
+        "BaseScale": 1,
+        "ScaleFactor": 0.5,
+        "ScaleFactorPower": 0.25,
+        "Scale": 0.25,
+        "LogScale": -0.60206,
+        "LogMeasure": 0.93995,
+        "DataRegime": "measured"
+      },
+      {
+        "ObservedScaleID": "Sierpinski_OBS_3",
+        "System": "Sierpinski",
+        "MeasurementModel": "Sierpinski_MM1",
+        "Iteration": 3,
+        "Measure": 24.2633,
+        "BaseScale": 1,
+        "ScaleFactor": 0.5,
+        "ScaleFactorPower": 0.125,
+        "Scale": 0.125,
+        "LogScale": -0.90309,
+        "LogMeasure": 1.38495,
+        "DataRegime": "measured"
+      },
+      {
+        "ObservedScaleID": "Sierpinski_OBS_4",
+        "System": "Sierpinski",
+        "MeasurementModel": "Sierpinski_MM1",
+        "Iteration": 4,
+        "Measure": 78.1194,
+        "BaseScale": 1,
+        "ScaleFactor": 0.5,
+        "ScaleFactorPower": 0.0625,
+        "Scale": 0.0625,
+        "LogScale": -1.20412,
+        "LogMeasure": 1.89276,
+        "DataRegime": "measured"
+      },
+      {
+        "ObservedScaleID": "Sierpinski_OBS_5",
+        "System": "Sierpinski",
+        "MeasurementModel": "Sierpinski_MM1",
+        "Iteration": 5,
+        "Measure": 218.5788,
+        "BaseScale": 1,
+        "ScaleFactor": 0.5,
+        "ScaleFactorPower": 0.03125,
+        "Scale": 0.03125,
+        "LogScale": -1.50515,
+        "LogMeasure": 2.33961,
+        "DataRegime": "measured"
+      },
+      {
+        "ObservedScaleID": "Sierpinski_OBS_6",
+        "System": "Sierpinski",
+        "MeasurementModel": "Sierpinski_MM1",
+        "Iteration": 6,
+        "Measure": 716.15,
+        "BaseScale": 1,
+        "ScaleFactor": 0.5,
+        "ScaleFactorPower": 0.015625,
+        "Scale": 0.015625,
+        "LogScale": -1.80618,
+        "LogMeasure": 2.855,
+        "DataRegime": "measured"
+      },
+      {
+        "ObservedScaleID": "Sierpinski_OBS_7",
+        "System": "Sierpinski",
+        "MeasurementModel": "Sierpinski_MM1",
+        "Iteration": 7,
+        "Measure": 2613.2189,
+        "BaseScale": 1,
+        "ScaleFactor": 0.5,
+        "ScaleFactorPower": 0.0078125,
+        "Scale": 0.0078125,
+        "LogScale": -2.10721,
+        "LogMeasure": 3.41718,
+        "DataRegime": "measured"
+      },
+      {
+        "ObservedScaleID": "Koch_OBS_0",
+        "System": "Koch",
+        "MeasurementModel": "Koch_MM1",
+        "Iteration": 0,
+        "Measure": 0.9426,
+        "BaseScale": 1,
+        "ScaleFactor": 0.3333333333,
+        "ScaleFactorPower": 1,
+        "Scale": 1,
+        "LogScale": 0,
+        "LogMeasure": -0.02567,
+        "DataRegime": "measured"
+      },
+      {
+        "ObservedScaleID": "Koch_OBS_1",
+        "System": "Koch",
+        "MeasurementModel": "Koch_MM1",
+        "Iteration": 1,
+        "Measure": 1.2377,
+        "BaseScale": 1,
+        "ScaleFactor": 0.3333333333,
+        "ScaleFactorPower": 0.3333333333,
+        "Scale": 0.3333333333,
+        "LogScale": -0.47712,
+        "LogMeasure": 0.09262,
+        "DataRegime": "measured"
+      },
+      {
+        "ObservedScaleID": "Koch_OBS_2",
+        "System": "Koch",
+        "MeasurementModel": "Koch_MM1",
+        "Iteration": 2,
+        "Measure": 1.8854,
+        "BaseScale": 1,
+        "ScaleFactor": 0.3333333333,
+        "ScaleFactorPower": 0.1111111111,
+        "Scale": 0.1111111111,
+        "LogScale": -0.95424,
+        "LogMeasure": 0.2754,
+        "DataRegime": "measured"
+      },
+      {
+        "ObservedScaleID": "Koch_OBS_3",
+        "System": "Koch",
+        "MeasurementModel": "Koch_MM1",
+        "Iteration": 3,
+        "Measure": 2.4741,
+        "BaseScale": 1,
+        "ScaleFactor": 0.3333333333,
+        "ScaleFactorPower": 0.037037037,
+        "Scale": 0.037037037,
+        "LogScale": -1.43136,
+        "LogMeasure": 0.39342,
+        "DataRegime": "measured"
+      },
+      {
+        "ObservedScaleID": "Koch_OBS_4",
+        "System": "Koch",
+        "MeasurementModel": "Koch_MM1",
+        "Iteration": 4,
+        "Measure": 3.261,
+        "BaseScale": 1,
+        "ScaleFactor": 0.3333333333,
+        "ScaleFactorPower": 0.012345679,
+        "Scale": 0.012345679,
+        "LogScale": -1.90849,
+        "LogMeasure": 0.51335,
+        "DataRegime": "measured"
+      },
+      {
+        "ObservedScaleID": "Koch_OBS_5",
+        "System": "Koch",
+        "MeasurementModel": "Koch_MM1",
+        "Iteration": 5,
+        "Measure": 3.7116,
+        "BaseScale": 1,
+        "ScaleFactor": 0.3333333333,
+        "ScaleFactorPower": 0.004115226,
+        "Scale": 0.004115226,
+        "LogScale": -2.38561,
+        "LogMeasure": 0.56956,
+        "DataRegime": "measured"
+      },
+      {
+        "ObservedScaleID": "Koch_OBS_6",
+        "System": "Koch",
+        "MeasurementModel": "Koch_MM1",
+        "Iteration": 6,
+        "Measure": 5.69,
+        "BaseScale": 1,
+        "ScaleFactor": 0.3333333333,
+        "ScaleFactorPower": 0.001371742,
+        "Scale": 0.001371742,
+        "LogScale": -2.86273,
+        "LogMeasure": 0.75511,
+        "DataRegime": "measured"
+      },
+      {
+        "ObservedScaleID": "Koch_OBS_7",
+        "System": "Koch",
+        "MeasurementModel": "Koch_MM1",
+        "Iteration": 7,
+        "Measure": 8.0222,
+        "BaseScale": 1,
+        "ScaleFactor": 0.3333333333,
+        "ScaleFactorPower": 0.000457247,
+        "Scale": 0.000457247,
+        "LogScale": -3.33985,
+        "LogMeasure": 0.90429,
+        "DataRegime": "measured"
+      },
+      {
+        "ObservedScaleID": "ZipfWords_OBS_0",
+        "System": "ZipfWords",
+        "MeasurementModel": "ZipfWords_MM1",
+        "Iteration": 0,
+        "Measure": 0.7851,
+        "BaseScale": 1,
+        "ScaleFactor": 2,
+        "ScaleFactorPower": 1,
+        "Scale": 1,
+        "LogScale": 0,
+        "LogMeasure": -0.10508,
+        "DataRegime": "measured"
+      },
+      {
+        "ObservedScaleID": "ZipfWords_OBS_1",
+        "System": "ZipfWords",
+        "MeasurementModel": "ZipfWords_MM1",
+        "Iteration": 1,
+        "Measure": 0.4605,
+        "BaseScale": 1,
+        "ScaleFactor": 2,
+        "ScaleFactorPower": 2,
+        "Scale": 2,
+        "LogScale": 0.30103,
+        "LogMeasure": -0.33677,
+        "DataRegime": "measured"
+      },
+      {
+        "ObservedScaleID": "ZipfWords_OBS_2",
+        "System": "ZipfWords",
+        "MeasurementModel": "ZipfWords_MM1",
+        "Iteration": 2,
+        "Measure": 0.1775,
+        "BaseScale": 1,
+        "ScaleFactor": 2,
+        "ScaleFactorPower": 4,
+        "Scale": 4,
+        "LogScale": 0.60206,
+        "LogMeasure": -0.7508,
+        "DataRegime": "measured"
+      },
+      {
+        "ObservedScaleID": "ZipfWords_OBS_3",
+        "System": "ZipfWords",
+        "MeasurementModel": "ZipfWords_MM1",
+        "Iteration": 3,
+        "Measure": 0.0991,
+        "BaseScale": 1,
+        "ScaleFactor": 2,
+        "ScaleFactorPower": 8,
+        "Scale": 8,
+        "LogScale": 0.90309,
+        "LogMeasure": -1.00393,
+        "DataRegime": "measured"
+      },
+      {
+        "ObservedScaleID": "ZipfWords_OBS_4",
+        "System": "ZipfWords",
+        "MeasurementModel": "ZipfWords_MM1",
+        "Iteration": 4,
+        "Measure": 0.0458,
+        "BaseScale": 1,
+        "ScaleFactor": 2,
+        "ScaleFactorPower": 16,
+        "Scale": 16,
+        "LogScale": 1.20412,
+        "LogMeasure": -1.33913,
+        "DataRegime": "measured"
+      },
+      {
+        "ObservedScaleID": "ZipfWords_OBS_5",
+        "System": "ZipfWords",
+        "MeasurementModel": "ZipfWords_MM1",
+        "Iteration": 5,
+        "Measure": 0.0292,
+        "BaseScale": 1,
+        "ScaleFactor": 2,
+        "ScaleFactorPower": 32,
+        "Scale": 32,
+        "LogScale": 1.50515,
+        "LogMeasure": -1.53462,
+        "DataRegime": "measured"
+      },
+      {
+        "ObservedScaleID": "ZipfWords_OBS_6",
+        "System": "ZipfWords",
+        "MeasurementModel": "ZipfWords_MM1",
+        "Iteration": 6,
+        "Measure": 0.0128,
+        "BaseScale": 1,
+        "ScaleFactor": 2,
+        "ScaleFactorPower": 64,
+        "Scale": 64,
+        "LogScale": 1.80618,
+        "LogMeasure": -1.89279,
+        "DataRegime": "measured"
+      },
+      {
+        "ObservedScaleID": "ZipfWords_OBS_7",
+        "System": "ZipfWords",
+        "MeasurementModel": "ZipfWords_MM1",
+        "Iteration": 7,
+        "Measure": 0.008,
+        "BaseScale": 1,
+        "ScaleFactor": 2,
+        "ScaleFactorPower": 128,
+        "Scale": 128,
+        "LogScale": 2.10721,
+        "LogMeasure": -2.09691,
+        "DataRegime": "measured"
+      },
+      {
+        "ObservedScaleID": "ScaleFreeNet_OBS_0",
+        "System": "ScaleFreeNet",
+        "MeasurementModel": "ScaleFreeNet_MM1",
+        "Iteration": 0,
+        "Measure": 1.0286,
+        "BaseScale": 1,
+        "ScaleFactor": 2,
+        "ScaleFactorPower": 1,
+        "Scale": 1,
+        "LogScale": 0,
+        "LogMeasure": 0.01225,
+        "DataRegime": "measured"
+      },
+      {
+        "ObservedScaleID": "ScaleFreeNet_OBS_1",
+        "System": "ScaleFreeNet",
+        "MeasurementModel": "ScaleFreeNet_MM1",
+        "Iteration": 1,
+        "Measure": 0.1709,
+        "BaseScale": 1,
+        "ScaleFactor": 2,
+        "ScaleFactorPower": 2,
+        "Scale": 2,
+        "LogScale": 0.30103,
+        "LogMeasure": -0.76726,
+        "DataRegime": "measured"
+      },
+      {
+        "ObservedScaleID": "ScaleFreeNet_OBS_2",
+        "System": "ScaleFreeNet",
+        "MeasurementModel": "ScaleFreeNet_MM1",
+        "Iteration": 2,
+        "Measure": 0.0199,
+        "BaseScale": 1,
+        "ScaleFactor": 2,
+        "ScaleFactorPower": 4,
+        "Scale": 4,
+        "LogScale": 0.60206,
+        "LogMeasure": -1.70115,
+        "DataRegime": "measured"
+      },
+      {
+        "ObservedScaleID": "ScaleFreeNet_OBS_3",
+        "System": "ScaleFreeNet",
+        "MeasurementModel": "ScaleFreeNet_MM1",
+        "Iteration": 3,
+        "Measure": 0.005,
+        "BaseScale": 1,
+        "ScaleFactor": 2,
+        "ScaleFactorPower": 8,
+        "Scale": 8,
+        "LogScale": 0.90309,
+        "LogMeasure": -2.30103,
+        "DataRegime": "measured"
+      },
+      {
+        "ObservedScaleID": "ScaleFreeNet_OBS_4",
+        "System": "ScaleFreeNet",
+        "MeasurementModel": "ScaleFreeNet_MM1",
+        "Iteration": 4,
+        "Measure": 0.001,
+        "BaseScale": 1,
+        "ScaleFactor": 2,
+        "ScaleFactorPower": 16,
+        "Scale": 16,
+        "LogScale": 1.20412,
+        "LogMeasure": -3.0,
+        "DataRegime": "measured"
+      },
+      {
+        "ObservedScaleID": "ScaleFreeNet_OBS_5",
+        "System": "ScaleFreeNet",
+        "MeasurementModel": "ScaleFreeNet_MM1",
+        "Iteration": 5,
+        "Measure": 0.0002,
+        "BaseScale": 1,
+        "ScaleFactor": 2,
+        "ScaleFactorPower": 32,
+        "Scale": 32,
+        "LogScale": 1.50515,
+        "LogMeasure": -3.69897,
+        "DataRegime": "measured"
+      },
+      {
+        "ObservedScaleID": "ScaleFreeNet_OBS_6",
+        "System": "ScaleFreeNet",
+        "MeasurementModel": "ScaleFreeNet_MM1",
+        "Iteration": 6,
+        "Measure": 2.4144143656495023e-05,
+        "BaseScale": 1,
+        "ScaleFactor": 2,
+        "ScaleFactorPower": 64,
+        "Scale": 64,
+        "LogScale": 1.80618,
+        "LogMeasure": -4.61719,
+        "DataRegime": "measured"
+      },
+      {
+        "ObservedScaleID": "ScaleFreeNet_OBS_7",
+        "System": "ScaleFreeNet",
+        "MeasurementModel": "ScaleFreeNet_MM1",
+        "Iteration": 7,
+        "Measure": 4.780687028940912e-06,
+        "BaseScale": 1,
+        "ScaleFactor": 2,
+        "ScaleFactorPower": 128,
+        "Scale": 128,
+        "LogScale": 2.10721,
+        "LogMeasure": -5.32051,
+        "DataRegime": "measured"
+      },
+      {
+        "ObservedScaleID": "Sandpile_OBS_0",
+        "System": "Sandpile",
+        "MeasurementModel": "Sandpile_MM1",
+        "Iteration": 0,
+        "Measure": 0.8385,
+        "BaseScale": 1,
+        "ScaleFactor": 2,
+        "ScaleFactorPower": 1,
+        "Scale": 1,
+        "LogScale": 0,
+        "LogMeasure": -0.0765,
+        "DataRegime": "measured"
+      },
+      {
+        "ObservedScaleID": "Sandpile_OBS_1",
+        "System": "Sandpile",
+        "MeasurementModel": "Sandpile_MM1",
+        "Iteration": 1,
+        "Measure": 0.4323,
+        "BaseScale": 1,
+        "ScaleFactor": 2,
+        "ScaleFactorPower": 2,
+        "Scale": 2,
+        "LogScale": 0.30103,
+        "LogMeasure": -0.36421,
+        "DataRegime": "measured"
+      },
+      {
+        "ObservedScaleID": "Sandpile_OBS_2",
+        "System": "Sandpile",
+        "MeasurementModel": "Sandpile_MM1",
+        "Iteration": 2,
+        "Measure": 0.3026,
+        "BaseScale": 1,
+        "ScaleFactor": 2,
+        "ScaleFactorPower": 4,
+        "Scale": 4,
+        "LogScale": 0.60206,
+        "LogMeasure": -0.51913,
+        "DataRegime": "measured"
+      },
+      {
+        "ObservedScaleID": "Sandpile_OBS_3",
+        "System": "Sandpile",
+        "MeasurementModel": "Sandpile_MM1",
+        "Iteration": 3,
+        "Measure": 0.1081,
+        "BaseScale": 1,
+        "ScaleFactor": 2,
+        "ScaleFactorPower": 8,
+        "Scale": 8,
+        "LogScale": 0.90309,
+        "LogMeasure": -0.96617,
+        "DataRegime": "measured"
+      },
+      {
+        "ObservedScaleID": "Sandpile_OBS_4",
+        "System": "Sandpile",
+        "MeasurementModel": "Sandpile_MM1",
+        "Iteration": 4,
+        "Measure": 0.0608,
+        "BaseScale": 1,
+        "ScaleFactor": 2,
+        "ScaleFactorPower": 16,
+        "Scale": 16,
+        "LogScale": 1.20412,
+        "LogMeasure": -1.2161,
+        "DataRegime": "measured"
+      },
+      {
+        "ObservedScaleID": "Sandpile_OBS_5",
+        "System": "Sandpile",
+        "MeasurementModel": "Sandpile_MM1",
+        "Iteration": 5,
+        "Measure": 0.0374,
+        "BaseScale": 1,
+        "ScaleFactor": 2,
+        "ScaleFactorPower": 32,
+        "Scale": 32,
+        "LogScale": 1.50515,
+        "LogMeasure": -1.42713,
+        "DataRegime": "measured"
+      },
+      {
+        "ObservedScaleID": "Sandpile_OBS_6",
+        "System": "Sandpile",
+        "MeasurementModel": "Sandpile_MM1",
+        "Iteration": 6,
+        "Measure": 0.0137,
+        "BaseScale": 1,
+        "ScaleFactor": 2,
+        "ScaleFactorPower": 64,
+        "Scale": 64,
+        "LogScale": 1.80618,
+        "LogMeasure": -1.86328,
+        "DataRegime": "measured"
+      },
+      {
+        "ObservedScaleID": "Sandpile_OBS_7",
+        "System": "Sandpile",
+        "MeasurementModel": "Sandpile_MM1",
+        "Iteration": 7,
+        "Measure": 0.0078,
+        "BaseScale": 1,
+        "ScaleFactor": 2,
+        "ScaleFactorPower": 128,
+        "Scale": 128,
+        "LogScale": 2.10721,
+        "LogMeasure": -2.10791,
+        "DataRegime": "measured"
+      },
+      {
+        "ObservedScaleID": "Earthquakes_OBS_0",
+        "System": "Earthquakes",
+        "MeasurementModel": "Earthquakes_MM1",
+        "Iteration": 0,
+        "Measure": 1.0201,
+        "BaseScale": 1,
+        "ScaleFactor": 2,
+        "ScaleFactorPower": 1,
+        "Scale": 1,
+        "LogScale": 0,
+        "LogMeasure": 0.00864,
+        "DataRegime": "measured"
+      },
+      {
+        "ObservedScaleID": "Earthquakes_OBS_1",
+        "System": "Earthquakes",
+        "MeasurementModel": "Earthquakes_MM1",
+        "Iteration": 1,
+        "Measure": 0.5058,
+        "BaseScale": 1,
+        "ScaleFactor": 2,
+        "ScaleFactorPower": 2,
+        "Scale": 2,
+        "LogScale": 0.30103,
+        "LogMeasure": -0.29602,
+        "DataRegime": "measured"
+      },
+      {
+        "ObservedScaleID": "Earthquakes_OBS_2",
+        "System": "Earthquakes",
+        "MeasurementModel": "Earthquakes_MM1",
+        "Iteration": 2,
+        "Measure": 0.2005,
+        "BaseScale": 1,
+        "ScaleFactor": 2,
+        "ScaleFactorPower": 4,
+        "Scale": 4,
+        "LogScale": 0.60206,
+        "LogMeasure": -0.69789,
+        "DataRegime": "measured"
+      },
+      {
+        "ObservedScaleID": "Earthquakes_OBS_3",
+        "System": "Earthquakes",
+        "MeasurementModel": "Earthquakes_MM1",
+        "Iteration": 3,
+        "Measure": 0.1267,
+        "BaseScale": 1,
+        "ScaleFactor": 2,
+        "ScaleFactorPower": 8,
+        "Scale": 8,
+        "LogScale": 0.90309,
+        "LogMeasure": -0.89722,
+        "DataRegime": "measured"
+      },
+      {
+        "ObservedScaleID": "Earthquakes_OBS_4",
+        "System": "Earthquakes",
+        "MeasurementModel": "Earthquakes_MM1",
+        "Iteration": 4,
+        "Measure": 0.0819,
+        "BaseScale": 1,
+        "ScaleFactor": 2,
+        "ScaleFactorPower": 16,
+        "Scale": 16,
+        "LogScale": 1.20412,
+        "LogMeasure": -1.08672,
+        "DataRegime": "measured"
+      },
+      {
+        "ObservedScaleID": "Earthquakes_OBS_5",
+        "System": "Earthquakes",
+        "MeasurementModel": "Earthquakes_MM1",
+        "Iteration": 5,
+        "Measure": 0.0233,
+        "BaseScale": 1,
+        "ScaleFactor": 2,
+        "ScaleFactorPower": 32,
+        "Scale": 32,
+        "LogScale": 1.50515,
+        "LogMeasure": -1.63264,
+        "DataRegime": "measured"
+      },
+      {
+        "ObservedScaleID": "Earthquakes_OBS_6",
+        "System": "Earthquakes",
+        "MeasurementModel": "Earthquakes_MM1",
+        "Iteration": 6,
+        "Measure": 0.0186,
+        "BaseScale": 1,
+        "ScaleFactor": 2,
+        "ScaleFactorPower": 64,
+        "Scale": 64,
+        "LogScale": 1.80618,
+        "LogMeasure": -1.73049,
+        "DataRegime": "measured"
+      },
+      {
+        "ObservedScaleID": "Earthquakes_OBS_7",
+        "System": "Earthquakes",
+        "MeasurementModel": "Earthquakes_MM1",
+        "Iteration": 7,
+        "Measure": 0.0078,
+        "BaseScale": 1,
+        "ScaleFactor": 2,
+        "ScaleFactorPower": 128,
+        "Scale": 128,
+        "LogScale": 2.10721,
+        "LogMeasure": -2.10791,
+        "DataRegime": "measured"
+      },
+      {
+        "ObservedScaleID": "ForestFires_OBS_0",
+        "System": "ForestFires",
+        "MeasurementModel": "ForestFires_MM1",
+        "Iteration": 0,
+        "Measure": 0.891,
+        "BaseScale": 1,
+        "ScaleFactor": 2,
+        "ScaleFactorPower": 1,
+        "Scale": 1,
+        "LogScale": 0,
+        "LogMeasure": -0.05012,
+        "DataRegime": "measured"
+      },
+      {
+        "ObservedScaleID": "ForestFires_OBS_1",
+        "System": "ForestFires",
+        "MeasurementModel": "ForestFires_MM1",
+        "Iteration": 1,
+        "Measure": 0.5822,
+        "BaseScale": 1,
+        "ScaleFactor": 2,
+        "ScaleFactorPower": 2,
+        "Scale": 2,
+        "LogScale": 0.30103,
+        "LogMeasure": -0.23493,
+        "DataRegime": "measured"
+      },
+      {
+        "ObservedScaleID": "ForestFires_OBS_2",
+        "System": "ForestFires",
+        "MeasurementModel": "ForestFires_MM1",
+        "Iteration": 2,
+        "Measure": 0.1892,
+        "BaseScale": 1,
+        "ScaleFactor": 2,
+        "ScaleFactorPower": 4,
+        "Scale": 4,
+        "LogScale": 0.60206,
+        "LogMeasure": -0.72308,
+        "DataRegime": "measured"
+      },
+      {
+        "ObservedScaleID": "ForestFires_OBS_3",
+        "System": "ForestFires",
+        "MeasurementModel": "ForestFires_MM1",
+        "Iteration": 3,
+        "Measure": 0.054,
+        "BaseScale": 1,
+        "ScaleFactor": 2,
+        "ScaleFactorPower": 8,
+        "Scale": 8,
+        "LogScale": 0.90309,
+        "LogMeasure": -1.26761,
+        "DataRegime": "measured"
+      },
+      {
+        "ObservedScaleID": "ForestFires_OBS_4",
+        "System": "ForestFires",
+        "MeasurementModel": "ForestFires_MM1",
+        "Iteration": 4,
+        "Measure": 0.0285,
+        "BaseScale": 1,
+        "ScaleFactor": 2,
+        "ScaleFactorPower": 16,
+        "Scale": 16,
+        "LogScale": 1.20412,
+        "LogMeasure": -1.54516,
+        "DataRegime": "measured"
+      },
+      {
+        "ObservedScaleID": "ForestFires_OBS_5",
+        "System": "ForestFires",
+        "MeasurementModel": "ForestFires_MM1",
+        "Iteration": 5,
+        "Measure": 0.0119,
+        "BaseScale": 1,
+        "ScaleFactor": 2,
+        "ScaleFactorPower": 32,
+        "Scale": 32,
+        "LogScale": 1.50515,
+        "LogMeasure": -1.92445,
+        "DataRegime": "measured"
+      },
+      {
+        "ObservedScaleID": "ForestFires_OBS_6",
+        "System": "ForestFires",
+        "MeasurementModel": "ForestFires_MM1",
+        "Iteration": 6,
+        "Measure": 0.0045,
+        "BaseScale": 1,
+        "ScaleFactor": 2,
+        "ScaleFactorPower": 64,
+        "Scale": 64,
+        "LogScale": 1.80618,
+        "LogMeasure": -2.34679,
+        "DataRegime": "measured"
+      },
+      {
+        "ObservedScaleID": "ForestFires_OBS_7",
+        "System": "ForestFires",
+        "MeasurementModel": "ForestFires_MM1",
+        "Iteration": 7,
+        "Measure": 0.002,
+        "BaseScale": 1,
+        "ScaleFactor": 2,
+        "ScaleFactorPower": 128,
+        "Scale": 128,
+        "LogScale": 2.10721,
+        "LogMeasure": -2.69897,
+        "DataRegime": "measured"
+      }
+    ]
+  },
+  "inference_runs": {
+    "Description": "Inference outputs (fits and residual geometry) computed from observed_scales relative to each system fixed point.",
+    "primary_key": [
+      "InferenceRunID"
+    ],
+    "schema": [
+      {
+        "name": "InferenceRunID",
+        "datatype": "string",
+        "type": "raw",
+        "is_primary_key": true,
+        "Description": "Primary key for this inference run."
+      },
+      {
+        "name": "System",
+        "datatype": "string",
+        "type": "relationship",
+        "RelatedTo": "systems",
+        "Description": "FK to systems table."
+      },
+      {
+        "name": "DataRegime",
+        "datatype": "string",
+        "type": "raw",
+        "Description": "Regime of the fitted data (ideal/measured)."
+      },
+      {
+        "name": "MeasurementModel",
+        "datatype": "string",
+        "type": "relationship",
+        "RelatedTo": "measurement_models",
+        "Description": "FK to measurement model used/assumed (nullable for ideal)."
+      },
+      {
+        "name": "FitMethod",
+        "datatype": "string",
+        "type": "raw",
+        "Description": "Fitting method used (e.g., OLS on log-log)."
+      },
+      {
+        "name": "PointCount",
+        "datatype": "integer",
+        "type": "aggregation",
+        "formula": "=COUNTIF(observed_scales!{{System}}, {{System}})",
+        "Description": "Count of observed points used in fit (measured)."
+      },
+      {
+        "name": "TheoreticalLogLogSlope",
+        "datatype": "number",
+        "type": "lookup",
+        "formula": "=INDEX(systems!{{TheoreticalLogLogSlope}}, MATCH(inference_runs!{{System}}, systems!{{SystemID}}, 0))",
+        "Description": "Fixed-point slope for the system."
+      },
+      {
+        "name": "FittedSlope",
+        "datatype": "number",
+        "type": "raw",
+        "Description": "Estimated slope from observed data under FitMethod."
+      },
+      {
+        "name": "FittedIntercept",
+        "datatype": "number",
+        "type": "raw",
+        "Description": "Estimated intercept in log10 space (logMeasure = intercept + slope*logScale)."
+      },
+      {
+        "name": "SlopeDelta",
+        "datatype": "number",
+        "type": "calculated",
+        "formula": "={{FittedSlope}} - {{TheoreticalLogLogSlope}}",
+        "Description": "Difference between fitted slope and fixed-point slope."
+      },
+      {
+        "name": "R2",
+        "datatype": "number",
+        "type": "raw",
+        "Description": "Coefficient of determination for the log-log fit."
+      },
+      {
+        "name": "ResidualRMS",
+        "datatype": "number",
+        "type": "raw",
+        "Description": "Root-mean-square residual in log10 space (vertical residuals)."
+      },
+      {
+        "name": "ResidualMaxAbs",
+        "datatype": "number",
+        "type": "raw",
+        "Description": "Maximum absolute residual in log10 space."
+      },
+      {
+        "name": "OrthogonalRMS",
+        "datatype": "number",
+        "type": "raw",
+        "Description": "RMS orthogonal distance to the fitted log-log line in (logScale, logMeasure) coordinates."
+      },
+      {
+        "name": "DeviationScore",
+        "datatype": "number",
+        "type": "calculated",
+        "formula": "=SQRT(POWER({{ResidualRMS}}, 2) + POWER({{SlopeDelta}}, 2))",
+        "Description": "Composite deviation score combining residual RMS and slope delta (units: log10 + slope)."
+      }
+    ],
+    "data": [
+      {
+        "InferenceRunID": "Sierpinski_INF_OLS_LOG10",
+        "System": "Sierpinski",
+        "DataRegime": "measured",
+        "MeasurementModel": "Sierpinski_MM1",
+        "FitMethod": "OLS_loglog",
+        "PointCount": 8,
+        "TheoreticalLogLogSlope": -1.585,
+        "FittedSlope": -1.599205,
+        "FittedIntercept": -0.019658,
+        "SlopeDelta": -0.014205,
+        "R2": 0.998968,
+        "ResidualRMS": 0.035459,
+        "ResidualMaxAbs": 0.066978,
+        "OrthogonalRMS": 0.0188,
+        "DeviationScore": 0.038198
+      },
+      {
+        "InferenceRunID": "Koch_INF_OLS_LOG10",
+        "System": "Koch",
+        "DataRegime": "measured",
+        "MeasurementModel": "Koch_MM1",
+        "FitMethod": "OLS_loglog",
+        "PointCount": 8,
+        "TheoreticalLogLogSlope": -0.262,
+        "FittedSlope": -0.270086,
+        "FittedIntercept": -0.016264,
+        "SlopeDelta": -0.008086,
+        "R2": 0.991272,
+        "ResidualRMS": 0.027705,
+        "ResidualMaxAbs": 0.058497,
+        "OrthogonalRMS": 0.026747,
+        "DeviationScore": 0.028861
+      },
+      {
+        "InferenceRunID": "ZipfWords_INF_OLS_LOG10",
+        "System": "ZipfWords",
+        "DataRegime": "measured",
+        "MeasurementModel": "ZipfWords_MM1",
+        "FitMethod": "OLS_loglog",
+        "PointCount": 8,
+        "TheoreticalLogLogSlope": -1,
+        "FittedSlope": -0.965319,
+        "FittedIntercept": -0.115438,
+        "SlopeDelta": 0.034681,
+        "R2": 0.995247,
+        "ResidualRMS": 0.046013,
+        "ResidualMaxAbs": 0.069258,
+        "OrthogonalRMS": 0.033105,
+        "DeviationScore": 0.057619
+      },
+      {
+        "InferenceRunID": "ScaleFreeNet_INF_OLS_LOG10",
+        "System": "ScaleFreeNet",
+        "DataRegime": "measured",
+        "MeasurementModel": "ScaleFreeNet_MM1",
+        "FitMethod": "OLS_loglog",
+        "PointCount": 8,
+        "TheoreticalLogLogSlope": -2.5,
+        "FittedSlope": -2.502179,
+        "FittedIntercept": -0.037924,
+        "SlopeDelta": -0.002179,
+        "R2": 0.998115,
+        "ResidualRMS": 0.074995,
+        "ResidualMaxAbs": 0.156764,
+        "OrthogonalRMS": 0.027831,
+        "DeviationScore": 0.075026
+      },
+      {
+        "InferenceRunID": "Sandpile_INF_OLS_LOG10",
+        "System": "Sandpile",
+        "DataRegime": "measured",
+        "MeasurementModel": "Sandpile_MM1",
+        "FitMethod": "OLS_loglog",
+        "PointCount": 8,
+        "TheoreticalLogLogSlope": -1,
+        "FittedSlope": -0.976376,
+        "FittedIntercept": -0.038839,
+        "SlopeDelta": 0.023624,
+        "R2": 0.992746,
+        "ResidualRMS": 0.057567,
+        "ResidualMaxAbs": 0.107546,
+        "OrthogonalRMS": 0.041189,
+        "DeviationScore": 0.062225
+      },
+      {
+        "InferenceRunID": "Earthquakes_INF_OLS_LOG10",
+        "System": "Earthquakes",
+        "DataRegime": "measured",
+        "MeasurementModel": "Earthquakes_MM1",
+        "FitMethod": "OLS_loglog",
+        "PointCount": 8,
+        "TheoreticalLogLogSlope": -1,
+        "FittedSlope": -0.987955,
+        "FittedIntercept": -0.014117,
+        "SlopeDelta": 0.012045,
+        "R2": 0.988159,
+        "ResidualRMS": 0.074595,
+        "ResidualMaxAbs": 0.131502,
+        "OrthogonalRMS": 0.053065,
+        "DeviationScore": 0.075561
+      },
+      {
+        "InferenceRunID": "ForestFires_INF_OLS_LOG10",
+        "System": "ForestFires",
+        "DataRegime": "measured",
+        "MeasurementModel": "ForestFires_MM1",
+        "FitMethod": "OLS_loglog",
+        "PointCount": 8,
+        "TheoreticalLogLogSlope": -1.3,
+        "FittedSlope": -1.304367,
+        "FittedIntercept": 0.025399,
+        "SlopeDelta": -0.004367,
+        "R2": 0.994038,
+        "ResidualRMS": 0.069674,
+        "ResidualMaxAbs": 0.132325,
+        "OrthogonalRMS": 0.042392,
+        "DeviationScore": 0.069811
+      }
+    ]
   }
 }

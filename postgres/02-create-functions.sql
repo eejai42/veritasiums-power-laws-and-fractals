@@ -11,13 +11,13 @@
 
 -- calc_scales_base_scale
 -- Field: scales.BaseScale
--- Type: lookup | DataType: decimal | Returns: NUMERIC
+-- Type: lookup | DataType: integer | Returns: INTEGER
 -- Lookup: BaseScale from related systems
 -- Formula: =INDEX(systems!{{BaseScale}}, MATCH(scales!{{System}}, systems!{{SystemID}}, 0))
 CREATE OR REPLACE FUNCTION calc_scales_base_scale(p_scale_id TEXT)
-RETURNS NUMERIC AS $$
+RETURNS INTEGER AS $$
 BEGIN
-  RETURN (SELECT base_scale::numeric FROM systems WHERE system_id = (SELECT "system" FROM scales WHERE scale_id = p_scale_id));
+  RETURN (SELECT base_scale::integer FROM systems WHERE system_id = (SELECT "system" FROM scales WHERE scale_id = p_scale_id));
 END;
 $$ LANGUAGE plpgsql;
 
@@ -57,7 +57,7 @@ $$ LANGUAGE plpgsql;
 -- Helper function: Get BaseScale from systems by SystemID
 -- Used for join-free cross-table references in aggregations
 CREATE OR REPLACE FUNCTION get_systems_base_scale(p_system_id TEXT)
-RETURNS NUMERIC AS $$
+RETURNS INTEGER AS $$
 BEGIN
   RETURN (SELECT base_scale FROM systems WHERE system_id = p_system_id);
 END;
@@ -127,7 +127,7 @@ $$ LANGUAGE plpgsql;
 -- Helper function: Get BaseScale from systems by SystemID
 -- Used for join-free cross-table references in aggregations
 CREATE OR REPLACE FUNCTION get_systems_base_scale(p_system_id TEXT)
-RETURNS NUMERIC AS $$
+RETURNS INTEGER AS $$
 BEGIN
   RETURN (SELECT base_scale FROM systems WHERE system_id = p_system_id);
 END;
@@ -197,7 +197,7 @@ $$ LANGUAGE plpgsql;
 -- Helper function: Get BaseScale from systems by SystemID
 -- Used for join-free cross-table references in aggregations
 CREATE OR REPLACE FUNCTION get_systems_base_scale(p_system_id TEXT)
-RETURNS NUMERIC AS $$
+RETURNS INTEGER AS $$
 BEGIN
   RETURN (SELECT base_scale FROM systems WHERE system_id = p_system_id);
 END;
@@ -240,6 +240,76 @@ CREATE OR REPLACE FUNCTION get_systems_theoretical_log_log_slope(p_system_id TEX
 RETURNS NUMERIC AS $$
 BEGIN
   RETURN (SELECT theoretical_log_log_slope FROM systems WHERE system_id = p_system_id);
+END;
+$$ LANGUAGE plpgsql;
+
+-- get_measurement_models_data_regime
+-- Helper function: Get DataRegime from measurement_models by MeasurementModelID
+-- Used for join-free cross-table references in aggregations
+CREATE OR REPLACE FUNCTION get_measurement_models_data_regime(p_measurement_model_id TEXT)
+RETURNS TEXT AS $$
+BEGIN
+  RETURN (SELECT data_regime FROM measurement_models WHERE measurement_model_id = p_measurement_model_id);
+END;
+$$ LANGUAGE plpgsql;
+
+-- get_measurement_models_noise_type
+-- Helper function: Get NoiseType from measurement_models by MeasurementModelID
+-- Used for join-free cross-table references in aggregations
+CREATE OR REPLACE FUNCTION get_measurement_models_noise_type(p_measurement_model_id TEXT)
+RETURNS TEXT AS $$
+BEGIN
+  RETURN (SELECT noise_type FROM measurement_models WHERE measurement_model_id = p_measurement_model_id);
+END;
+$$ LANGUAGE plpgsql;
+
+-- get_measurement_models_noise_sigma
+-- Helper function: Get NoiseSigma from measurement_models by MeasurementModelID
+-- Used for join-free cross-table references in aggregations
+CREATE OR REPLACE FUNCTION get_measurement_models_noise_sigma(p_measurement_model_id TEXT)
+RETURNS NUMERIC AS $$
+BEGIN
+  RETURN (SELECT noise_sigma FROM measurement_models WHERE measurement_model_id = p_measurement_model_id);
+END;
+$$ LANGUAGE plpgsql;
+
+-- get_measurement_models_cutoff_min_scale
+-- Helper function: Get CutoffMinScale from measurement_models by MeasurementModelID
+-- Used for join-free cross-table references in aggregations
+CREATE OR REPLACE FUNCTION get_measurement_models_cutoff_min_scale(p_measurement_model_id TEXT)
+RETURNS NUMERIC AS $$
+BEGIN
+  RETURN (SELECT cutoff_min_scale FROM measurement_models WHERE measurement_model_id = p_measurement_model_id);
+END;
+$$ LANGUAGE plpgsql;
+
+-- get_measurement_models_cutoff_max_scale
+-- Helper function: Get CutoffMaxScale from measurement_models by MeasurementModelID
+-- Used for join-free cross-table references in aggregations
+CREATE OR REPLACE FUNCTION get_measurement_models_cutoff_max_scale(p_measurement_model_id TEXT)
+RETURNS NUMERIC AS $$
+BEGIN
+  RETURN (SELECT cutoff_max_scale FROM measurement_models WHERE measurement_model_id = p_measurement_model_id);
+END;
+$$ LANGUAGE plpgsql;
+
+-- get_measurement_models_discretization_type
+-- Helper function: Get DiscretizationType from measurement_models by MeasurementModelID
+-- Used for join-free cross-table references in aggregations
+CREATE OR REPLACE FUNCTION get_measurement_models_discretization_type(p_measurement_model_id TEXT)
+RETURNS TEXT AS $$
+BEGIN
+  RETURN (SELECT discretization_type FROM measurement_models WHERE measurement_model_id = p_measurement_model_id);
+END;
+$$ LANGUAGE plpgsql;
+
+-- get_measurement_models_discretization_param
+-- Helper function: Get DiscretizationParam from measurement_models by MeasurementModelID
+-- Used for join-free cross-table references in aggregations
+CREATE OR REPLACE FUNCTION get_measurement_models_discretization_param(p_measurement_model_id TEXT)
+RETURNS TEXT AS $$
+BEGIN
+  RETURN (SELECT discretization_param FROM measurement_models WHERE measurement_model_id = p_measurement_model_id);
 END;
 $$ LANGUAGE plpgsql;
 
@@ -355,7 +425,7 @@ $$ LANGUAGE plpgsql;
 -- Helper function: Get BaseScale from systems by SystemID
 -- Used for join-free cross-table references in aggregations
 CREATE OR REPLACE FUNCTION get_systems_base_scale(p_system_id TEXT)
-RETURNS NUMERIC AS $$
+RETURNS INTEGER AS $$
 BEGIN
   RETURN (SELECT base_scale FROM systems WHERE system_id = p_system_id);
 END;
@@ -425,7 +495,7 @@ $$ LANGUAGE plpgsql;
 -- Helper function: Get BaseScale from systems by SystemID
 -- Used for join-free cross-table references in aggregations
 CREATE OR REPLACE FUNCTION get_systems_base_scale(p_system_id TEXT)
-RETURNS NUMERIC AS $$
+RETURNS INTEGER AS $$
 BEGIN
   RETURN (SELECT base_scale FROM systems WHERE system_id = p_system_id);
 END;
@@ -495,7 +565,7 @@ $$ LANGUAGE plpgsql;
 -- Helper function: Get BaseScale from systems by SystemID
 -- Used for join-free cross-table references in aggregations
 CREATE OR REPLACE FUNCTION get_systems_base_scale(p_system_id TEXT)
-RETURNS NUMERIC AS $$
+RETURNS INTEGER AS $$
 BEGIN
   RETURN (SELECT base_scale FROM systems WHERE system_id = p_system_id);
 END;
@@ -682,6 +752,715 @@ CREATE OR REPLACE FUNCTION calc_system_stats_slope_error(p_system_stats_id TEXT)
 RETURNS NUMERIC AS $$
 BEGIN
   RETURN (((COALESCE(calc_system_stats_empirical_log_log_slope(p_system_stats_id), 0))::numeric - (COALESCE(calc_system_stats_theoretical_log_log_slope(p_system_stats_id), 0))::numeric))::numeric;
+END;
+$$ LANGUAGE plpgsql;
+
+-- get_systems_display_name
+-- Helper function: Get DisplayName from systems by SystemID
+-- Used for join-free cross-table references in aggregations
+CREATE OR REPLACE FUNCTION get_systems_display_name(p_system_id TEXT)
+RETURNS TEXT AS $$
+BEGIN
+  RETURN (SELECT display_name FROM systems WHERE system_id = p_system_id);
+END;
+$$ LANGUAGE plpgsql;
+
+-- get_systems_class
+-- Helper function: Get Class from systems by SystemID
+-- Used for join-free cross-table references in aggregations
+CREATE OR REPLACE FUNCTION get_systems_class(p_system_id TEXT)
+RETURNS TEXT AS $$
+BEGIN
+  RETURN (SELECT class FROM systems WHERE system_id = p_system_id);
+END;
+$$ LANGUAGE plpgsql;
+
+-- get_systems_base_scale
+-- Helper function: Get BaseScale from systems by SystemID
+-- Used for join-free cross-table references in aggregations
+CREATE OR REPLACE FUNCTION get_systems_base_scale(p_system_id TEXT)
+RETURNS INTEGER AS $$
+BEGIN
+  RETURN (SELECT base_scale FROM systems WHERE system_id = p_system_id);
+END;
+$$ LANGUAGE plpgsql;
+
+-- get_systems_scale_factor
+-- Helper function: Get ScaleFactor from systems by SystemID
+-- Used for join-free cross-table references in aggregations
+CREATE OR REPLACE FUNCTION get_systems_scale_factor(p_system_id TEXT)
+RETURNS NUMERIC AS $$
+BEGIN
+  RETURN (SELECT scale_factor FROM systems WHERE system_id = p_system_id);
+END;
+$$ LANGUAGE plpgsql;
+
+-- get_systems_measure_name
+-- Helper function: Get MeasureName from systems by SystemID
+-- Used for join-free cross-table references in aggregations
+CREATE OR REPLACE FUNCTION get_systems_measure_name(p_system_id TEXT)
+RETURNS TEXT AS $$
+BEGIN
+  RETURN (SELECT measure_name FROM systems WHERE system_id = p_system_id);
+END;
+$$ LANGUAGE plpgsql;
+
+-- get_systems_fractal_dimension
+-- Helper function: Get FractalDimension from systems by SystemID
+-- Used for join-free cross-table references in aggregations
+CREATE OR REPLACE FUNCTION get_systems_fractal_dimension(p_system_id TEXT)
+RETURNS NUMERIC AS $$
+BEGIN
+  RETURN (SELECT fractal_dimension FROM systems WHERE system_id = p_system_id);
+END;
+$$ LANGUAGE plpgsql;
+
+-- get_systems_theoretical_log_log_slope
+-- Helper function: Get TheoreticalLogLogSlope from systems by SystemID
+-- Used for join-free cross-table references in aggregations
+CREATE OR REPLACE FUNCTION get_systems_theoretical_log_log_slope(p_system_id TEXT)
+RETURNS NUMERIC AS $$
+BEGIN
+  RETURN (SELECT theoretical_log_log_slope FROM systems WHERE system_id = p_system_id);
+END;
+$$ LANGUAGE plpgsql;
+
+-- calc_observed_scales_base_scale
+-- Field: observed_scales.BaseScale
+-- Type: lookup | DataType: integer | Returns: INTEGER
+-- Lookup: BaseScale from related systems
+-- Formula: =INDEX(systems!{{BaseScale}}, MATCH(observed_scales!{{System}}, systems!{{SystemID}}, 0))
+CREATE OR REPLACE FUNCTION calc_observed_scales_base_scale(p_observed_scale_id TEXT)
+RETURNS INTEGER AS $$
+BEGIN
+  RETURN (SELECT base_scale::integer FROM systems WHERE system_id = (SELECT "system" FROM observed_scales WHERE observed_scale_id = p_observed_scale_id));
+END;
+$$ LANGUAGE plpgsql;
+
+-- calc_observed_scales_scale_factor
+-- Field: observed_scales.ScaleFactor
+-- Type: lookup | DataType: decimal | Returns: NUMERIC
+-- Lookup: ScaleFactor from related systems
+-- Formula: =INDEX(systems!{{ScaleFactor}}, MATCH(observed_scales!{{System}}, systems!{{SystemID}}, 0))
+CREATE OR REPLACE FUNCTION calc_observed_scales_scale_factor(p_observed_scale_id TEXT)
+RETURNS NUMERIC AS $$
+BEGIN
+  RETURN (SELECT scale_factor::numeric FROM systems WHERE system_id = (SELECT "system" FROM observed_scales WHERE observed_scale_id = p_observed_scale_id));
+END;
+$$ LANGUAGE plpgsql;
+
+-- get_systems_display_name
+-- Helper function: Get DisplayName from systems by SystemID
+-- Used for join-free cross-table references in aggregations
+CREATE OR REPLACE FUNCTION get_systems_display_name(p_system_id TEXT)
+RETURNS TEXT AS $$
+BEGIN
+  RETURN (SELECT display_name FROM systems WHERE system_id = p_system_id);
+END;
+$$ LANGUAGE plpgsql;
+
+-- get_systems_class
+-- Helper function: Get Class from systems by SystemID
+-- Used for join-free cross-table references in aggregations
+CREATE OR REPLACE FUNCTION get_systems_class(p_system_id TEXT)
+RETURNS TEXT AS $$
+BEGIN
+  RETURN (SELECT class FROM systems WHERE system_id = p_system_id);
+END;
+$$ LANGUAGE plpgsql;
+
+-- get_systems_base_scale
+-- Helper function: Get BaseScale from systems by SystemID
+-- Used for join-free cross-table references in aggregations
+CREATE OR REPLACE FUNCTION get_systems_base_scale(p_system_id TEXT)
+RETURNS INTEGER AS $$
+BEGIN
+  RETURN (SELECT base_scale FROM systems WHERE system_id = p_system_id);
+END;
+$$ LANGUAGE plpgsql;
+
+-- get_systems_scale_factor
+-- Helper function: Get ScaleFactor from systems by SystemID
+-- Used for join-free cross-table references in aggregations
+CREATE OR REPLACE FUNCTION get_systems_scale_factor(p_system_id TEXT)
+RETURNS NUMERIC AS $$
+BEGIN
+  RETURN (SELECT scale_factor FROM systems WHERE system_id = p_system_id);
+END;
+$$ LANGUAGE plpgsql;
+
+-- get_systems_measure_name
+-- Helper function: Get MeasureName from systems by SystemID
+-- Used for join-free cross-table references in aggregations
+CREATE OR REPLACE FUNCTION get_systems_measure_name(p_system_id TEXT)
+RETURNS TEXT AS $$
+BEGIN
+  RETURN (SELECT measure_name FROM systems WHERE system_id = p_system_id);
+END;
+$$ LANGUAGE plpgsql;
+
+-- get_systems_fractal_dimension
+-- Helper function: Get FractalDimension from systems by SystemID
+-- Used for join-free cross-table references in aggregations
+CREATE OR REPLACE FUNCTION get_systems_fractal_dimension(p_system_id TEXT)
+RETURNS NUMERIC AS $$
+BEGIN
+  RETURN (SELECT fractal_dimension FROM systems WHERE system_id = p_system_id);
+END;
+$$ LANGUAGE plpgsql;
+
+-- get_systems_theoretical_log_log_slope
+-- Helper function: Get TheoreticalLogLogSlope from systems by SystemID
+-- Used for join-free cross-table references in aggregations
+CREATE OR REPLACE FUNCTION get_systems_theoretical_log_log_slope(p_system_id TEXT)
+RETURNS NUMERIC AS $$
+BEGIN
+  RETURN (SELECT theoretical_log_log_slope FROM systems WHERE system_id = p_system_id);
+END;
+$$ LANGUAGE plpgsql;
+
+-- get_measurement_models_data_regime
+-- Helper function: Get DataRegime from measurement_models by MeasurementModelID
+-- Used for join-free cross-table references in aggregations
+CREATE OR REPLACE FUNCTION get_measurement_models_data_regime(p_measurement_model_id TEXT)
+RETURNS TEXT AS $$
+BEGIN
+  RETURN (SELECT data_regime FROM measurement_models WHERE measurement_model_id = p_measurement_model_id);
+END;
+$$ LANGUAGE plpgsql;
+
+-- get_measurement_models_noise_type
+-- Helper function: Get NoiseType from measurement_models by MeasurementModelID
+-- Used for join-free cross-table references in aggregations
+CREATE OR REPLACE FUNCTION get_measurement_models_noise_type(p_measurement_model_id TEXT)
+RETURNS TEXT AS $$
+BEGIN
+  RETURN (SELECT noise_type FROM measurement_models WHERE measurement_model_id = p_measurement_model_id);
+END;
+$$ LANGUAGE plpgsql;
+
+-- get_measurement_models_noise_sigma
+-- Helper function: Get NoiseSigma from measurement_models by MeasurementModelID
+-- Used for join-free cross-table references in aggregations
+CREATE OR REPLACE FUNCTION get_measurement_models_noise_sigma(p_measurement_model_id TEXT)
+RETURNS NUMERIC AS $$
+BEGIN
+  RETURN (SELECT noise_sigma FROM measurement_models WHERE measurement_model_id = p_measurement_model_id);
+END;
+$$ LANGUAGE plpgsql;
+
+-- get_measurement_models_cutoff_min_scale
+-- Helper function: Get CutoffMinScale from measurement_models by MeasurementModelID
+-- Used for join-free cross-table references in aggregations
+CREATE OR REPLACE FUNCTION get_measurement_models_cutoff_min_scale(p_measurement_model_id TEXT)
+RETURNS NUMERIC AS $$
+BEGIN
+  RETURN (SELECT cutoff_min_scale FROM measurement_models WHERE measurement_model_id = p_measurement_model_id);
+END;
+$$ LANGUAGE plpgsql;
+
+-- get_measurement_models_cutoff_max_scale
+-- Helper function: Get CutoffMaxScale from measurement_models by MeasurementModelID
+-- Used for join-free cross-table references in aggregations
+CREATE OR REPLACE FUNCTION get_measurement_models_cutoff_max_scale(p_measurement_model_id TEXT)
+RETURNS NUMERIC AS $$
+BEGIN
+  RETURN (SELECT cutoff_max_scale FROM measurement_models WHERE measurement_model_id = p_measurement_model_id);
+END;
+$$ LANGUAGE plpgsql;
+
+-- get_measurement_models_discretization_type
+-- Helper function: Get DiscretizationType from measurement_models by MeasurementModelID
+-- Used for join-free cross-table references in aggregations
+CREATE OR REPLACE FUNCTION get_measurement_models_discretization_type(p_measurement_model_id TEXT)
+RETURNS TEXT AS $$
+BEGIN
+  RETURN (SELECT discretization_type FROM measurement_models WHERE measurement_model_id = p_measurement_model_id);
+END;
+$$ LANGUAGE plpgsql;
+
+-- get_measurement_models_discretization_param
+-- Helper function: Get DiscretizationParam from measurement_models by MeasurementModelID
+-- Used for join-free cross-table references in aggregations
+CREATE OR REPLACE FUNCTION get_measurement_models_discretization_param(p_measurement_model_id TEXT)
+RETURNS TEXT AS $$
+BEGIN
+  RETURN (SELECT discretization_param FROM measurement_models WHERE measurement_model_id = p_measurement_model_id);
+END;
+$$ LANGUAGE plpgsql;
+
+-- get_systems_display_name
+-- Helper function: Get DisplayName from systems by SystemID
+-- Used for join-free cross-table references in aggregations
+CREATE OR REPLACE FUNCTION get_systems_display_name(p_system_id TEXT)
+RETURNS TEXT AS $$
+BEGIN
+  RETURN (SELECT display_name FROM systems WHERE system_id = p_system_id);
+END;
+$$ LANGUAGE plpgsql;
+
+-- get_systems_class
+-- Helper function: Get Class from systems by SystemID
+-- Used for join-free cross-table references in aggregations
+CREATE OR REPLACE FUNCTION get_systems_class(p_system_id TEXT)
+RETURNS TEXT AS $$
+BEGIN
+  RETURN (SELECT class FROM systems WHERE system_id = p_system_id);
+END;
+$$ LANGUAGE plpgsql;
+
+-- get_systems_base_scale
+-- Helper function: Get BaseScale from systems by SystemID
+-- Used for join-free cross-table references in aggregations
+CREATE OR REPLACE FUNCTION get_systems_base_scale(p_system_id TEXT)
+RETURNS INTEGER AS $$
+BEGIN
+  RETURN (SELECT base_scale FROM systems WHERE system_id = p_system_id);
+END;
+$$ LANGUAGE plpgsql;
+
+-- get_systems_scale_factor
+-- Helper function: Get ScaleFactor from systems by SystemID
+-- Used for join-free cross-table references in aggregations
+CREATE OR REPLACE FUNCTION get_systems_scale_factor(p_system_id TEXT)
+RETURNS NUMERIC AS $$
+BEGIN
+  RETURN (SELECT scale_factor FROM systems WHERE system_id = p_system_id);
+END;
+$$ LANGUAGE plpgsql;
+
+-- get_systems_measure_name
+-- Helper function: Get MeasureName from systems by SystemID
+-- Used for join-free cross-table references in aggregations
+CREATE OR REPLACE FUNCTION get_systems_measure_name(p_system_id TEXT)
+RETURNS TEXT AS $$
+BEGIN
+  RETURN (SELECT measure_name FROM systems WHERE system_id = p_system_id);
+END;
+$$ LANGUAGE plpgsql;
+
+-- get_systems_fractal_dimension
+-- Helper function: Get FractalDimension from systems by SystemID
+-- Used for join-free cross-table references in aggregations
+CREATE OR REPLACE FUNCTION get_systems_fractal_dimension(p_system_id TEXT)
+RETURNS NUMERIC AS $$
+BEGIN
+  RETURN (SELECT fractal_dimension FROM systems WHERE system_id = p_system_id);
+END;
+$$ LANGUAGE plpgsql;
+
+-- get_systems_theoretical_log_log_slope
+-- Helper function: Get TheoreticalLogLogSlope from systems by SystemID
+-- Used for join-free cross-table references in aggregations
+CREATE OR REPLACE FUNCTION get_systems_theoretical_log_log_slope(p_system_id TEXT)
+RETURNS NUMERIC AS $$
+BEGIN
+  RETURN (SELECT theoretical_log_log_slope FROM systems WHERE system_id = p_system_id);
+END;
+$$ LANGUAGE plpgsql;
+
+-- get_systems_display_name
+-- Helper function: Get DisplayName from systems by SystemID
+-- Used for join-free cross-table references in aggregations
+CREATE OR REPLACE FUNCTION get_systems_display_name(p_system_id TEXT)
+RETURNS TEXT AS $$
+BEGIN
+  RETURN (SELECT display_name FROM systems WHERE system_id = p_system_id);
+END;
+$$ LANGUAGE plpgsql;
+
+-- get_systems_class
+-- Helper function: Get Class from systems by SystemID
+-- Used for join-free cross-table references in aggregations
+CREATE OR REPLACE FUNCTION get_systems_class(p_system_id TEXT)
+RETURNS TEXT AS $$
+BEGIN
+  RETURN (SELECT class FROM systems WHERE system_id = p_system_id);
+END;
+$$ LANGUAGE plpgsql;
+
+-- get_systems_base_scale
+-- Helper function: Get BaseScale from systems by SystemID
+-- Used for join-free cross-table references in aggregations
+CREATE OR REPLACE FUNCTION get_systems_base_scale(p_system_id TEXT)
+RETURNS INTEGER AS $$
+BEGIN
+  RETURN (SELECT base_scale FROM systems WHERE system_id = p_system_id);
+END;
+$$ LANGUAGE plpgsql;
+
+-- get_systems_scale_factor
+-- Helper function: Get ScaleFactor from systems by SystemID
+-- Used for join-free cross-table references in aggregations
+CREATE OR REPLACE FUNCTION get_systems_scale_factor(p_system_id TEXT)
+RETURNS NUMERIC AS $$
+BEGIN
+  RETURN (SELECT scale_factor FROM systems WHERE system_id = p_system_id);
+END;
+$$ LANGUAGE plpgsql;
+
+-- get_systems_measure_name
+-- Helper function: Get MeasureName from systems by SystemID
+-- Used for join-free cross-table references in aggregations
+CREATE OR REPLACE FUNCTION get_systems_measure_name(p_system_id TEXT)
+RETURNS TEXT AS $$
+BEGIN
+  RETURN (SELECT measure_name FROM systems WHERE system_id = p_system_id);
+END;
+$$ LANGUAGE plpgsql;
+
+-- get_systems_fractal_dimension
+-- Helper function: Get FractalDimension from systems by SystemID
+-- Used for join-free cross-table references in aggregations
+CREATE OR REPLACE FUNCTION get_systems_fractal_dimension(p_system_id TEXT)
+RETURNS NUMERIC AS $$
+BEGIN
+  RETURN (SELECT fractal_dimension FROM systems WHERE system_id = p_system_id);
+END;
+$$ LANGUAGE plpgsql;
+
+-- get_systems_theoretical_log_log_slope
+-- Helper function: Get TheoreticalLogLogSlope from systems by SystemID
+-- Used for join-free cross-table references in aggregations
+CREATE OR REPLACE FUNCTION get_systems_theoretical_log_log_slope(p_system_id TEXT)
+RETURNS NUMERIC AS $$
+BEGIN
+  RETURN (SELECT theoretical_log_log_slope FROM systems WHERE system_id = p_system_id);
+END;
+$$ LANGUAGE plpgsql;
+
+-- calc_observed_scales_scale_factor_power
+-- Field: observed_scales.ScaleFactorPower
+-- Type: calculated | DataType: number | Returns: NUMERIC
+-- Formula: =POWER({{ScaleFactor}}, {{Iteration}})
+-- ============================================================================
+-- CRITICAL FUNCTION VALIDATION CODE - DO NOT REMOVE
+-- Original Excel Formula: =POWER({{ScaleFactor}}, {{Iteration}})
+-- This formula is preserved for validation and debugging purposes
+-- ============================================================================
+CREATE OR REPLACE FUNCTION calc_observed_scales_scale_factor_power(p_observed_scale_id TEXT)
+RETURNS NUMERIC AS $$
+BEGIN
+  RETURN (POWER(calc_observed_scales_scale_factor(p_observed_scale_id), (SELECT iteration FROM observed_scales WHERE observed_scale_id = p_observed_scale_id)))::numeric;
+END;
+$$ LANGUAGE plpgsql;
+
+-- calc_observed_scales_scale
+-- Field: observed_scales.Scale
+-- Type: calculated | DataType: number | Returns: NUMERIC
+-- Formula: ={{BaseScale}} * {{ScaleFactorPower}}
+-- ============================================================================
+-- CRITICAL FUNCTION VALIDATION CODE - DO NOT REMOVE
+-- Original Excel Formula: ={{BaseScale}} * {{ScaleFactorPower}}
+-- This formula is preserved for validation and debugging purposes
+-- ============================================================================
+CREATE OR REPLACE FUNCTION calc_observed_scales_scale(p_observed_scale_id TEXT)
+RETURNS NUMERIC AS $$
+BEGIN
+  RETURN (((COALESCE(calc_observed_scales_base_scale(p_observed_scale_id), 0))::numeric * (COALESCE(calc_observed_scales_scale_factor_power(p_observed_scale_id), 0))::numeric))::numeric;
+END;
+$$ LANGUAGE plpgsql;
+
+-- calc_observed_scales_log_scale
+-- Field: observed_scales.LogScale
+-- Type: calculated | DataType: number | Returns: NUMERIC
+-- Formula: =LOG10({{Scale}})
+-- ============================================================================
+-- CRITICAL FUNCTION VALIDATION CODE - DO NOT REMOVE
+-- Original Excel Formula: =LOG10({{Scale}})
+-- This formula is preserved for validation and debugging purposes
+-- ============================================================================
+CREATE OR REPLACE FUNCTION calc_observed_scales_log_scale(p_observed_scale_id TEXT)
+RETURNS NUMERIC AS $$
+BEGIN
+  RETURN (LOG10(calc_observed_scales_scale(p_observed_scale_id)))::numeric;
+END;
+$$ LANGUAGE plpgsql;
+
+-- calc_observed_scales_log_measure
+-- Field: observed_scales.LogMeasure
+-- Type: calculated | DataType: number | Returns: NUMERIC
+-- Formula: =LOG10({{Measure}})
+-- ============================================================================
+-- CRITICAL FUNCTION VALIDATION CODE - DO NOT REMOVE
+-- Original Excel Formula: =LOG10({{Measure}})
+-- This formula is preserved for validation and debugging purposes
+-- ============================================================================
+CREATE OR REPLACE FUNCTION calc_observed_scales_log_measure(p_observed_scale_id TEXT)
+RETURNS NUMERIC AS $$
+BEGIN
+  RETURN (LOG10((SELECT measure FROM observed_scales WHERE observed_scale_id = p_observed_scale_id)))::numeric;
+END;
+$$ LANGUAGE plpgsql;
+
+-- calc_inference_runs_theoretical_log_log_slope
+-- Field: inference_runs.TheoreticalLogLogSlope
+-- Type: lookup | DataType: decimal | Returns: NUMERIC
+-- Lookup: TheoreticalLogLogSlope from related systems
+-- Formula: =INDEX(systems!{{TheoreticalLogLogSlope}}, MATCH(inference_runs!{{System}}, systems!{{SystemID}}, 0))
+CREATE OR REPLACE FUNCTION calc_inference_runs_theoretical_log_log_slope(p_inference_run_id TEXT)
+RETURNS NUMERIC AS $$
+BEGIN
+  RETURN (SELECT theoretical_log_log_slope::numeric FROM systems WHERE system_id = (SELECT "system" FROM inference_runs WHERE inference_run_id = p_inference_run_id));
+END;
+$$ LANGUAGE plpgsql;
+
+-- get_systems_display_name
+-- Helper function: Get DisplayName from systems by SystemID
+-- Used for join-free cross-table references in aggregations
+CREATE OR REPLACE FUNCTION get_systems_display_name(p_system_id TEXT)
+RETURNS TEXT AS $$
+BEGIN
+  RETURN (SELECT display_name FROM systems WHERE system_id = p_system_id);
+END;
+$$ LANGUAGE plpgsql;
+
+-- get_systems_class
+-- Helper function: Get Class from systems by SystemID
+-- Used for join-free cross-table references in aggregations
+CREATE OR REPLACE FUNCTION get_systems_class(p_system_id TEXT)
+RETURNS TEXT AS $$
+BEGIN
+  RETURN (SELECT class FROM systems WHERE system_id = p_system_id);
+END;
+$$ LANGUAGE plpgsql;
+
+-- get_systems_base_scale
+-- Helper function: Get BaseScale from systems by SystemID
+-- Used for join-free cross-table references in aggregations
+CREATE OR REPLACE FUNCTION get_systems_base_scale(p_system_id TEXT)
+RETURNS INTEGER AS $$
+BEGIN
+  RETURN (SELECT base_scale FROM systems WHERE system_id = p_system_id);
+END;
+$$ LANGUAGE plpgsql;
+
+-- get_systems_scale_factor
+-- Helper function: Get ScaleFactor from systems by SystemID
+-- Used for join-free cross-table references in aggregations
+CREATE OR REPLACE FUNCTION get_systems_scale_factor(p_system_id TEXT)
+RETURNS NUMERIC AS $$
+BEGIN
+  RETURN (SELECT scale_factor FROM systems WHERE system_id = p_system_id);
+END;
+$$ LANGUAGE plpgsql;
+
+-- get_systems_measure_name
+-- Helper function: Get MeasureName from systems by SystemID
+-- Used for join-free cross-table references in aggregations
+CREATE OR REPLACE FUNCTION get_systems_measure_name(p_system_id TEXT)
+RETURNS TEXT AS $$
+BEGIN
+  RETURN (SELECT measure_name FROM systems WHERE system_id = p_system_id);
+END;
+$$ LANGUAGE plpgsql;
+
+-- get_systems_fractal_dimension
+-- Helper function: Get FractalDimension from systems by SystemID
+-- Used for join-free cross-table references in aggregations
+CREATE OR REPLACE FUNCTION get_systems_fractal_dimension(p_system_id TEXT)
+RETURNS NUMERIC AS $$
+BEGIN
+  RETURN (SELECT fractal_dimension FROM systems WHERE system_id = p_system_id);
+END;
+$$ LANGUAGE plpgsql;
+
+-- get_systems_theoretical_log_log_slope
+-- Helper function: Get TheoreticalLogLogSlope from systems by SystemID
+-- Used for join-free cross-table references in aggregations
+CREATE OR REPLACE FUNCTION get_systems_theoretical_log_log_slope(p_system_id TEXT)
+RETURNS NUMERIC AS $$
+BEGIN
+  RETURN (SELECT theoretical_log_log_slope FROM systems WHERE system_id = p_system_id);
+END;
+$$ LANGUAGE plpgsql;
+
+-- get_measurement_models_data_regime
+-- Helper function: Get DataRegime from measurement_models by MeasurementModelID
+-- Used for join-free cross-table references in aggregations
+CREATE OR REPLACE FUNCTION get_measurement_models_data_regime(p_measurement_model_id TEXT)
+RETURNS TEXT AS $$
+BEGIN
+  RETURN (SELECT data_regime FROM measurement_models WHERE measurement_model_id = p_measurement_model_id);
+END;
+$$ LANGUAGE plpgsql;
+
+-- get_measurement_models_noise_type
+-- Helper function: Get NoiseType from measurement_models by MeasurementModelID
+-- Used for join-free cross-table references in aggregations
+CREATE OR REPLACE FUNCTION get_measurement_models_noise_type(p_measurement_model_id TEXT)
+RETURNS TEXT AS $$
+BEGIN
+  RETURN (SELECT noise_type FROM measurement_models WHERE measurement_model_id = p_measurement_model_id);
+END;
+$$ LANGUAGE plpgsql;
+
+-- get_measurement_models_noise_sigma
+-- Helper function: Get NoiseSigma from measurement_models by MeasurementModelID
+-- Used for join-free cross-table references in aggregations
+CREATE OR REPLACE FUNCTION get_measurement_models_noise_sigma(p_measurement_model_id TEXT)
+RETURNS NUMERIC AS $$
+BEGIN
+  RETURN (SELECT noise_sigma FROM measurement_models WHERE measurement_model_id = p_measurement_model_id);
+END;
+$$ LANGUAGE plpgsql;
+
+-- get_measurement_models_cutoff_min_scale
+-- Helper function: Get CutoffMinScale from measurement_models by MeasurementModelID
+-- Used for join-free cross-table references in aggregations
+CREATE OR REPLACE FUNCTION get_measurement_models_cutoff_min_scale(p_measurement_model_id TEXT)
+RETURNS NUMERIC AS $$
+BEGIN
+  RETURN (SELECT cutoff_min_scale FROM measurement_models WHERE measurement_model_id = p_measurement_model_id);
+END;
+$$ LANGUAGE plpgsql;
+
+-- get_measurement_models_cutoff_max_scale
+-- Helper function: Get CutoffMaxScale from measurement_models by MeasurementModelID
+-- Used for join-free cross-table references in aggregations
+CREATE OR REPLACE FUNCTION get_measurement_models_cutoff_max_scale(p_measurement_model_id TEXT)
+RETURNS NUMERIC AS $$
+BEGIN
+  RETURN (SELECT cutoff_max_scale FROM measurement_models WHERE measurement_model_id = p_measurement_model_id);
+END;
+$$ LANGUAGE plpgsql;
+
+-- get_measurement_models_discretization_type
+-- Helper function: Get DiscretizationType from measurement_models by MeasurementModelID
+-- Used for join-free cross-table references in aggregations
+CREATE OR REPLACE FUNCTION get_measurement_models_discretization_type(p_measurement_model_id TEXT)
+RETURNS TEXT AS $$
+BEGIN
+  RETURN (SELECT discretization_type FROM measurement_models WHERE measurement_model_id = p_measurement_model_id);
+END;
+$$ LANGUAGE plpgsql;
+
+-- get_measurement_models_discretization_param
+-- Helper function: Get DiscretizationParam from measurement_models by MeasurementModelID
+-- Used for join-free cross-table references in aggregations
+CREATE OR REPLACE FUNCTION get_measurement_models_discretization_param(p_measurement_model_id TEXT)
+RETURNS TEXT AS $$
+BEGIN
+  RETURN (SELECT discretization_param FROM measurement_models WHERE measurement_model_id = p_measurement_model_id);
+END;
+$$ LANGUAGE plpgsql;
+
+-- get_systems_display_name
+-- Helper function: Get DisplayName from systems by SystemID
+-- Used for join-free cross-table references in aggregations
+CREATE OR REPLACE FUNCTION get_systems_display_name(p_system_id TEXT)
+RETURNS TEXT AS $$
+BEGIN
+  RETURN (SELECT display_name FROM systems WHERE system_id = p_system_id);
+END;
+$$ LANGUAGE plpgsql;
+
+-- get_systems_class
+-- Helper function: Get Class from systems by SystemID
+-- Used for join-free cross-table references in aggregations
+CREATE OR REPLACE FUNCTION get_systems_class(p_system_id TEXT)
+RETURNS TEXT AS $$
+BEGIN
+  RETURN (SELECT class FROM systems WHERE system_id = p_system_id);
+END;
+$$ LANGUAGE plpgsql;
+
+-- get_systems_base_scale
+-- Helper function: Get BaseScale from systems by SystemID
+-- Used for join-free cross-table references in aggregations
+CREATE OR REPLACE FUNCTION get_systems_base_scale(p_system_id TEXT)
+RETURNS INTEGER AS $$
+BEGIN
+  RETURN (SELECT base_scale FROM systems WHERE system_id = p_system_id);
+END;
+$$ LANGUAGE plpgsql;
+
+-- get_systems_scale_factor
+-- Helper function: Get ScaleFactor from systems by SystemID
+-- Used for join-free cross-table references in aggregations
+CREATE OR REPLACE FUNCTION get_systems_scale_factor(p_system_id TEXT)
+RETURNS NUMERIC AS $$
+BEGIN
+  RETURN (SELECT scale_factor FROM systems WHERE system_id = p_system_id);
+END;
+$$ LANGUAGE plpgsql;
+
+-- get_systems_measure_name
+-- Helper function: Get MeasureName from systems by SystemID
+-- Used for join-free cross-table references in aggregations
+CREATE OR REPLACE FUNCTION get_systems_measure_name(p_system_id TEXT)
+RETURNS TEXT AS $$
+BEGIN
+  RETURN (SELECT measure_name FROM systems WHERE system_id = p_system_id);
+END;
+$$ LANGUAGE plpgsql;
+
+-- get_systems_fractal_dimension
+-- Helper function: Get FractalDimension from systems by SystemID
+-- Used for join-free cross-table references in aggregations
+CREATE OR REPLACE FUNCTION get_systems_fractal_dimension(p_system_id TEXT)
+RETURNS NUMERIC AS $$
+BEGIN
+  RETURN (SELECT fractal_dimension FROM systems WHERE system_id = p_system_id);
+END;
+$$ LANGUAGE plpgsql;
+
+-- get_systems_theoretical_log_log_slope
+-- Helper function: Get TheoreticalLogLogSlope from systems by SystemID
+-- Used for join-free cross-table references in aggregations
+CREATE OR REPLACE FUNCTION get_systems_theoretical_log_log_slope(p_system_id TEXT)
+RETURNS NUMERIC AS $$
+BEGIN
+  RETURN (SELECT theoretical_log_log_slope FROM systems WHERE system_id = p_system_id);
+END;
+$$ LANGUAGE plpgsql;
+
+-- calc_inference_runs_point_count
+-- Field: inference_runs.PointCount
+-- Type: aggregation | DataType: integer | Returns: INTEGER
+-- Formula: =COUNTIF(observed_scales!{{System}}, {{System}})
+-- ============================================================================
+-- CRITICAL FUNCTION VALIDATION CODE - DO NOT REMOVE
+-- Original Excel Formula: =COUNTIF(observed_scales!{{System}}, {{System}})
+-- This formula is preserved for validation and debugging purposes
+-- ============================================================================
+CREATE OR REPLACE FUNCTION calc_inference_runs_point_count(p_inference_run_id TEXT)
+RETURNS INTEGER AS $$
+BEGIN
+  RETURN ((SELECT COUNT(*) FROM observed_scales WHERE "system" = (SELECT NULLIF("system", '') FROM inference_runs WHERE inference_run_id = p_inference_run_id)))::integer;
+END;
+$$ LANGUAGE plpgsql;
+
+-- calc_inference_runs_slope_delta
+-- Field: inference_runs.SlopeDelta
+-- Type: calculated | DataType: number | Returns: NUMERIC
+-- Formula: ={{FittedSlope}} - {{TheoreticalLogLogSlope}}
+-- ============================================================================
+-- CRITICAL FUNCTION VALIDATION CODE - DO NOT REMOVE
+-- Original Excel Formula: ={{FittedSlope}} - {{TheoreticalLogLogSlope}}
+-- This formula is preserved for validation and debugging purposes
+-- ============================================================================
+CREATE OR REPLACE FUNCTION calc_inference_runs_slope_delta(p_inference_run_id TEXT)
+RETURNS NUMERIC AS $$
+BEGIN
+  RETURN (((COALESCE((SELECT fitted_slope FROM inference_runs WHERE inference_run_id = p_inference_run_id), 0))::numeric - (COALESCE(calc_inference_runs_theoretical_log_log_slope(p_inference_run_id), 0))::numeric))::numeric;
+END;
+$$ LANGUAGE plpgsql;
+
+-- calc_inference_runs_deviation_score
+-- Field: inference_runs.DeviationScore
+-- Type: calculated | DataType: number | Returns: NUMERIC
+-- Formula: =SQRT(POWER({{ResidualRMS}}, 2) + POWER({{SlopeDelta}}, 2))
+-- WARNING: Formula translation failed: Function 'SQRT' is not supported yet
+-- ============================================================================
+-- CRITICAL FUNCTION VALIDATION CODE - DO NOT REMOVE
+-- Original Excel Formula: =SQRT(POWER({{ResidualRMS}}, 2) + POWER({{SlopeDelta}}, 2))
+-- This formula is preserved for validation and debugging purposes
+-- ============================================================================
+CREATE OR REPLACE FUNCTION calc_inference_runs_deviation_score(p_inference_run_id TEXT)
+RETURNS NUMERIC AS $$
+BEGIN
+  RETURN NULL; -- Formula translation failed
 END;
 $$ LANGUAGE plpgsql;
 
