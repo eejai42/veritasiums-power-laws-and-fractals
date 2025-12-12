@@ -176,19 +176,19 @@ func (s *Scale) CalculateAllFields(systems SystemsMap) {
 	s.CalculateLogMeasure()
 }
 
-// ToOutputMap converts Scale to a map for JSON output
+// ToOutputMap converts Scale to a map for JSON output (rounded to 6 decimal places)
 func (s *Scale) ToOutputMap() map[string]interface{} {
 	return map[string]interface{}{
 		"ScaleID":          s.ScaleID,
 		"System":           s.System,
 		"Iteration":        s.Iteration,
-		"Measure":          s.Measure,
-		"BaseScale":        roundTo(s.GetBaseScale(), 5),
-		"ScaleFactor":      roundTo(s.GetScaleFactor(), 5),
-		"ScaleFactorPower": roundTo(s.GetScaleFactorPower(), 5),
-		"Scale":            roundTo(s.GetScale(), 5),
-		"LogScale":         roundTo(s.GetLogScale(), 5),
-		"LogMeasure":       roundTo(s.GetLogMeasure(), 5),
+		"Measure":          roundTo(s.Measure, 6),
+		"BaseScale":        roundTo(s.GetBaseScale(), 6),
+		"ScaleFactor":      roundTo(s.GetScaleFactor(), 6),
+		"ScaleFactorPower": roundTo(s.GetScaleFactorPower(), 6),
+		"Scale":            roundTo(s.GetScale(), 6),
+		"LogScale":         roundTo(s.GetLogScale(), 6),
+		"LogMeasure":       roundTo(s.GetLogMeasure(), 6),
 		"IsProjected":      s.IsProjected,
 	}
 }

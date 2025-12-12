@@ -11,8 +11,9 @@ import (
 	"math"
 )
 
-// Tolerance for floating point comparisons
-const Tolerance = 0.0001
+// Tolerance for floating point comparisons (allows for floating-point precision in 6dp comparisons)
+// Using 0.0000015 to handle rounding at the 6th decimal place boundary
+const Tolerance = 0.0000015
 
 // ValidationResult represents the result of validating a scale
 type ValidationResult struct {

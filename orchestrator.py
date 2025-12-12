@@ -33,8 +33,8 @@ DIM = '\033[2m'
 RESET = '\033[0m'
 BOLD = '\033[1m'
 
-# Tolerance for floating point comparisons (SSoT has pre-rounded values)
-TOLERANCE = 0.0001
+# Tolerance for floating point comparisons (6 decimal places with margin)
+TOLERANCE = 0.0000015
 
 
 class Platform:
@@ -130,6 +130,7 @@ def compare_scale(expected: Dict, actual: Dict) -> List[str]:
 def validate_results(platform_name: str, verbose: bool = False) -> Tuple[bool, int, int, List[Dict]]:
     """
     Validate platform results against answer key.
+    Only validates PROJECTED scales (iterations 4-7) since those are what platforms compute.
     Returns: (all_passed, pass_count, fail_count, failures_list)
     """
     answer_key = load_json(TEST_DATA_DIR / 'answer-key.json')
@@ -140,8 +141,10 @@ def validate_results(platform_name: str, verbose: bool = False) -> Tuple[bool, i
     
     results = load_json(results_file)
     
-    # Build lookup by ScaleID
-    expected_by_id = {s['ScaleID']: s for s in answer_key['scales']}
+    # Only validate PROJECTED scales (IsProjected=True, iterations 4-7)
+    # These are the scales that platforms are tested on
+    projected_scales = [s for s in answer_key['scales'] if s.get('IsProjected', False)]
+    expected_by_id = {s['ScaleID']: s for s in projected_scales}
     actual_by_id = {s['ScaleID']: s for s in results.get('scales', [])}
     
     pass_count = 0

@@ -34,8 +34,9 @@ TEST_RESULTS_DIR = PROJECT_ROOT / 'test-results'
 RED = '\033[91m'
 RESET = '\033[0m'
 
-# Tolerance for validation
-TOLERANCE = 0.0001
+# Tolerance for validation (allows for floating-point precision in 6dp comparisons)
+# Using 0.0000015 to handle rounding at the 6th decimal place boundary
+TOLERANCE = 0.0000015
 
 
 @dataclass
@@ -132,20 +133,20 @@ def compute_derived_values(scale: Scale, systems: Dict[str, System]) -> Scale:
     return scale
 
 
-def round_for_comparison(value: float, decimals: int = 5) -> float:
-    """Round a float for consistent comparison"""
+def round_for_comparison(value: float, decimals: int = 6) -> float:
+    """Round a float for consistent comparison (6 decimal places)"""
     if value is None:
         return None
     return round(value, decimals)
 
 
 def scale_to_dict(scale: Scale) -> Dict:
-    """Convert Scale to dict with rounded values for JSON output"""
+    """Convert Scale to dict with rounded values for JSON output (6 decimal places)"""
     return {
         'ScaleID': scale.ScaleID,
         'System': scale.System,
         'Iteration': scale.Iteration,
-        'Measure': scale.Measure,
+        'Measure': round_for_comparison(scale.Measure),
         'BaseScale': round_for_comparison(scale.BaseScale),
         'ScaleFactor': round_for_comparison(scale.ScaleFactor),
         'ScaleFactorPower': round_for_comparison(scale.ScaleFactorPower),

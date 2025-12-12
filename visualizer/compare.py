@@ -28,8 +28,9 @@ DIM = '\033[2m'
 RESET = '\033[0m'
 BOLD = '\033[1m'
 
-# Tolerance for comparisons
-TOLERANCE = 0.0001
+# Tolerance for comparisons (allows for floating-point precision in 6dp comparisons)
+# Using 0.0000015 to handle rounding at the 6th decimal place boundary
+TOLERANCE = 0.0000015
 
 # Platforms to compare
 PLATFORMS = ['python', 'postgres', 'golang']
@@ -67,11 +68,14 @@ def load_all_results() -> Dict[str, Dict]:
 
 
 def compare_platform(platform: str, results: Dict, answer_key: Dict) -> Dict:
-    """Compare platform results against answer key"""
+    """Compare platform results against answer key (only projected/test scales)"""
     if results is None:
         return {'status': 'not_run', 'pass_count': 0, 'fail_count': 0, 'details': []}
     
-    expected_by_id = {s['ScaleID']: s for s in answer_key.get('scales', [])}
+    # Only compare projected scales (IsProjected=True, iterations 4-7)
+    # These are the scales platforms are tested on
+    expected_scales = [s for s in answer_key.get('scales', []) if s.get('IsProjected', False)]
+    expected_by_id = {s['ScaleID']: s for s in expected_scales}
     actual_by_id = {s['ScaleID']: s for s in results.get('scales', [])}
     
     computed_fields = ['BaseScale', 'ScaleFactor', 'ScaleFactorPower', 'Scale', 'LogScale', 'LogMeasure']
@@ -202,30 +206,66 @@ def print_console_output(comparisons: Dict[str, Dict], base_data: Dict):
 
 
 def generate_html_report(comparisons: Dict[str, Dict], base_data: Dict, answer_key: Dict):
-    """Generate comprehensive HTML report"""
+    """Generate comprehensive HTML report with full data tables and log-log graphs"""
+    
+    import json as json_module
     
     systems = base_data.get('systems', [])
+    all_answer_scales = answer_key.get('scales', [])
+    system_lookup = {s['SystemID']: s for s in systems}
     
-    # Build platform comparison data for each scale
-    all_scale_data = []
-    expected_by_id = {s['ScaleID']: s for s in answer_key.get('scales', [])}
+    # Group all scales by system
+    scales_by_system = {}
+    for s in all_answer_scales:
+        sys_id = s['System']
+        if sys_id not in scales_by_system:
+            scales_by_system[sys_id] = []
+        scales_by_system[sys_id].append(s)
     
-    for scale_id, expected in expected_by_id.items():
-        scale_data = {
-            'ScaleID': scale_id,
-            'System': expected.get('System'),
-            'Iteration': expected.get('Iteration'),
-            'expected': expected,
-            'platforms': {}
+    # Build chart data and full data for each system
+    chart_data = {}
+    full_data = {}
+    
+    for sys_id, sys_scales in scales_by_system.items():
+        sorted_scales = sorted(sys_scales, key=lambda x: x.get('Iteration', 0))
+        system_info = system_lookup.get(sys_id, {})
+        
+        actual_points = []
+        projected_points = []
+        all_rows = []
+        
+        for s in sorted_scales:
+            point = {'x': s.get('LogScale', 0), 'y': s.get('LogMeasure', 0), 'iteration': s.get('Iteration', 0)}
+            row = {
+                'iteration': s.get('Iteration', 0),
+                'measure': s.get('Measure', 0),
+                'scale': s.get('Scale', 0),
+                'logScale': s.get('LogScale', 0),
+                'logMeasure': s.get('LogMeasure', 0),
+                'scaleFactorPower': s.get('ScaleFactorPower', 0),
+                'isProjected': s.get('IsProjected', False)
+            }
+            all_rows.append(row)
+            
+            if s.get('IsProjected', False):
+                projected_points.append(point)
+            else:
+                actual_points.append(point)
+        
+        chart_data[sys_id] = {
+            'actual': actual_points,
+            'projected': projected_points,
+            'slope': system_info.get('TheoreticalLogLogSlope', 0),
+            'displayName': system_info.get('DisplayName', sys_id),
+            'class': system_info.get('Class', 'power_law')
         }
-        
-        for platform in PLATFORMS:
-            comp = comparisons.get(platform, {})
-            detail = next((d for d in comp.get('details', []) if d.get('ScaleID') == scale_id), None)
-            if detail:
-                scale_data['platforms'][platform] = detail
-        
-        all_scale_data.append(scale_data)
+        full_data[sys_id] = all_rows
+    
+    chart_data_json = json_module.dumps(chart_data)
+    full_data_json = json_module.dumps(full_data)
+    
+    # Get validation summary for projected scales only
+    expected_scales = [s for s in all_answer_scales if s.get('IsProjected', False)]
     
     html = f'''<!DOCTYPE html>
 <html lang="en">
@@ -233,6 +273,7 @@ def generate_html_report(comparisons: Dict[str, Dict], base_data: Dict, answer_k
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Power Laws & Fractals - Test Results</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {{
             --bg-dark: #0d1117;
@@ -414,6 +455,26 @@ def generate_html_report(comparisons: Dict[str, Dict], base_data: Dict, answer_k
             margin-bottom: 1.5rem;
         }}
         
+        .system-content {{
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 2rem;
+            align-items: start;
+        }}
+        
+        .chart-container {{
+            background: var(--bg-dark);
+            border-radius: 8px;
+            padding: 1rem;
+            height: 300px;
+        }}
+        
+        @media (max-width: 1000px) {{
+            .system-content {{
+                grid-template-columns: 1fr;
+            }}
+        }}
+        
         .system-header {{
             display: flex;
             align-items: center;
@@ -559,19 +620,21 @@ def generate_html_report(comparisons: Dict[str, Dict], base_data: Dict, answer_k
                     <span class="system-icon">{icon}</span>
                     <span class="system-name">{system.get('DisplayName', sys_id)}</span>
                     <span class="system-type">{type_label}</span>
+                    <span class="system-type">slope: {system.get('TheoreticalLogLogSlope', 0)}</span>
                 </div>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Iteration</th>
-                            <th>Field</th>
-                            <th>Expected</th>
-                            <th>Python</th>
-                            <th>Postgres</th>
-                            <th>Go</th>
-                        </tr>
-                    </thead>
-                    <tbody>
+                <div class="system-content">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Iter</th>
+                                <th>Field</th>
+                                <th>Expected</th>
+                                <th>Python</th>
+                                <th>Postgres</th>
+                                <th>Go</th>
+                            </tr>
+                        </thead>
+                        <tbody>
 '''
         
         for scale in sorted(scales, key=lambda x: x['Iteration']):
@@ -602,9 +665,13 @@ def generate_html_report(comparisons: Dict[str, Dict], base_data: Dict, answer_k
                 
                 html += '                        </tr>\n'
         
-        html += '''
-                    </tbody>
-                </table>
+        html += f'''
+                        </tbody>
+                    </table>
+                    <div class="chart-container">
+                        <canvas id="chart-{sys_id}"></canvas>
+                    </div>
+                </div>
             </div>
 '''
     
@@ -613,9 +680,110 @@ def generate_html_report(comparisons: Dict[str, Dict], base_data: Dict, answer_k
         
         <footer>
             <p>ERB Testing Protocol • Power Laws & Fractals • Veritasium Edition</p>
-            <p>Testing {len(answer_key.get('scales', []))} scales across {len(systems)} systems</p>
+            <p>Testing {len(expected_scales)} projected scales across {len(systems)} systems</p>
         </footer>
     </div>
+    
+    <script>
+        const chartData = {chart_data_json};
+        
+        // Create charts for each system
+        Object.keys(chartData).forEach(systemId => {{
+            const data = chartData[systemId];
+            const canvas = document.getElementById('chart-' + systemId);
+            if (!canvas) return;
+            
+            const ctx = canvas.getContext('2d');
+            
+            // Generate theoretical line points
+            const allPoints = [...data.actual, ...data.projected];
+            if (allPoints.length === 0) return;
+            
+            const xMin = Math.min(...allPoints.map(p => p.x));
+            const xMax = Math.max(...allPoints.map(p => p.x));
+            const firstPoint = allPoints[0];
+            
+            const theoreticalLine = [];
+            for (let i = 0; i <= 10; i++) {{
+                const x = xMin + (xMax - xMin) * i / 10;
+                const y = firstPoint.y + data.slope * (x - firstPoint.x);
+                theoreticalLine.push({{x, y}});
+            }}
+            
+            new Chart(ctx, {{
+                type: 'scatter',
+                data: {{
+                    datasets: [
+                        {{
+                            label: 'Actual (0-3)',
+                            data: data.actual,
+                            backgroundColor: '#3fb950',
+                            borderColor: '#3fb950',
+                            pointRadius: 8,
+                            pointHoverRadius: 10
+                        }},
+                        {{
+                            label: 'Projected (4-7)',
+                            data: data.projected,
+                            backgroundColor: '#a371f7',
+                            borderColor: '#a371f7',
+                            pointRadius: 8,
+                            pointHoverRadius: 10,
+                            pointStyle: 'circle'
+                        }},
+                        {{
+                            label: 'Theoretical (slope=' + data.slope.toFixed(3) + ')',
+                            data: theoreticalLine,
+                            type: 'line',
+                            borderColor: 'rgba(139, 148, 158, 0.5)',
+                            borderDash: [5, 5],
+                            pointRadius: 0,
+                            fill: false
+                        }}
+                    ]
+                }},
+                options: {{
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {{
+                        legend: {{
+                            display: true,
+                            position: 'bottom',
+                            labels: {{
+                                color: '#c9d1d9',
+                                font: {{ size: 10 }}
+                            }}
+                        }},
+                        title: {{
+                            display: true,
+                            text: 'Log-Log Plot',
+                            color: '#c9d1d9'
+                        }}
+                    }},
+                    scales: {{
+                        x: {{
+                            title: {{
+                                display: true,
+                                text: 'log(Scale)',
+                                color: '#8b949e'
+                            }},
+                            ticks: {{ color: '#8b949e' }},
+                            grid: {{ color: '#30363d' }}
+                        }},
+                        y: {{
+                            title: {{
+                                display: true,
+                                text: 'log(Measure)',
+                                color: '#8b949e'
+                            }},
+                            ticks: {{ color: '#8b949e' }},
+                            grid: {{ color: '#30363d' }}
+                        }}
+                    }}
+                }}
+            }});
+        }});
+    </script>
 </body>
 </html>
 '''

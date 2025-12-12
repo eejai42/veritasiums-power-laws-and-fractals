@@ -1,6 +1,6 @@
 {
-  "description": "Test input with only raw facts (platforms must compute derived values)",
-  "generated": "2025-12-12T00:20:33.549157+00:00",
+  "description": "Test input with only raw facts for iterations 4-7 (platforms must compute derived values)",
+  "generated": "2025-12-12T01:00:45.722514+00:00",
   "source": "ssot/ERB_veritasium-power-laws-and-fractals.json",
   "total_iterations": 8,
   "base_iterations": 4,
@@ -9,56 +9,56 @@
       "ScaleID": "Sierpinski_4",
       "System": "Sierpinski",
       "Iteration": 4,
-      "Measure": 81.00842201409793,
+      "Measure": 81.008422,
       "IsProjected": true
     },
     {
       "ScaleID": "Sierpinski_5",
       "System": "Sierpinski",
       "Iteration": 5,
-      "Measure": 243.03158296333288,
+      "Measure": 243.031583,
       "IsProjected": true
     },
     {
       "ScaleID": "Sierpinski_6",
       "System": "Sierpinski",
       "Iteration": 6,
-      "Measure": 729.1137001457007,
+      "Measure": 729.1137,
       "IsProjected": true
     },
     {
       "ScaleID": "Sierpinski_7",
       "System": "Sierpinski",
       "Iteration": 7,
-      "Measure": 2187.3979556820004,
+      "Measure": 2187.397956,
       "IsProjected": true
     },
     {
       "ScaleID": "Koch_4",
       "System": "Koch",
       "Iteration": 4,
-      "Measure": 3.162445683185973,
+      "Measure": 3.162446,
       "IsProjected": true
     },
     {
       "ScaleID": "Koch_5",
       "System": "Koch",
       "Iteration": 5,
-      "Measure": 4.217245114014812,
+      "Measure": 4.217245,
       "IsProjected": true
     },
     {
       "ScaleID": "Koch_6",
       "System": "Koch",
       "Iteration": 6,
-      "Measure": 5.623861445665788,
+      "Measure": 5.623861,
       "IsProjected": true
     },
     {
       "ScaleID": "Koch_7",
       "System": "Koch",
       "Iteration": 7,
-      "Measure": 7.499639386608111,
+      "Measure": 7.499639,
       "IsProjected": true
     },
     {
@@ -86,35 +86,35 @@
       "ScaleID": "ZipfWords_7",
       "System": "ZipfWords",
       "Iteration": 7,
-      "Measure": 0.0078125,
+      "Measure": 0.007812,
       "IsProjected": true
     },
     {
       "ScaleID": "ScaleFreeNet_4",
       "System": "ScaleFreeNet",
       "Iteration": 4,
-      "Measure": 0.0009765625,
+      "Measure": 0.000977,
       "IsProjected": true
     },
     {
       "ScaleID": "ScaleFreeNet_5",
       "System": "ScaleFreeNet",
       "Iteration": 5,
-      "Measure": 0.000172633491501,
+      "Measure": 0.000173,
       "IsProjected": true
     },
     {
       "ScaleID": "ScaleFreeNet_6",
       "System": "ScaleFreeNet",
       "Iteration": 6,
-      "Measure": 3.0517578125e-05,
+      "Measure": 3.1e-05,
       "IsProjected": true
     },
     {
       "ScaleID": "ScaleFreeNet_7",
       "System": "ScaleFreeNet",
       "Iteration": 7,
-      "Measure": 5.394796609e-06,
+      "Measure": 5e-06,
       "IsProjected": true
     },
     {
@@ -142,7 +142,7 @@
       "ScaleID": "Sandpile_7",
       "System": "Sandpile",
       "Iteration": 7,
-      "Measure": 0.0078125,
+      "Measure": 0.007812,
       "IsProjected": true
     },
     {
@@ -170,35 +170,35 @@
       "ScaleID": "Earthquakes_7",
       "System": "Earthquakes",
       "Iteration": 7,
-      "Measure": 0.0078125,
+      "Measure": 0.007812,
       "IsProjected": true
     },
     {
       "ScaleID": "ForestFires_4",
       "System": "ForestFires",
       "Iteration": 4,
-      "Measure": 0.027204705103004,
+      "Measure": 0.027205,
       "IsProjected": true
     },
     {
       "ScaleID": "ForestFires_5",
       "System": "ForestFires",
       "Iteration": 5,
-      "Measure": 0.01104854345604,
+      "Measure": 0.011049,
       "IsProjected": true
     },
     {
       "ScaleID": "ForestFires_6",
       "System": "ForestFires",
       "Iteration": 6,
-      "Measure": 0.004487102949207,
+      "Measure": 0.004487,
       "IsProjected": true
     },
     {
       "ScaleID": "ForestFires_7",
       "System": "ForestFires",
       "Iteration": 7,
-      "Measure": 0.001822330061595,
+      "Measure": 0.001822,
       "IsProjected": true
     }
   ]

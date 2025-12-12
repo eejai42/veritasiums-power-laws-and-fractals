@@ -4,8 +4,11 @@ Generate Test Data from SSoT
 
 Creates the test-data/ directory with:
 - base-data.json: Base iterations with all values (for platform initialization)
-- test-input.json: Test iterations with only raw facts (for testing)
-- answer-key.json: Test iterations with all computed values (for validation)
+- test-input.json: Test iterations (4-7) with only raw facts (for testing)
+- answer-key.json: ALL iterations (0-7) with all computed values rounded to 6dp (for validation)
+
+The answer-key.json is the CANONICAL reference that all platforms must match.
+All numeric values are rounded to 6 decimal places for consistent cross-platform comparison.
 
 Supports configurable iteration counts via command line:
   python generate-test-data.py --iterations 1000
@@ -43,6 +46,25 @@ def load_ssot():
         return json.load(f)
 
 
+def round_numeric(value, decimals=2):
+    """Round a numeric value to specified decimal places, handling special cases"""
+    if value is None:
+        return None
+    if isinstance(value, bool):
+        return value
+    if isinstance(value, (int, float)):
+        return round(value, decimals)
+    return value
+
+
+def round_scale_record(scale: dict, decimals: int = 2) -> dict:
+    """Round all numeric values in a scale record to specified decimal places"""
+    result = {}
+    for key, value in scale.items():
+        result[key] = round_numeric(value, decimals)
+    return result
+
+
 def calculate_scale_values(system: dict, iteration: int, measure: float) -> dict:
     """Calculate all derived values for a scale given system parameters"""
     base_scale = system['BaseScale']
@@ -70,10 +92,10 @@ def calculate_scale_values(system: dict, iteration: int, measure: float) -> dict
     return {
         'BaseScale': base_scale,
         'ScaleFactor': scale_factor,
-        'ScaleFactorPower': round(scale_factor_power, 15),
-        'Scale': round(scale, 15),
-        'LogScale': round(log_scale, 5),
-        'LogMeasure': round(log_measure, 5)
+        'ScaleFactorPower': scale_factor_power,
+        'Scale': scale,
+        'LogScale': log_scale,
+        'LogMeasure': log_measure
     }
 
 
@@ -145,14 +167,33 @@ def generate_scales_for_system(system: dict, total_iterations: int, base_iterati
     return scales
 
 
-def extract_raw_facts(scale):
-    """Extract only raw fact fields from a scale record"""
-    return {k: scale.get(k) for k in RAW_SCALE_FIELDS}
+def extract_raw_facts(scale, round_decimals: int = 6):
+    """Extract only raw fact fields from a scale record, with rounding"""
+    result = {k: scale.get(k) for k in RAW_SCALE_FIELDS}
+    return round_scale_record(result, round_decimals)
 
 
-def extract_all_fields(scale):
-    """Extract all fields from a scale record"""
-    return {k: scale.get(k) for k in ALL_SCALE_FIELDS}
+def extract_all_fields(scale, round_decimals: int = 6):
+    """
+    Extract all fields from a scale record, with rounding.
+    
+    IMPORTANT: LogMeasure is recomputed from the ROUNDED Measure value
+    to ensure consistency with platforms that compute from rounded inputs.
+    """
+    result = {}
+    for k in ALL_SCALE_FIELDS:
+        result[k] = scale.get(k)
+    
+    # Round all values first
+    result = round_scale_record(result, round_decimals)
+    
+    # Recompute LogMeasure from the ROUNDED Measure value for consistency
+    # This ensures answer-key matches what platforms compute from test-input
+    rounded_measure = result.get('Measure', 0)
+    if rounded_measure and rounded_measure > 0:
+        result['LogMeasure'] = round(math.log10(rounded_measure), round_decimals)
+    
+    return result
 
 
 def generate_test_data(total_iterations: int = DEFAULT_TOTAL_ITERATIONS, 
@@ -187,7 +228,7 @@ def generate_test_data(total_iterations: int = DEFAULT_TOTAL_ITERATIONS,
     print(f"  Total test scales: {len(test_scales)}")
     print(f"  Total scales: {len(all_scales)}")
     
-    # Generate base-data.json
+    # Generate base-data.json (with rounding for consistency)
     base_data = {
         'description': f'Base data for platform initialization (iterations 0-{base_iterations - 1})',
         'generated': datetime.now(timezone.utc).isoformat(),
@@ -203,9 +244,9 @@ def generate_test_data(total_iterations: int = DEFAULT_TOTAL_ITERATIONS,
         json.dump(base_data, f, indent=2)
     print(f"\n  ✓ Generated {base_data_path}")
     
-    # Generate test-input.json (only raw facts)
+    # Generate test-input.json (only raw facts for iterations 4-7, with rounding)
     test_input = {
-        'description': f'Test input with only raw facts (platforms must compute derived values)',
+        'description': f'Test input with only raw facts for iterations {base_iterations}-{total_iterations-1} (platforms must compute derived values)',
         'generated': datetime.now(timezone.utc).isoformat(),
         'source': 'ssot/ERB_veritasium-power-laws-and-fractals.json',
         'total_iterations': total_iterations,
@@ -218,14 +259,16 @@ def generate_test_data(total_iterations: int = DEFAULT_TOTAL_ITERATIONS,
         json.dump(test_input, f, indent=2)
     print(f"  ✓ Generated {test_input_path}")
     
-    # Generate answer-key.json (all computed values)
+    # Generate answer-key.json (ALL 8 iterations with all computed values, rounded to 6dp)
+    # This is the CANONICAL reference that all platforms must match
     answer_key = {
-        'description': f'Expected results for test validation (all computed values)',
+        'description': f'CANONICAL answer key - ALL {total_iterations} iterations with computed values (rounded to 6dp)',
         'generated': datetime.now(timezone.utc).isoformat(),
         'source': 'ssot/ERB_veritasium-power-laws-and-fractals.json',
         'total_iterations': total_iterations,
         'base_iterations': base_iterations,
-        'scales': [extract_all_fields(s) for s in test_scales]
+        'note': 'This file contains ALL iterations (0-7). Platforms should match these values exactly.',
+        'scales': [extract_all_fields(s) for s in all_scales]  # ALL scales, not just test_scales
     }
     
     answer_key_path = TEST_DATA_DIR / 'answer-key.json'
@@ -239,10 +282,11 @@ def generate_test_data(total_iterations: int = DEFAULT_TOTAL_ITERATIONS,
     
     print("\n✓ Test data generation complete!")
     print(f"\nTest data structure:")
-    print(f"  test-data/base-data.json   - {len(base_scales)} scales (init platforms)")
-    print(f"  test-data/test-input.json  - {len(test_scales)} scales (raw facts only)")
-    print(f"  test-data/answer-key.json  - {len(test_scales)} scales (expected results)")
+    print(f"  test-data/base-data.json   - {len(base_scales)} scales (init platforms, iterations 0-{base_iterations-1})")
+    print(f"  test-data/test-input.json  - {len(test_scales)} scales (raw facts only, iterations {base_iterations}-{total_iterations-1})")
+    print(f"  test-data/answer-key.json  - {len(all_scales)} scales (ALL iterations 0-{total_iterations-1}, rounded to 6dp)")
     print(f"\nTotal: {len(all_scales)} scales across {len(systems)} systems")
+    print(f"\n📌 All numeric values rounded to 6 decimal places for cross-platform consistency.")
 
 
 def main():

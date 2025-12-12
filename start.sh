@@ -26,22 +26,20 @@ show_menu() {
     echo -e "${BOLD}║${NC}     🔺 ${CYAN}POWER LAWS & FRACTALS${NC} - Veritasium Edition        ${BOLD}║${NC}"
     echo -e "${BOLD}╚════════════════════════════════════════════════════════════╝${NC}"
     echo ""
-    echo -e "  ${BOLD}Test Platforms:${NC}"
-    echo -e "  ${GREEN}1)${NC}  🧪  Run All Platform Tests   ${YELLOW}(orchestrator)${NC}"
-    echo -e "  ${GREEN}2)${NC}  🐍  Python Tests Only"
-    echo -e "  ${GREEN}3)${NC}  🐹  Go Tests Only"
-    echo -e "  ${GREEN}4)${NC}  🐘  PostgreSQL Tests Only    ${DIM}(requires Docker)${NC}"
+    echo -e "  ${BOLD}Run Tests:${NC}"
+    echo -e "  ${GREEN}1)${NC}  🧪  Run ALL Platform Tests   ${YELLOW}(+ opens report)${NC}"
+    echo -e "  ${GREEN}2)${NC}  🐍  Python Only"
+    echo -e "  ${GREEN}3)${NC}  🐹  Go Only"
+    echo -e "  ${GREEN}4)${NC}  🐘  PostgreSQL Only          ${DIM}(requires Docker)${NC}"
     echo ""
-    echo -e "  ${BOLD}Visualizers:${NC}"
-    echo -e "  ${GREEN}5)${NC}  🔬  Cross-Platform Comparison"
-    echo -e "  ${GREEN}6)${NC}  🌐  Open HTML Dashboard      ${YELLOW}(opens in browser)${NC}"
-    echo -e "  ${GREEN}7)${NC}  📊  Generate HTML Report"
+    echo -e "  ${BOLD}View:${NC}"
+    echo -e "  ${GREEN}5)${NC}  📊  View Results Report      ${YELLOW}(opens in browser)${NC}"
     echo ""
     echo -e "  ${BOLD}Utilities:${NC}"
-    echo -e "  ${MAGENTA}g)${NC}  🔄  Regenerate Test Data     ${DIM}(from SSoT)${NC}"
-    echo -e "  ${MAGENTA}s)${NC}  📄  View SSoT JSON          ${DIM}(source of truth)${NC}"
+    echo -e "  ${MAGENTA}g)${NC}  🔄  Regenerate Test Data     ${DIM}(CANONICAL Python, 6dp)${NC}"
+    echo -e "  ${MAGENTA}s)${NC}  📄  View SSoT JSON"
     echo -e "  ${MAGENTA}r)${NC}  📖  View README"
-    echo -e "  ${MAGENTA}j)${NC}  📓  Jupyter Notebook        ${DIM}(interactive analysis)${NC}"
+    echo -e "  ${MAGENTA}j)${NC}  📓  Jupyter Notebook"
     echo ""
     echo -e "  ${RED}q)${NC}  ❌  Quit"
     echo ""
@@ -49,11 +47,29 @@ show_menu() {
     echo -n "  Pick an option: "
 }
 
+open_report() {
+    # Generate the comprehensive HTML report and open it
+    python3 "$SCRIPT_DIR/visualizer/generate_report.py"
+    
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+        open "$SCRIPT_DIR/visualizer/report.html"
+    elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
+        xdg-open "$SCRIPT_DIR/visualizer/report.html" 2>/dev/null || echo "Open visualizer/report.html in your browser"
+    else
+        echo "Open visualizer/report.html in your browser"
+    fi
+}
+
 run_all_tests() {
     echo ""
-    echo -e "${CYAN}Running all platform tests via orchestrator...${NC}"
+    echo -e "${CYAN}╔════════════════════════════════════════════════════════════╗${NC}"
+    echo -e "${CYAN}║  Running ALL Platform Tests                                ║${NC}"
+    echo -e "${CYAN}╚════════════════════════════════════════════════════════════╝${NC}"
     echo ""
     python3 "$SCRIPT_DIR/orchestrator.py" --all --regenerate
+    echo ""
+    echo -e "${CYAN}Opening results report in browser...${NC}"
+    open_report
     echo ""
     echo -e "${YELLOW}Press Enter to continue...${NC}"
     read
@@ -102,44 +118,17 @@ run_postgres() {
     read
 }
 
-run_comparison() {
+view_report() {
     echo ""
-    echo -e "${CYAN}Running cross-platform comparison...${NC}"
+    echo -e "${CYAN}Generating and opening results report...${NC}"
     echo ""
+    # Show console summary first
     python3 "$SCRIPT_DIR/visualizer/compare.py"
     echo ""
-    echo -e "${YELLOW}Press Enter to continue...${NC}"
-    read
-}
-
-open_dashboard() {
+    # Then generate and open HTML
+    open_report
     echo ""
-    echo -e "${CYAN}Opening HTML dashboard in browser...${NC}"
-    echo ""
-    if [[ "$OSTYPE" == "darwin"* ]]; then
-        open "$SCRIPT_DIR/visualizer/index.html"
-    elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
-        xdg-open "$SCRIPT_DIR/visualizer/index.html" 2>/dev/null || echo "Open visualizer/index.html in your browser"
-    else
-        echo "Open visualizer/index.html in your browser"
-    fi
-    echo -e "${GREEN}Opened!${NC}"
-    echo ""
-    echo -e "${YELLOW}Press Enter to continue...${NC}"
-    read
-}
-
-generate_report() {
-    echo ""
-    echo -e "${CYAN}Generating HTML report...${NC}"
-    echo ""
-    python3 "$SCRIPT_DIR/visualizer/compare.py" --html
-    echo ""
-    if [[ "$OSTYPE" == "darwin"* ]]; then
-        open "$SCRIPT_DIR/visualizer/report.html"
-    elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
-        xdg-open "$SCRIPT_DIR/visualizer/report.html" 2>/dev/null
-    fi
+    echo -e "${GREEN}Report opened in browser!${NC}"
     echo ""
     echo -e "${YELLOW}Press Enter to continue...${NC}"
     read
@@ -147,7 +136,17 @@ generate_report() {
 
 regenerate_data() {
     echo ""
-    echo -e "${CYAN}Regenerating test data from SSoT...${NC}"
+    echo -e "${CYAN}╔════════════════════════════════════════════════════════════╗${NC}"
+    echo -e "${CYAN}║  Regenerating CANONICAL Test Data from SSoT                ║${NC}"
+    echo -e "${CYAN}╚════════════════════════════════════════════════════════════╝${NC}"
+    echo ""
+    echo -e "${YELLOW}This Python script generates:${NC}"
+    echo -e "  • ${GREEN}test-input.json${NC}  - iterations 4-7 with raw facts only"
+    echo -e "  • ${GREEN}answer-key.json${NC}  - ALL 8 iterations with computed values (6dp)"
+    echo -e "  • ${GREEN}base-data.json${NC}   - iterations 0-3 for platform init"
+    echo ""
+    echo -e "${MAGENTA}All numeric values are rounded to 6 decimal places.${NC}"
+    echo -e "${MAGENTA}These files are CANONICAL - all platforms must match them exactly.${NC}"
     echo ""
     python3 "$SCRIPT_DIR/generate-test-data.py"
     echo ""
@@ -206,9 +205,7 @@ while true; do
         2) run_python ;;
         3) run_golang ;;
         4) run_postgres ;;
-        5) run_comparison ;;
-        6) open_dashboard ;;
-        7) generate_report ;;
+        5) view_report ;;
         g|G) regenerate_data ;;
         s|S) view_ssot ;;
         r|R) view_readme ;;

@@ -41,8 +41,9 @@ RESET = '\033[0m'
 # Database connection
 DB_CONN = "postgresql://postgres@localhost:5432/demo"
 
-# Tolerance for validation
-TOLERANCE = 0.0001
+# Tolerance for validation (allows for floating-point precision in 6dp comparisons)
+# Using 0.0000015 to handle rounding at the 6th decimal place boundary
+TOLERANCE = 0.0000015
 
 
 def run_sql(query: str, fetch: bool = True) -> List[List[str]]:
@@ -165,7 +166,7 @@ def insert_test_scales(scales: List[Dict]) -> bool:
 
 
 def query_all_scales() -> List[Dict]:
-    """Query ALL computed values from vw_scales view"""
+    """Query ALL computed values from vw_scales view (rounded to 6 decimal places)"""
     
     query = """
         SELECT scale_id, "system", iteration, measure, 
@@ -183,13 +184,13 @@ def query_all_scales() -> List[Dict]:
             'ScaleID': row[0],
             'System': row[1],
             'Iteration': int(row[2]) if row[2] else 0,
-            'Measure': float(row[3]) if row[3] else 0,
-            'BaseScale': round(float(row[4]), 5) if row[4] else None,
-            'ScaleFactor': round(float(row[5]), 5) if row[5] else None,
-            'ScaleFactorPower': round(float(row[6]), 5) if row[6] else None,
-            'Scale': round(float(row[7]), 5) if row[7] else None,
-            'LogScale': round(float(row[8]), 5) if row[8] else None,
-            'LogMeasure': round(float(row[9]), 5) if row[9] else None,
+            'Measure': round(float(row[3]), 6) if row[3] else 0,
+            'BaseScale': round(float(row[4]), 6) if row[4] else None,
+            'ScaleFactor': round(float(row[5]), 6) if row[5] else None,
+            'ScaleFactorPower': round(float(row[6]), 6) if row[6] else None,
+            'Scale': round(float(row[7]), 6) if row[7] else None,
+            'LogScale': round(float(row[8]), 6) if row[8] else None,
+            'LogMeasure': round(float(row[9]), 6) if row[9] else None,
             'IsProjected': row[10] == 't' if row[10] else False
         })
     
@@ -289,7 +290,6 @@ def main():
     # Save full results (all 8 iterations per system)
     full_results = {
         'platform': 'postgres',
-        'timestamp': datetime.now(timezone.utc).isoformat(),
         'scales': all_scales
     }
     
