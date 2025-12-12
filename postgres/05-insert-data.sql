@@ -218,26 +218,26 @@ INSERT INTO system_stats (system_stats_id, "system", analysis_name, status)
 VALUES ('ForestFires_Stats', 'ForestFires', 'Forest Fire Size Analysis', 'validated');
 
 -- Insert data for measurement_models
-INSERT INTO measurement_models (measurement_model_id, "system", data_regime, noise_type, noise_sigma, cutoff_min_scale, cutoff_max_scale, discretization_type, discretization_param)
-VALUES ('Sierpinski_MM1', 'Sierpinski', 'measured', 'lognormal', 0.12, 1.0, 0.0078125, 'rounding', 'decimals=4');
+INSERT INTO measurement_models (measurement_model_id, "system", data_regime, scale_regime, noise_type, noise_sigma, cutoff_min_scale, cutoff_max_scale, discretization_type, discretization_param)
+VALUES ('Sierpinski_MM1', 'Sierpinski', 'measured', NULL, 'lognormal', 0.12, 1.0, 0.0078125, 'rounding', 'decimals=4');
 
-INSERT INTO measurement_models (measurement_model_id, "system", data_regime, noise_type, noise_sigma, cutoff_min_scale, cutoff_max_scale, discretization_type, discretization_param)
-VALUES ('Koch_MM1', 'Koch', 'measured', 'lognormal', 0.12, 1.0, 0.0004572473705075444, 'rounding', 'decimals=4');
+INSERT INTO measurement_models (measurement_model_id, "system", data_regime, scale_regime, noise_type, noise_sigma, cutoff_min_scale, cutoff_max_scale, discretization_type, discretization_param)
+VALUES ('Koch_MM1', 'Koch', 'measured', NULL, 'lognormal', 0.12, 1.0, 0.0004572473705075444, 'rounding', 'decimals=4');
 
-INSERT INTO measurement_models (measurement_model_id, "system", data_regime, noise_type, noise_sigma, cutoff_min_scale, cutoff_max_scale, discretization_type, discretization_param)
-VALUES ('ZipfWords_MM1', 'ZipfWords', 'measured', 'lognormal', 0.18, 1, 128, 'rounding', 'decimals=4');
+INSERT INTO measurement_models (measurement_model_id, "system", data_regime, scale_regime, noise_type, noise_sigma, cutoff_min_scale, cutoff_max_scale, discretization_type, discretization_param)
+VALUES ('ZipfWords_MM1', 'ZipfWords', 'measured', 'all', 'lognormal', 0.18, 1, 128, 'rounding', 'decimals=4');
 
-INSERT INTO measurement_models (measurement_model_id, "system", data_regime, noise_type, noise_sigma, cutoff_min_scale, cutoff_max_scale, discretization_type, discretization_param)
-VALUES ('ScaleFreeNet_MM1', 'ScaleFreeNet', 'measured', 'lognormal', 0.18, 1, 128, 'rounding', 'decimals=4');
+INSERT INTO measurement_models (measurement_model_id, "system", data_regime, scale_regime, noise_type, noise_sigma, cutoff_min_scale, cutoff_max_scale, discretization_type, discretization_param)
+VALUES ('ScaleFreeNet_MM1', 'ScaleFreeNet', 'measured', NULL, 'lognormal', 0.18, 1, 128, 'rounding', 'decimals=4');
 
-INSERT INTO measurement_models (measurement_model_id, "system", data_regime, noise_type, noise_sigma, cutoff_min_scale, cutoff_max_scale, discretization_type, discretization_param)
-VALUES ('Sandpile_MM1', 'Sandpile', 'measured', 'lognormal', 0.18, 1, 128, 'rounding', 'decimals=4');
+INSERT INTO measurement_models (measurement_model_id, "system", data_regime, scale_regime, noise_type, noise_sigma, cutoff_min_scale, cutoff_max_scale, discretization_type, discretization_param)
+VALUES ('Sandpile_MM1', 'Sandpile', 'measured', NULL, 'lognormal', 0.18, 1, 128, 'rounding', 'decimals=4');
 
-INSERT INTO measurement_models (measurement_model_id, "system", data_regime, noise_type, noise_sigma, cutoff_min_scale, cutoff_max_scale, discretization_type, discretization_param)
-VALUES ('Earthquakes_MM1', 'Earthquakes', 'measured', 'lognormal', 0.18, 1, 128, 'rounding', 'decimals=4');
+INSERT INTO measurement_models (measurement_model_id, "system", data_regime, scale_regime, noise_type, noise_sigma, cutoff_min_scale, cutoff_max_scale, discretization_type, discretization_param)
+VALUES ('Earthquakes_MM1', 'Earthquakes', 'measured', NULL, 'lognormal', 0.18, 1, 128, 'rounding', 'decimals=4');
 
-INSERT INTO measurement_models (measurement_model_id, "system", data_regime, noise_type, noise_sigma, cutoff_min_scale, cutoff_max_scale, discretization_type, discretization_param)
-VALUES ('ForestFires_MM1', 'ForestFires', 'measured', 'lognormal', 0.18, 1, 128, 'rounding', 'decimals=4');
+INSERT INTO measurement_models (measurement_model_id, "system", data_regime, scale_regime, noise_type, noise_sigma, cutoff_min_scale, cutoff_max_scale, discretization_type, discretization_param)
+VALUES ('ForestFires_MM1', 'ForestFires', 'measured', NULL, 'lognormal', 0.18, 1, 128, 'rounding', 'decimals=4');
 
 -- Insert data for observed_scales
 INSERT INTO observed_scales (observed_scale_id, "system", measurement_model, iteration, measure, data_regime)

@@ -12,6 +12,7 @@ ALTER TABLE system_stats ENABLE ROW LEVEL SECURITY;
 ALTER TABLE measurement_models ENABLE ROW LEVEL SECURITY;
 ALTER TABLE observed_scales ENABLE ROW LEVEL SECURITY;
 ALTER TABLE inference_runs ENABLE ROW LEVEL SECURITY;
+ALTER TABLE scale_regimes ENABLE ROW LEVEL SECURITY;
 
 -- TODO: Add specific RLS policies based on your security requirements
 -- Example:

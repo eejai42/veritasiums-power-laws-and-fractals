@@ -253,6 +253,16 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+-- get_measurement_models_scale_regime
+-- Helper function: Get ScaleRegime from measurement_models by MeasurementModelID
+-- Used for join-free cross-table references in aggregations
+CREATE OR REPLACE FUNCTION get_measurement_models_scale_regime(p_measurement_model_id TEXT)
+RETURNS TEXT AS $$
+BEGIN
+  RETURN (SELECT scale_regime FROM measurement_models WHERE measurement_model_id = p_measurement_model_id);
+END;
+$$ LANGUAGE plpgsql;
+
 -- get_measurement_models_noise_type
 -- Helper function: Get NoiseType from measurement_models by MeasurementModelID
 -- Used for join-free cross-table references in aggregations
@@ -929,6 +939,16 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+-- get_measurement_models_scale_regime
+-- Helper function: Get ScaleRegime from measurement_models by MeasurementModelID
+-- Used for join-free cross-table references in aggregations
+CREATE OR REPLACE FUNCTION get_measurement_models_scale_regime(p_measurement_model_id TEXT)
+RETURNS TEXT AS $$
+BEGIN
+  RETURN (SELECT scale_regime FROM measurement_models WHERE measurement_model_id = p_measurement_model_id);
+END;
+$$ LANGUAGE plpgsql;
+
 -- get_measurement_models_noise_type
 -- Helper function: Get NoiseType from measurement_models by MeasurementModelID
 -- Used for join-free cross-table references in aggregations
@@ -1282,6 +1302,16 @@ CREATE OR REPLACE FUNCTION get_measurement_models_data_regime(p_measurement_mode
 RETURNS TEXT AS $$
 BEGIN
   RETURN (SELECT data_regime FROM measurement_models WHERE measurement_model_id = p_measurement_model_id);
+END;
+$$ LANGUAGE plpgsql;
+
+-- get_measurement_models_scale_regime
+-- Helper function: Get ScaleRegime from measurement_models by MeasurementModelID
+-- Used for join-free cross-table references in aggregations
+CREATE OR REPLACE FUNCTION get_measurement_models_scale_regime(p_measurement_model_id TEXT)
+RETURNS TEXT AS $$
+BEGIN
+  RETURN (SELECT scale_regime FROM measurement_models WHERE measurement_model_id = p_measurement_model_id);
 END;
 $$ LANGUAGE plpgsql;
 

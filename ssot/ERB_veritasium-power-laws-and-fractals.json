@@ -1333,6 +1333,12 @@
         "Description": "Regime this model describes. Usually 'measured'."
       },
       {
+        "name": "ScaleRegime",
+        "datatype": "string",
+        "type": "raw",
+        "Description": "Optional RegimeID this measurement model applies to"
+      },
+      {
         "name": "NoiseType",
         "datatype": "string",
         "type": "raw",
@@ -1396,6 +1402,7 @@
         "MeasurementModelID": "ZipfWords_MM1",
         "System": "ZipfWords",
         "DataRegime": "measured",
+        "ScaleRegime": "all",
         "NoiseType": "lognormal",
         "NoiseSigma": 0.18,
         "CutoffMinScale": 1,
@@ -2547,6 +2554,37 @@
         "ResidualMaxAbs": 0.132325,
         "OrthogonalRMS": 0.042392,
         "DeviationScore": 0.069811
+      }
+    ]
+  },
+  "scale_regimes": {
+    "primary_key": [
+      "RegimeID"
+    ],
+    "schema": [
+      {
+        "name": "RegimeID",
+        "datatype": "string"
+      },
+      {
+        "name": "System",
+        "datatype": "string"
+      },
+      {
+        "name": "MinLogScale",
+        "datatype": "number"
+      },
+      {
+        "name": "MaxLogScale",
+        "datatype": "number"
+      },
+      {
+        "name": "ExpectedSlope",
+        "datatype": "number"
+      },
+      {
+        "name": "RegimeType",
+        "datatype": "string"
       }
     ]
   }
