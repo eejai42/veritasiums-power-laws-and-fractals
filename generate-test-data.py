@@ -247,7 +247,6 @@ def generate_test_data(total_iterations: int = DEFAULT_TOTAL_ITERATIONS,
     # Generate test-input.json (only raw facts for iterations 4-7, with rounding)
     test_input = {
         'description': f'Test input with only raw facts for iterations {base_iterations}-{total_iterations-1} (platforms must compute derived values)',
-        'generated': datetime.now(timezone.utc).isoformat(),
         'source': 'ssot/ERB_veritasium-power-laws-and-fractals.json',
         'total_iterations': total_iterations,
         'base_iterations': base_iterations,

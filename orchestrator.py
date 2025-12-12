@@ -63,14 +63,14 @@ class Platform:
                 timeout=120
             )
             
-            if result.returncode != 0:
+            # Check if results file exists (even if exit code non-zero)
+            # Exit code 1 usually means validation failed, not execution error
+            if not self.results_file.exists():
                 if verbose:
                     print(f"{DIM}{result.stderr}{RESET}")
-                return False, f"Exit code {result.returncode}"
+                return False, f"Results file not generated (exit code {result.returncode})"
             
-            if not self.results_file.exists():
-                return False, f"Results file not generated: {self.results_file}"
-            
+            # Results file exists - we can validate even if exit code was non-zero
             return True, "OK"
         
         except subprocess.TimeoutExpired:
@@ -295,19 +295,10 @@ def print_failures(results: Dict[str, Dict]):
 
 
 def generate_html_report(results: Dict[str, Dict]):
-    """Generate HTML report"""
-    # Load data for the report
-    try:
-        base_data = load_json(TEST_DATA_DIR / 'base-data.json')
-        answer_key = load_json(TEST_DATA_DIR / 'answer-key.json')
-    except Exception as e:
-        print(f"  {YELLOW}⚠ Could not load test data for report: {e}{RESET}")
-        return
-    
-    # Generate report using the visualizer
+    """Generate HTML report using generate_report.py"""
     try:
         result = subprocess.run(
-            ['python3', 'compare.py', '--html'],
+            ['python3', 'generate_report.py'],
             cwd=VISUALIZER_DIR,
             capture_output=True,
             text=True
@@ -317,6 +308,8 @@ def generate_html_report(results: Dict[str, Dict]):
             print(f"  {GREEN}✓ HTML report generated: visualizer/report.html{RESET}")
         else:
             print(f"  {YELLOW}⚠ Could not generate HTML report{RESET}")
+            if result.stderr:
+                print(f"  {DIM}{result.stderr}{RESET}")
     except Exception as e:
         print(f"  {YELLOW}⚠ HTML report generation skipped: {e}{RESET}")
 

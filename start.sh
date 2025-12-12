@@ -66,7 +66,10 @@ run_all_tests() {
     echo -e "${CYAN}║  Running ALL Platform Tests                                ║${NC}"
     echo -e "${CYAN}╚════════════════════════════════════════════════════════════╝${NC}"
     echo ""
-    python3 "$SCRIPT_DIR/orchestrator.py" --all --regenerate
+    echo -e "${DIM}Using existing test-input.json and answer-key.json${NC}"
+    echo -e "${DIM}(Use 'g' to regenerate test data from SSoT)${NC}"
+    echo ""
+    python3 "$SCRIPT_DIR/orchestrator.py" --all
     echo ""
     echo -e "${CYAN}Opening results report in browser...${NC}"
     open_report
@@ -122,10 +125,7 @@ view_report() {
     echo ""
     echo -e "${CYAN}Generating and opening results report...${NC}"
     echo ""
-    # Show console summary first
-    python3 "$SCRIPT_DIR/visualizer/compare.py"
-    echo ""
-    # Then generate and open HTML
+    # Generate and open HTML
     open_report
     echo ""
     echo -e "${GREEN}Report opened in browser!${NC}"

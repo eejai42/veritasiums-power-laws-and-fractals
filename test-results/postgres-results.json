@@ -200,13 +200,13 @@
       "ScaleID": "ForestFires_7",
       "System": "ForestFires",
       "Iteration": 7,
-      "Measure": 0.001822,
+      "Measure": 2e-06,
       "BaseScale": 1.0,
       "ScaleFactor": 2.0,
       "ScaleFactorPower": 128.0,
       "Scale": 128.0,
       "LogScale": 2.10721,
-      "LogMeasure": -2.739452,
+      "LogMeasure": -5.69897,
       "IsProjected": true
     },
     {
