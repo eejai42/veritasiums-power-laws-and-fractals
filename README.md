@@ -1,312 +1,167 @@
-# Power Laws and Fractals Analysis Engine
-
-A multi-platform analytical framework for modeling, analyzing, and visualizing fractal systems and power-law distributions.
-
-## 🚀 Quick Start
-
-```bash
-./start.sh
-```
-
-That's it! Pick from Python, PostgreSQL, Jupyter, Go, or the HTML visualizer.
-
-## 📚 Documentation
-
-- **[QUICKSTART.md](QUICKSTART.md)** - Start here to continue development
-- **[PROGRESS.md](PROGRESS.md)** - Current status and completed work
-- **[IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md)** - Technical architecture
-
-## 📊 Current Status
-
-| Platform | Status | Location | Generator |
-|----------|--------|----------|-----------|
-| **PostgreSQL** | ✅ COMPLETE | [postgres/](postgres/) | External tool |
-| **Python** | ✅ COMPLETE | [python/rulebook/](python/rulebook/) | [rulebook-to-python.py](python/rulebook-to-python.py) |
-| **Golang** | 📋 Planned | [golang/](golang/) | To be built |
-| **Visualizer** | 📋 Planned | [visualizer/](visualizer/) | To be built |
-| **Jupyter** | 📋 Planned | [jupyter/](jupyter/) | To be built |
-
-**Meta-Programming Approach**: One canonical rulebook → Multiple platform-specific implementations via code generators.
-
-## Overview
-
-This project implements a computational engine for analyzing systems that exhibit power-law behavior and fractal characteristics. Inspired by concepts from the Veritasium video on power laws and fractals, it provides tools to:
-
-- Define fractal and power-law systems with consistent parameters
-- Calculate scale relationships across multiple iterations
-- Perform log-log analysis to validate theoretical predictions
-- Visualize scaling behavior and self-similarity patterns
-- Compare empirical measurements against theoretical models
-
-## What is the Rulebook?
-
-The **rulebook** is a standardized data model that defines how to represent and analyze self-similar systems. It consists of three core components:
-
-### 1. Systems Table
-Defines the fundamental properties of each fractal or power-law system:
-
-- **SystemID**: Unique identifier (e.g., "Sierpinski", "Koch", "ZipfWords")
-- **DisplayName**: Human-readable name
-- **Class**: Type of system ("fractal" or "power_law")
-- **BaseScale**: Starting scale/size at iteration 0
-- **ScaleFactor**: Multiplicative factor between iterations
-- **MeasureName**: What is being measured (e.g., "black_triangle_count", "edge_length_total")
-- **FractalDimension**: For fractals, the Hausdorff dimension
-- **TheoreticalLogLogSlope**: Expected slope on log-log plot
-
-### 2. Scales Table
-Records measurements at each iteration/scale of a system:
-
-- **ScaleID**: Unique identifier for each measurement point
-- **System**: Reference to parent system
-- **Iteration**: Which iteration/generation (0, 1, 2, 3, ...)
-- **Measure**: The actual measurement value
-- **Calculated Fields**:
-  - ScaleFactorPower: Scale factor raised to iteration power
-  - Scale: Actual scale at this iteration
-  - LogScale: Log₁₀ of the scale
-  - LogMeasure: Log₁₀ of the measurement
-
-### 3. System Stats Table
-Aggregates statistical analysis for each system:
-
-- **SystemStatsID**: Unique identifier
-- **System**: Reference to parent system
-- **AnalysisName**: Name of this analysis run
-- **Status**: Validation status ("validated", "pending", etc.)
-- **Calculated Aggregations**:
-  - PointCount: Number of data points
-  - MinLogScale, MaxLogScale: Range of log scales
-  - MinLogMeasure, MaxLogMeasure: Range of log measurements
-  - DeltaLogMeasure, DeltaLogScale: Differences for slope calculation
-  - EmpiricalLogLogSlope: Measured slope from data
-  - SlopeError: Difference between empirical and theoretical slopes
-
-## Example Systems in the Rulebook
-
-The current implementation includes four classic examples:
-
-### 1. Sierpinski Triangle
-- **Class**: Fractal
-- **Measure**: Count of black triangles
-- **Fractal Dimension**: 1.585
-- **Behavior**: At each iteration, each triangle subdivides into 3 smaller triangles
-- **Theoretical Slope**: -1.585
-
-### 2. Koch Snowflake
-- **Class**: Fractal
-- **Measure**: Total edge length
-- **Fractal Dimension**: 1.262
-- **Behavior**: Each edge segment is replaced by 4 segments at 1/3 the length
-- **Theoretical Slope**: -0.262
-
-### 3. Zipf's Law (Word Frequencies)
-- **Class**: Power Law
-- **Measure**: Relative frequency
-- **Behavior**: Word frequency inversely proportional to rank
-- **Theoretical Slope**: -1.0
-
-### 4. Scale-Free Networks
-- **Class**: Power Law
-- **Measure**: Node count at each degree
-- **Behavior**: Degree distribution follows power law
-- **Theoretical Slope**: -2.5
-
-## Project Status
-
-### Completed Modules
-
-#### PostgreSQL Implementation (rulebook-to-postgres)
-A fully functional, spreadsheet-like PostgreSQL database that implements the complete engine.
+# From Veritasium’s Power Laws to a Working Lab: Fixed Points, Neighborhoods, and Log–Log Science
 
-**Features:**
-- Normalized schema with separate tables for raw data
-- Calculation functions for all derived fields
-- Views that present spreadsheet-like calculated columns
-- Support for lookup, calculated, and aggregation field types
-- Row-level security policies
-- Automatic validation of theoretical vs. empirical slopes
-
-**Files:**
-- [postgres/01-drop-and-create-tables.sql](postgres/01-drop-and-create-tables.sql) - Schema definition
-- [postgres/02-create-functions.sql](postgres/02-create-functions.sql) - Calculation functions
-- [postgres/03-create-views.sql](postgres/03-create-views.sql) - Spreadsheet-like views
-- [postgres/04-create-policies.sql](postgres/04-create-policies.sql) - Security policies
-- [postgres/05-insert-data.sql](postgres/05-insert-data.sql) - Sample data
-
-## Planned Modules
-
-### Python SDK (rulebook-to-python)
-A Python implementation providing:
-- Object-oriented API for defining and analyzing systems
-- NumPy-based calculations for performance
-- Pandas DataFrames for data manipulation
-- Matplotlib/Plotly integration for visualization
-- Export to various formats (CSV, JSON, Excel)
-
-**Status**: Planned
-
-**Directory**: [python/](python/)
-
-### Golang SDK (rulebook-to-golang)
-A Go implementation providing:
-- Type-safe system definitions
-- Concurrent calculation engine
-- REST API for system queries
-- gRPC support for inter-service communication
-- High-performance batch processing
-
-**Status**: Planned
-
-**Directory**: TBD (to be created)
-
-### Visualizer
-An interactive visualization tool for exploring fractal and power-law systems:
-- Log-log plot generation
-- Interactive scaling controls
-- Side-by-side system comparison
-- Animation of fractal generation
-- Export of publication-ready figures
-
-**Status**: Planned
-
-**Technologies**: D3.js, React, or Observable
-**Directory**: TBD (to be created)
-
-### Jupyter Notebook (rulebook-to-jupyter)
-Educational Jupyter notebooks demonstrating:
-- Step-by-step construction of fractal systems
-- Interactive parameter exploration
-- Real-time log-log plotting
-- Integration with Python SDK
-- Example analyses and tutorials
-
-**Status**: Planned
-
-**Directory**: TBD (to be created)
-
-## Future Possibilities
-
-- **Additional Systems**: Mandelbrot set, Cantor set, Pareto distributions, city size distributions
-- **3D Fractals**: Extension to 3D systems (Menger sponge, etc.)
-- **Real-world Data**: Integration with actual datasets (earthquake magnitudes, wealth distribution)
-- **Machine Learning**: Pattern recognition in power-law systems
-- **Web API**: RESTful service for system analysis
-- **Mobile App**: iOS/Android visualization tools
-
-## Core Concepts
-
-### Log-Log Analysis
-The engine performs log-log analysis to validate power-law and fractal behavior:
-
-1. Measure values at different scales (iterations)
-2. Take log₁₀ of both scale and measure
-3. Plot LogMeasure vs. LogScale
-4. Calculate slope using: `(MaxLogMeasure - MinLogMeasure) / (MaxLogScale - MinLogScale)`
-5. Compare empirical slope to theoretical prediction
-
-For a perfect power law or fractal, points on a log-log plot form a straight line. The slope reveals the scaling exponent.
-
-### Field Type System
-The rulebook supports three field types:
-
-1. **Raw Fields**: Direct data storage (Iteration, Measure, SystemID)
-2. **Lookup Fields**: Values from related tables (BaseScale from Systems)
-3. **Calculated Fields**: Derived from other fields using formulas (LogScale = LOG10(Scale))
-4. **Aggregation Fields**: Rollups across multiple rows (PointCount, MinLogScale)
-
-## Getting Started
-
-### PostgreSQL Implementation
-
-1. Ensure PostgreSQL is installed and running
-2. Create a new database
-3. Run the SQL scripts in order:
-```bash
-psql -d your_database -f postgres/01-drop-and-create-tables.sql
-psql -d your_database -f postgres/02-create-functions.sql
-psql -d your_database -f postgres/03-create-views.sql
-psql -d your_database -f postgres/04-create-policies.sql
-psql -d your_database -f postgres/05-insert-data.sql
-```
-
-4. Query the views to see calculated results:
-```sql
-SELECT * FROM vw_scales;
-SELECT * FROM vw_system_stats;
-```
-
-### Python SDK (Coming Soon)
-```python
-from rulebook import System, Scale
-
-# Define a system
-sierpinski = System(
-    system_id="Sierpinski",
-    display_name="Sierpinski Triangle",
-    base_scale=1.0,
-    scale_factor=0.5,
-    fractal_dimension=1.585
-)
-
-# Add measurements
-sierpinski.add_scale(iteration=0, measure=1.0)
-sierpinski.add_scale(iteration=1, measure=3.0)
-sierpinski.add_scale(iteration=2, measure=9.0)
-
-# Analyze
-stats = sierpinski.analyze()
-print(f"Empirical slope: {stats.empirical_slope}")
-print(f"Theoretical slope: {stats.theoretical_slope}")
-print(f"Error: {stats.slope_error}")
-```
-
-## Architecture Principles
-
-Each implementation follows these principles:
-
-1. **Separation of Concerns**: Raw data storage separate from calculations
-2. **Formula Preservation**: Original Excel-like formulas documented in code
-3. **Type Safety**: Proper typing for all fields and calculations
-4. **Validation**: Automatic comparison of empirical vs. theoretical results
-5. **Extensibility**: Easy to add new systems and measurement types
-
-## Contributing
-
-This is an educational and research project. Contributions are welcome for:
-
-- New system implementations
-- Additional calculation methods
-- Visualization improvements
-- Documentation and tutorials
-- Bug fixes and optimizations
-
-## References
-
-- [Veritasium - The Surprising Reason Why Power Laws Are Everywhere](https://www.youtube.com/watch?v=3PdBZiHHHoQ)
-- Mandelbrot, B. (1982). The Fractal Geometry of Nature
-- Barabási, A-L. (2016). Network Science
-- Newman, M. (2005). Power laws, Pareto distributions and Zipf's law
-
-## License
-
-MIT License - See LICENSE file for details
-
-## Project Structure
-
-```
-ERB_veritasium-power-laws-and-fractals/
-├── README.md                    # This file
-├── postgres/                    # PostgreSQL implementation (COMPLETE)
-│   ├── README.md               # Generation report
-│   ├── 01-drop-and-create-tables.sql
-│   ├── 02-create-functions.sql
-│   ├── 03-create-views.sql
-│   ├── 04-create-policies.sql
-│   └── 05-insert-data.sql
-├── python/                      # Python SDK (PLANNED)
-│   └── rulebook-to-python.py   # Placeholder
-├── golang/                      # Golang SDK (PLANNED)
-├── visualizer/                  # Interactive visualizer (PLANNED)
-└── jupyter/                     # Jupyter notebooks (PLANNED)
-```
+Halfway through Veritasium’s power-law video, there’s a familiar move: take a messy distribution, go to log–log space, and the curve becomes a straight line.
+
+But the straight line isn’t the phenomenon. The phenomenon is the *cloud* around it: finite ranges, censoring, measurement noise, discretization, regime changes, and “toy model vs real world” mismatch. The line is the attractor; the data is the neighborhood.
+
+So I built the thing I wished I had while watching: a repo where a power-law “theory” is a **row**, observations are a **neighborhood**, and validation is computed automatically.
+
+This repo’s core is a CMCC model (and a PostgreSQL implementation of it) that treats scaling laws like executable science: define the fixed point, load the data, query the fit, and compare “what you expected” to “what you got.” 
+
+---
+
+## Power laws aren’t “a weird distribution.” They’re a different kind of world.
+
+The video opens by contrasting normal distributions (heights, IQ, apple sizes) with power-law worlds—worlds where extreme events aren’t just possible, they’re structurally important.
+
+In a normal distribution, the average is stable: outliers exist, but they don’t dominate the story. In a power-law distribution, outliers can dominate the average, and your intuition breaks: measuring more can increase your estimated “typical” value because the tail is heavy.
+
+That difference isn’t just philosophical—it’s operational. If you’re playing a normal game, consistency wins. If you’re playing a power-law game, a small number of runaway outcomes can dominate everything.
+
+And the central visual move is Pareto’s: take income distributions spanning orders of magnitude, log-transform them, and suddenly the story becomes a line with a slope. In the video’s framing, the exponent is the absolute value of that slope.
+
+That’s the moment most people stop: “cool, it’s a line.”
+
+But the interesting part is what *doesn’t* become a line: the ways real data deviates from the line, and what that deviation means.
+
+---
+
+## The missing piece: the *neighborhood*
+
+The video keeps weaving between:
+
+* **Toy mechanisms** (St. Petersburg paradox, sandpile rules, preferential attachment)
+* **Empirical data** (income, earthquakes, forest fires, network degrees)
+* **Big claims** (scale-free behavior, criticality, universality classes)
+
+That weave is exactly why it’s compelling—and exactly why it’s hard to “do science” with it without constantly rewriting bespoke analysis scripts.
+
+The repo’s premise is simple:
+
+> A scaling theory is not just an equation. It’s a computational object that should be able to host many observations, tolerate noise, and report back how well reality clusters around it.
+
+So the model makes a clean separation:
+
+* **Fixed point (theory)**: the minimal parameters you’re claiming generate the scaling behavior.
+* **Neighborhood (data)**: the actual observed points that orbit that theory in log–log space.
+* **Inference (validation)**: the fitted slope/intercept and quality metrics that tell you whether the neighborhood actually clusters around the fixed point.
+
+In this repo, that separation is not a metaphor. It’s schema.
+
+---
+
+## A schema for the video’s ideas
+
+### Fixed points live in `systems`
+
+Each “system” is a power-law or fractal instance with a theoretical slope (your fixed point in log–log geometry). In the included model, systems include Sierpinski, Koch, Zipf-like word frequencies, scale-free networks, sandpile avalanches, earthquakes, and forest fires, all unified with the same log–log machinery. 
+
+The key field is:
+
+* `systems.TheoreticalLogLogSlope`
+
+This is the “one number” the video keeps returning to: the exponent that defines the straight line in log–log space.
+
+### Neighborhoods live in `observed_scales`
+
+The neighborhood is where reality shows up: noisy observations, finite ranges, discretization effects, etc. In the model, `observed_scales` mirrors the idealized `scales` table but explicitly represents measured data as its own dataset. 
+
+Crucially, the model doesn’t just store `(Scale, Measure)`; it stores the transformations too:
+
+* `observed_scales.LogScale`
+* `observed_scales.LogMeasure`
+
+That makes log–log space the “native geometry” of the entire system.
+
+### Validation lives in `inference_runs`
+
+This is where the repo turns “plot a line” into a reusable scientific primitive. For each system, `inference_runs` stores:
+
+* `TheoreticalLogLogSlope` (the fixed point)
+* `FittedSlope` (inferred from the neighborhood)
+* `R2`, residual RMS, slope delta, and other fit metrics 
+
+For example, the bundled data includes runs like:
+
+* `ZipfWords_INF_OLS_LOG10`: theoretical slope -1, fitted slope about -0.965, high R²
+* `ScaleFreeNet_INF_OLS_LOG10`: theoretical slope -2.5, fitted slope about -2.502, high R² 
+
+So instead of “the line looks straight,” you can say: “here is the fitted slope, here is its deviation from theory, and here is the quality of fit.”
+
+---
+
+## Connecting the video’s greatest hits to the repo
+
+### 1) Pareto / Zipf: “curve becomes line”
+
+In the video, Pareto log-transforms income data, sees a line, and reads off a slope.
+
+In this repo, that move becomes a standard workflow:
+
+1. Define the theoretical slope for the system.
+2. Load observed points.
+3. Query the inference results.
+
+Zipf-style behavior is represented directly as a system with a theoretical slope of -1 (`ZipfWords.TheoreticalLogLogSlope = -1`). 
+The neighborhood is stored as noisy observed points (`ZipfWords_OBS_*`). 
+The model then stores the reconstruction (fitted slope, intercept, R²) in `inference_runs`. 
+
+That’s the video’s plot, but operational.
+
+### 2) The St. Petersburg paradox: “two exponentials dancing”
+
+The video shows how exponential payout growth and exponential probability decay combine to yield a power law.
+
+This repo doesn’t hardcode that derivation; instead, it gives you a place to *host it*:
+
+* the “theory” lives as the expected slope of the payout distribution in log–log space
+* the “neighborhood” is your sampled realizations
+* the “validation” is your recovered exponent and residual geometry
+
+The important shift is that you’re not arguing about a line—you’re storing the claim and letting inference repeatedly re-derive it from realizations.
+
+### 3) Self-organized criticality: “same process, all scales”
+
+The video’s SOC arc (forest fires, sandpiles, earthquakes) is really about *regimes* and *cutoffs*—the parts that ruin simplistic “one slope fits all” takes.
+
+This model makes those first-class:
+
+* measurement models include cutoffs (`CutoffMinScale`, `CutoffMaxScale`) and noise (`NoiseSigma`) 
+* there’s explicit scaffolding for multi-regime behavior via `scale_regimes` (e.g., “small fires” vs “large fires”) 
+
+That matters because in the real world, scaling is often only “clean” over some span, and then something changes: finite-size effects, saturation, censoring, or a genuine crossover.
+
+The repo isn’t just saying “power laws exist.” It’s giving you a place to say “power laws exist… *where* and *under what measurement assumptions*.”
+
+---
+
+## The best part: it’s executable
+
+The CMCC model is accompanied by SQL that turns it into a working PostgreSQL database:
+
+* raw, normalized tables (`systems`, `scales`, `observed_scales`, `inference_runs`, etc.) 
+* calculation functions that mimic spreadsheet-like calculated fields 
+* views that present “raw + computed” as a clean interface (like `vw_inference_runs`) 
+* data inserts that load the example systems, points, and inference results 
+
+That means the “instrument panel” is literally a query away: select from the views and you see, side by side, the fixed point and the inferred slope, plus fit quality.
+
+---
+
+## Why this is worth publishing
+
+The video makes an emotional argument: power laws show up across wildly different domains, and that’s weird and important.
+
+This repo makes a practical argument:
+
+> If you want to take that seriously, you need a way to represent scaling claims that separates theory from measurement, and measurement from validation—without rewriting the world each time.
+
+That’s what this does.
+
+It doesn’t “prove universality.” What it does is make universality *testable in a reusable way*: add a system, load observations, compute slope, inspect residuals, compare regimes.
+
+Power laws aren’t lines.
+
+They’re neighborhoods around fixed points.
+
+And once you build a place to store that distinction, you stop arguing about plots and start running experiments. 
