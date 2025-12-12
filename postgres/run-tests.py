@@ -8,7 +8,7 @@ Follows the unified testing protocol:
 3. Query vw_scales to get ALL computed values from PostgreSQL (all 8 iterations)
 4. Output results to test-results/postgres-results.json
 5. Validate against answer-key.json
-6. Display with color-coded actual vs projected and ASCII plots
+6. Display with unified visualization (all 8 iterations, colors, ASCII plots)
 
 Requires: PostgreSQL running on localhost:5432 with database 'demo'
 """
@@ -16,47 +16,33 @@ Requires: PostgreSQL running on localhost:5432 with database 'demo'
 import json
 import subprocess
 import sys
-import math
 from pathlib import Path
 from datetime import datetime, timezone
-from typing import Dict, List, Tuple, Optional
+from typing import Dict, List, Tuple
 
-# Paths
+# Add visualizer to path for shared library
 SCRIPT_DIR = Path(__file__).parent
 PROJECT_ROOT = SCRIPT_DIR.parent
+sys.path.insert(0, str(PROJECT_ROOT / 'visualizer'))
+
+from console_output import print_full_report
+
+# Paths
 TEST_DATA_DIR = PROJECT_ROOT / 'test-data'
 TEST_RESULTS_DIR = PROJECT_ROOT / 'test-results'
 
-# ANSI colors
+# ANSI colors (for initialization messages)
 GREEN = '\033[92m'
-YELLOW = '\033[93m'
 CYAN = '\033[96m'
 RED = '\033[91m'
 DIM = '\033[2m'
 RESET = '\033[0m'
-BOLD = '\033[1m'
-MAGENTA = '\033[95m'
-BLUE = '\033[94m'
-WHITE = '\033[97m'
-BG_DARK = '\033[48;5;236m'
 
 # Database connection
 DB_CONN = "postgresql://postgres@localhost:5432/demo"
 
 # Tolerance for validation
 TOLERANCE = 0.0001
-
-# ASCII plot characters
-PLOT_CHARS = {
-    'actual': '●',
-    'projected': '◌',
-    'line': '─',
-    'theoretical': '╌',
-    'axis_v': '│',
-    'axis_h': '─',
-    'corner': '└',
-    'cross': '┼'
-}
 
 
 def run_sql(query: str, fetch: bool = True) -> List[List[str]]:
@@ -210,41 +196,6 @@ def query_all_scales() -> List[Dict]:
     return scales
 
 
-def query_test_scales(test_scale_ids: List[str]) -> List[Dict]:
-    """Query computed values for test scales only (for validation)"""
-    
-    ids_str = "', '".join(test_scale_ids)
-    
-    query = f"""
-        SELECT scale_id, "system", iteration, measure, 
-               base_scale, scale_factor, scale_factor_power, 
-               scale, log_scale, log_measure, is_projected
-        FROM vw_scales
-        WHERE scale_id IN ('{ids_str}')
-        ORDER BY scale_id
-    """
-    
-    rows = run_sql(query)
-    
-    scales = []
-    for row in rows:
-        scales.append({
-            'ScaleID': row[0],
-            'System': row[1],
-            'Iteration': int(row[2]) if row[2] else 0,
-            'Measure': float(row[3]) if row[3] else 0,
-            'BaseScale': round(float(row[4]), 5) if row[4] else None,
-            'ScaleFactor': round(float(row[5]), 5) if row[5] else None,
-            'ScaleFactorPower': round(float(row[6]), 5) if row[6] else None,
-            'Scale': round(float(row[7]), 5) if row[7] else None,
-            'LogScale': round(float(row[8]), 5) if row[8] else None,
-            'LogMeasure': round(float(row[9]), 5) if row[9] else None,
-            'IsProjected': row[10] == 't' if row[10] else True
-        })
-    
-    return scales
-
-
 def compare_values(expected, actual, tolerance: float = TOLERANCE) -> bool:
     """Compare two values with tolerance for floats"""
     if expected is None and actual is None:
@@ -288,166 +239,6 @@ def validate_results(computed_scales: List[Dict], answer_key: Dict) -> Tuple[int
             pass_count += 1
     
     return pass_count, fail_count, failures
-
-
-def render_ascii_plot(scales: List[Dict], system: Dict, width: int = 50, height: int = 12) -> str:
-    """Render an ASCII plot for log-log data"""
-    
-    if not scales:
-        return "  (No data)"
-    
-    # Get data points
-    points = [(s['LogScale'], s['LogMeasure'], s['IsProjected']) for s in scales if s['LogScale'] is not None and s['LogMeasure'] is not None]
-    
-    if not points:
-        return "  (No valid data points)"
-    
-    # Calculate bounds
-    x_vals = [p[0] for p in points]
-    y_vals = [p[1] for p in points]
-    
-    x_min, x_max = min(x_vals), max(x_vals)
-    y_min, y_max = min(y_vals), max(y_vals)
-    
-    # Add padding
-    x_range = x_max - x_min if x_max != x_min else 1
-    y_range = y_max - y_min if y_max != y_min else 1
-    
-    # Create plot grid
-    grid = [[' ' for _ in range(width)] for _ in range(height)]
-    
-    # Map coordinates to grid
-    def to_grid(x, y):
-        gx = int((x - x_min) / x_range * (width - 1)) if x_range else width // 2
-        gy = height - 1 - int((y - y_min) / y_range * (height - 1)) if y_range else height // 2
-        return max(0, min(width - 1, gx)), max(0, min(height - 1, gy))
-    
-    # Draw theoretical slope line
-    slope = system.get('TheoreticalLogLogSlope', 0)
-    if slope != 0:
-        # Line passes through first point with given slope
-        x0, y0 = x_vals[0], y_vals[0]
-        for i in range(width):
-            x = x_min + (i / (width - 1)) * x_range
-            y = y0 + slope * (x - x0)
-            if y_min <= y <= y_max:
-                gx, gy = to_grid(x, y)
-                if grid[gy][gx] == ' ':
-                    grid[gy][gx] = f'{DIM}·{RESET}'
-    
-    # Plot data points
-    for x, y, is_projected in points:
-        gx, gy = to_grid(x, y)
-        if is_projected:
-            grid[gy][gx] = f'{MAGENTA}{PLOT_CHARS["projected"]}{RESET}'
-        else:
-            grid[gy][gx] = f'{GREEN}{PLOT_CHARS["actual"]}{RESET}'
-    
-    # Build output
-    lines = []
-    
-    # Y-axis label
-    lines.append(f"  {DIM}log(Measure){RESET}")
-    
-    # Top y value
-    lines.append(f"  {y_max:>7.2f} ┤")
-    
-    # Grid rows
-    for i, row in enumerate(grid):
-        prefix = "        │" if i != len(grid) - 1 else f"  {y_min:>7.2f} ┤"
-        lines.append(prefix + ''.join(row))
-    
-    # X-axis
-    lines.append(f"         └{'─' * width}")
-    lines.append(f"         {x_min:<7.2f}{' ' * (width - 14)}{x_max:>7.2f}")
-    lines.append(f"  {DIM}{'log(Scale)':^{width + 9}}{RESET}")
-    
-    # Legend
-    lines.append(f"  {GREEN}●{RESET} Actual   {MAGENTA}◌{RESET} Projected   {DIM}·{RESET} Theoretical (slope={slope})")
-    
-    return '\n'.join(lines)
-
-
-def print_console_output(all_scales: List[Dict], base_data: Dict,
-                         pass_count: int, fail_count: int, failures: List):
-    """Print results to console with all 8 rows and colors"""
-    print(f"\n{'=' * 80}")
-    print(f"  {BOLD}🐘 POWER LAWS & FRACTALS - PostgreSQL Test Runner{RESET}")
-    print(f"{'=' * 80}")
-    
-    # Build systems lookup
-    systems = {s['SystemID']: s for s in base_data.get('systems', [])}
-    
-    # Group scales by system
-    by_system = {}
-    for scale in all_scales:
-        if scale['System'] not in by_system:
-            by_system[scale['System']] = []
-        by_system[scale['System']].append(scale)
-    
-    print(f"\n{CYAN}All Computed Values (from PostgreSQL views):{RESET}")
-    print(f"  {GREEN}● Green{RESET} = Actual Data (iterations 0-3)")
-    print(f"  {MAGENTA}◌ Magenta{RESET} = Projected/Computed (iterations 4-7)")
-    print(f"{'─' * 80}")
-    
-    for system_id in sorted(by_system.keys()):
-        scales = by_system[system_id]
-        system = systems.get(system_id, {})
-        icon = "🔺" if system.get('Class') == "fractal" else "📈"
-        
-        print(f"\n{icon} {BOLD}{system.get('DisplayName', system_id)}{RESET}")
-        print(f"  {DIM}Theoretical slope: {system.get('TheoreticalLogLogSlope', 'N/A')}{RESET}")
-        
-        # Header
-        print(f"\n  {'Iter':>4}  {'Measure':>12}  {'Scale':>14}  {'LogScale':>10}  {'LogMeasure':>12}  {'Type':>10}")
-        print(f"  {'─' * 70}")
-        
-        # Data rows with colors
-        for s in sorted(scales, key=lambda x: x['Iteration']):
-            is_proj = s.get('IsProjected', False)
-            color = MAGENTA if is_proj else GREEN
-            marker = "◌" if is_proj else "●"
-            type_label = "projected" if is_proj else "actual"
-            
-            print(f"  {color}{s['Iteration']:>4}  {s['Measure']:>12.6f}  {s['Scale']:>14.8f}  {s['LogScale']:>10.5f}  {s['LogMeasure']:>12.5f}  {marker} {type_label}{RESET}")
-        
-        print(f"\n  {DIM}Row count: {len(scales)}{RESET}")
-        
-        # ASCII Plot
-        print(f"\n{CYAN}  Log-Log Plot:{RESET}")
-        plot = render_ascii_plot(scales, system)
-        print(plot)
-    
-    # Validation results
-    print(f"\n{'=' * 80}")
-    print(f"{CYAN}Validation Results (projected scales vs answer-key):{RESET}")
-    print(f"{'─' * 80}")
-    
-    if fail_count == 0:
-        print(f"  {GREEN}✓ All {pass_count} projected scales validated successfully!{RESET}")
-    else:
-        print(f"  {YELLOW}⚠ {pass_count} passed, {fail_count} failed{RESET}")
-        for scale_id, mismatches in failures[:5]:
-            print(f"    • {scale_id}:")
-            if isinstance(mismatches, list):
-                for m in mismatches:
-                    print(f"      - {m}")
-            else:
-                print(f"      - {mismatches}")
-    
-    # Summary stats
-    total_scales = len(all_scales)
-    systems_count = len(by_system)
-    
-    print(f"\n{'=' * 80}")
-    print(f"  {BOLD}Summary:{RESET}")
-    print(f"    Systems: {systems_count}")
-    print(f"    Total scales: {total_scales} ({total_scales // systems_count} per system)")
-    print(f"    Actual (0-3): {sum(1 for s in all_scales if not s.get('IsProjected', False))}")
-    print(f"    Projected (4-7): {sum(1 for s in all_scales if s.get('IsProjected', False))}")
-    print(f"{'=' * 80}")
-    print(f"  {GREEN}✓ PostgreSQL test run complete!{RESET}")
-    print(f"{'=' * 80}\n")
 
 
 def main():
@@ -511,8 +302,19 @@ def main():
     test_scales = [s for s in all_scales if s['ScaleID'] in test_scale_ids]
     pass_count, fail_count, failures = validate_results(test_scales, answer_key)
     
-    # Print console output with all data
-    print_console_output(all_scales, base_data, pass_count, fail_count, failures)
+    # Build systems dict for visualization
+    systems_dict = {s['SystemID']: s for s in base_data.get('systems', [])}
+    
+    # Print full report using shared library
+    print_full_report(
+        platform='postgres',
+        all_scales=all_scales,
+        systems=systems_dict,
+        pass_count=pass_count,
+        fail_count=fail_count,
+        failures=failures,
+        show_plots=True
+    )
     
     # Exit with appropriate code
     sys.exit(0 if fail_count == 0 else 1)

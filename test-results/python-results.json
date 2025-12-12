@@ -1,6 +1,6 @@
 {
   "platform": "python",
-  "timestamp": "2025-12-12T00:08:14.235121+00:00",
+  "timestamp": "2025-12-12T00:15:12.384533+00:00",
   "scales": [
     {
       "ScaleID": "Sierpinski_4",
@@ -45,13 +45,13 @@
       "ScaleID": "Sierpinski_7",
       "System": "Sierpinski",
       "Iteration": 7,
-      "Measure": 1500,
+      "Measure": 2225,
       "BaseScale": 1,
       "ScaleFactor": 0.5,
       "ScaleFactorPower": 0.00781,
       "Scale": 0.00781,
       "LogScale": -2.10721,
-      "LogMeasure": 3.17609,
+      "LogMeasure": 3.34733,
       "IsProjected": true
     },
     {
