@@ -56,6 +56,62 @@
         "datatype": "number",
         "type": "raw",
         "Description": "Theoretical slope d(log Measure)/d(log Scale) for this system under the chosen definition of Scale."
+      },
+      {
+        "name": "EmpiricalFitQuality",
+        "datatype": "number",
+        "type": "lookup",
+        "formula": "=INDEX(inference_runs!{{R2}}, MATCH(systems!{{SystemID}}, inference_runs!{{System}}, 0))",
+        "Description": "R² value from fitted model showing how well observed data fits theory."
+      },
+      {
+        "name": "EmpiricalSlopeDeviation",
+        "datatype": "number",
+        "type": "calculated",
+        "formula": "=ABS(INDEX(inference_runs!{{SlopeDelta}}, MATCH(systems!{{SystemID}}, inference_runs!{{System}}, 0)))",
+        "Description": "Absolute magnitude of slope error from fitted observations."
+      },
+      {
+        "name": "MeasurementNoiseLevel",
+        "datatype": "number",
+        "type": "lookup",
+        "formula": "=INDEX(measurement_models!{{NoiseSigma}}, MATCH(systems!{{SystemID}}, measurement_models!{{System}}, 0))",
+        "Description": "Noise sigma parameter from measurement model for this system."
+      },
+      {
+        "name": "DataQualityScore",
+        "datatype": "number",
+        "type": "calculated",
+        "formula": "={{EmpiricalFitQuality}} * (1 - {{EmpiricalSlopeDeviation}})",
+        "Description": "Composite quality metric combining fit quality and slope accuracy."
+      },
+      {
+        "name": "RelativeSlopeError",
+        "datatype": "number",
+        "type": "calculated",
+        "formula": "=INDEX(inference_runs!{{SlopeDelta}}, MATCH(systems!{{SystemID}}, inference_runs!{{System}}, 0)) / {{TheoreticalLogLogSlope}}",
+        "Description": "Slope deviation as a fraction of theoretical slope (percentage error)."
+      },
+      {
+        "name": "IsHighQualityFit",
+        "datatype": "boolean",
+        "type": "calculated",
+        "formula": "=AND({{EmpiricalFitQuality}} > 0.99, {{EmpiricalSlopeDeviation}} < 0.05)",
+        "Description": "Boolean flag indicating excellent fit (R² > 0.99 and slope error < 0.05)."
+      },
+      {
+        "name": "ScaleRangeSpan",
+        "datatype": "number",
+        "type": "lookup",
+        "formula": "=INDEX(system_stats!{{DeltaLogScale}}, MATCH(systems!{{SystemID}}, system_stats!{{System}}, 0))",
+        "Description": "Total span in log-scale space covered by data (decades of scale)."
+      },
+      {
+        "name": "MeasureRangeSpan",
+        "datatype": "number",
+        "type": "lookup",
+        "formula": "=INDEX(system_stats!{{DeltaLogMeasure}}, MATCH(systems!{{SystemID}}, system_stats!{{System}}, 0))",
+        "Description": "Total span in log-measure space covered by data (decades of measure)."
       }
     ],
     "data": [
@@ -223,6 +279,55 @@
         "type": "relationship",
         "RelatedTo": "measurement_models",
         "Description": "Optional FK to measurement_models describing noise/cutoff/discretization used to generate or interpret this point."
+      },
+      {
+        "name": "TheoreticalLogLogSlope",
+        "datatype": "number",
+        "type": "lookup",
+        "formula": "=INDEX(systems!{{TheoreticalLogLogSlope}}, MATCH(scales!{{System}}, systems!{{SystemID}}, 0))",
+        "Description": "Theoretical slope from parent system for comparison."
+      },
+      {
+        "name": "EmpiricalLogLogSlope",
+        "datatype": "number",
+        "type": "lookup",
+        "formula": "=INDEX(system_stats!{{EmpiricalLogLogSlope}}, MATCH(scales!{{System}}, system_stats!{{System}}, 0))",
+        "Description": "Empirical slope from system_stats for residual calculation."
+      },
+      {
+        "name": "SystemMinLogScale",
+        "datatype": "number",
+        "type": "lookup",
+        "formula": "=INDEX(system_stats!{{MinLogScale}}, MATCH(scales!{{System}}, system_stats!{{System}}, 0))",
+        "Description": "Minimum log scale for the system (for normalization)."
+      },
+      {
+        "name": "SystemMaxLogScale",
+        "datatype": "number",
+        "type": "lookup",
+        "formula": "=INDEX(system_stats!{{MaxLogScale}}, MATCH(scales!{{System}}, system_stats!{{System}}, 0))",
+        "Description": "Maximum log scale for the system (for normalization)."
+      },
+      {
+        "name": "SystemDeltaLogScale",
+        "datatype": "number",
+        "type": "lookup",
+        "formula": "=INDEX(system_stats!{{DeltaLogScale}}, MATCH(scales!{{System}}, system_stats!{{System}}, 0))",
+        "Description": "Total log scale range for the system."
+      },
+      {
+        "name": "ScaleRatio",
+        "datatype": "number",
+        "type": "calculated",
+        "formula": "={{Scale}} / NULLIF({{BaseScale}}, 0)",
+        "Description": "How many times larger than base scale (multiplicative factor)."
+      },
+      {
+        "name": "LogScaleNormalized",
+        "datatype": "number",
+        "type": "calculated",
+        "formula": "=({{LogScale}} - {{SystemMinLogScale}}) / NULLIF({{SystemDeltaLogScale}}, 0)",
+        "Description": "Position within system's log-scale range as 0-1 value."
       }
     ],
     "data": [
@@ -1167,7 +1272,7 @@
         "name": "EmpiricalLogLogSlope",
         "datatype": "number",
         "type": "calculated",
-        "formula": "={{DeltaLogMeasure}} / {{DeltaLogScale}}",
+        "formula": "={{DeltaLogMeasure}} / NULLIF({{DeltaLogScale}}, 0)",
         "Description": "Calculated: Slope of log-log line from empirical data."
       },
       {
@@ -1176,6 +1281,90 @@
         "type": "calculated",
         "formula": "={{EmpiricalLogLogSlope}} - {{TheoreticalLogLogSlope}}",
         "Description": "Calculated: Difference between empirical and theoretical slopes."
+      },
+      {
+        "name": "FittedSlope",
+        "datatype": "number",
+        "type": "lookup",
+        "formula": "=INDEX(inference_runs!{{FittedSlope}}, MATCH(system_stats!{{System}}, inference_runs!{{System}}, 0))",
+        "Description": "Fitted slope from inference_runs on observed data."
+      },
+      {
+        "name": "FittedVsEmpiricalDelta",
+        "datatype": "number",
+        "type": "calculated",
+        "formula": "={{FittedSlope}} - {{EmpiricalLogLogSlope}}",
+        "Description": "Difference between fitted slope (noisy obs) and empirical slope (ideal data)."
+      },
+      {
+        "name": "R2",
+        "datatype": "number",
+        "type": "lookup",
+        "formula": "=INDEX(inference_runs!{{R2}}, MATCH(system_stats!{{System}}, inference_runs!{{System}}, 0))",
+        "Description": "R² fit quality from inference_runs."
+      },
+      {
+        "name": "QualityWeightedSlope",
+        "datatype": "number",
+        "type": "calculated",
+        "formula": "={{R2}} * {{FittedSlope}}",
+        "Description": "Fitted slope weighted by confidence (R²)."
+      },
+      {
+        "name": "ResidualRMS",
+        "datatype": "number",
+        "type": "lookup",
+        "formula": "=INDEX(inference_runs!{{ResidualRMS}}, MATCH(system_stats!{{System}}, inference_runs!{{System}}, 0))",
+        "Description": "RMS residual from fitted model."
+      },
+      {
+        "name": "NoiseSigma",
+        "datatype": "number",
+        "type": "lookup",
+        "formula": "=INDEX(measurement_models!{{NoiseSigma}}, MATCH(system_stats!{{System}}, measurement_models!{{System}}, 0))",
+        "Description": "Noise level parameter from measurement model."
+      },
+      {
+        "name": "SlopeToNoiseRatio",
+        "datatype": "number",
+        "type": "calculated",
+        "formula": "=ABS({{EmpiricalLogLogSlope}}) / NULLIF({{NoiseSigma}}, 0)",
+        "Description": "Signal-to-noise ratio (slope magnitude vs. noise level)."
+      },
+      {
+        "name": "DeviationScore",
+        "datatype": "number",
+        "type": "lookup",
+        "formula": "=INDEX(inference_runs!{{DeviationScore}}, MATCH(system_stats!{{System}}, inference_runs!{{System}}, 0))",
+        "Description": "Composite error metric from inference_runs."
+      },
+      {
+        "name": "AbsDeltaLogMeasure",
+        "datatype": "number",
+        "type": "calculated",
+        "formula": "=ABS({{DeltaLogMeasure}})",
+        "Description": "Absolute value of delta log measure."
+      },
+      {
+        "name": "LogLogArea",
+        "datatype": "number",
+        "type": "calculated",
+        "formula": "={{DeltaLogScale}} * {{AbsDeltaLogMeasure}}",
+        "Description": "Area in log-log space (product of ranges)."
+      },
+      {
+        "name": "DataDensity",
+        "datatype": "number",
+        "type": "calculated",
+        "formula": "={{PointCount}} / NULLIF({{LogLogArea}}, 0)",
+        "Description": "Number of data points per unit area in log-log space."
+      },
+      {
+        "name": "RelativeSlopeError",
+        "datatype": "number",
+        "type": "calculated",
+        "formula": "={{SlopeError}} / NULLIF({{TheoreticalLogLogSlope}}, 0)",
+        "Description": "Slope error as fraction of theoretical slope (percentage)."
       }
     ],
     "data": [
@@ -1373,6 +1562,69 @@
         "datatype": "string",
         "type": "raw",
         "Description": "Parameterization of discretization (e.g., decimals=2 or binwidth=log2)."
+      },
+      {
+        "name": "MeanAbsoluteResidual",
+        "datatype": "number",
+        "type": "aggregation",
+        "formula": "=AVERAGEIFS(observed_scales!{{AbsResidual}}, observed_scales!{{MeasurementModel}}, measurement_models!{{MeasurementModelID}})",
+        "Description": "Average absolute residual from fitted model for observations using this model."
+      },
+      {
+        "name": "OutlierCount",
+        "datatype": "integer",
+        "type": "aggregation",
+        "formula": "=COUNTIFS(observed_scales!{{MeasurementModel}}, measurement_models!{{MeasurementModelID}}, observed_scales!{{IsOutlier}}, TRUE)",
+        "Description": "Number of outlier points (|standardized residual| > 2.5) in observed_scales."
+      },
+      {
+        "name": "TotalPointCount",
+        "datatype": "integer",
+        "type": "aggregation",
+        "formula": "=COUNTIFS(observed_scales!{{MeasurementModel}}, measurement_models!{{MeasurementModelID}})",
+        "Description": "Total number of observed data points using this measurement model."
+      },
+      {
+        "name": "OutlierRate",
+        "datatype": "number",
+        "type": "calculated",
+        "formula": "={{OutlierCount}} / NULLIF({{TotalPointCount}}, 0)",
+        "Description": "Fraction of points that are outliers (quality metric)."
+      },
+      {
+        "name": "EffectivePointCount",
+        "datatype": "integer",
+        "type": "calculated",
+        "formula": "={{TotalPointCount}} - {{OutlierCount}}",
+        "Description": "Number of non-outlier points (usable for analysis)."
+      },
+      {
+        "name": "ResidualRMSFromInference",
+        "datatype": "number",
+        "type": "lookup",
+        "formula": "=INDEX(inference_runs!{{ResidualRMS}}, MATCH(measurement_models!{{System}}, inference_runs!{{System}}, 0))",
+        "Description": "RMS residual from inference_runs (total fit error)."
+      },
+      {
+        "name": "CutoffLogMinScale",
+        "datatype": "number",
+        "type": "calculated",
+        "formula": "=LOG10({{CutoffMinScale}})",
+        "Description": "Log10 of minimum cutoff scale."
+      },
+      {
+        "name": "CutoffLogMaxScale",
+        "datatype": "number",
+        "type": "calculated",
+        "formula": "=LOG10({{CutoffMaxScale}})",
+        "Description": "Log10 of maximum cutoff scale."
+      },
+      {
+        "name": "CutoffRangeSpan",
+        "datatype": "number",
+        "type": "calculated",
+        "formula": "={{CutoffLogMaxScale}} - {{CutoffLogMinScale}}",
+        "Description": "Range of observable scales in log units (decades)."
       }
     ],
     "data": [
@@ -1542,6 +1794,76 @@
         "datatype": "string",
         "type": "raw",
         "Description": "Data regime. For observed_scales this is 'measured'."
+      },
+      {
+        "name": "FittedSlope",
+        "datatype": "number",
+        "type": "lookup",
+        "formula": "=INDEX(inference_runs!{{FittedSlope}}, MATCH(observed_scales!{{System}}, inference_runs!{{System}}, 0))",
+        "Description": "Fitted slope from inference_runs for this system."
+      },
+      {
+        "name": "FittedIntercept",
+        "datatype": "number",
+        "type": "lookup",
+        "formula": "=INDEX(inference_runs!{{FittedIntercept}}, MATCH(observed_scales!{{System}}, inference_runs!{{System}}, 0))",
+        "Description": "Fitted intercept from inference_runs for this system."
+      },
+      {
+        "name": "ResidualRMS",
+        "datatype": "number",
+        "type": "lookup",
+        "formula": "=INDEX(inference_runs!{{ResidualRMS}}, MATCH(observed_scales!{{System}}, inference_runs!{{System}}, 0))",
+        "Description": "RMS residual from fitted model (for standardization)."
+      },
+      {
+        "name": "PredictedLogMeasure",
+        "datatype": "number",
+        "type": "calculated",
+        "formula": "={{FittedSlope}} * {{LogScale}} + {{FittedIntercept}}",
+        "Description": "Predicted log measure from fitted model."
+      },
+      {
+        "name": "Residual",
+        "datatype": "number",
+        "type": "calculated",
+        "formula": "={{LogMeasure}} - {{PredictedLogMeasure}}",
+        "Description": "Vertical distance from fitted line in log-log space."
+      },
+      {
+        "name": "ResidualSquared",
+        "datatype": "number",
+        "type": "calculated",
+        "formula": "={{Residual}} * {{Residual}}",
+        "Description": "Squared residual for aggregation into RMS calculations."
+      },
+      {
+        "name": "StandardizedResidual",
+        "datatype": "number",
+        "type": "calculated",
+        "formula": "={{Residual}} / NULLIF({{ResidualRMS}}, 0)",
+        "Description": "Residual in units of RMS (number of standard deviations)."
+      },
+      {
+        "name": "IsOutlier",
+        "datatype": "boolean",
+        "type": "calculated",
+        "formula": "=ABS({{StandardizedResidual}}) > 2.5",
+        "Description": "Outlier detection flag (>2.5 RMS units from fit)."
+      },
+      {
+        "name": "ScaleRatio",
+        "datatype": "number",
+        "type": "calculated",
+        "formula": "={{Scale}} / NULLIF({{BaseScale}}, 0)",
+        "Description": "Scale relative to base scale (multiplicative factor)."
+      },
+      {
+        "name": "AbsResidual",
+        "datatype": "number",
+        "type": "calculated",
+        "formula": "=ABS({{Residual}})",
+        "Description": "Absolute value of residual for aggregation."
       }
     ],
     "data": [
@@ -2433,6 +2755,146 @@
         "type": "calculated",
         "formula": "=SQRT(POWER({{ResidualRMS}}, 2) + POWER({{SlopeDelta}}, 2))",
         "Description": "Composite deviation score combining residual RMS and slope delta (units: log10 + slope)."
+      },
+      {
+        "name": "SlopeConfidenceInterval",
+        "datatype": "number",
+        "type": "calculated",
+        "formula": "=1.96 * ({{ResidualRMS}} / NULLIF(SQRT({{PointCount}}), 0))",
+        "Description": "Approximate 95% confidence interval for slope (simplified formula)."
+      },
+      {
+        "name": "MinLogScale",
+        "datatype": "number",
+        "type": "aggregation",
+        "formula": "=MINIFS(observed_scales!{{LogScale}}, observed_scales!{{System}}, inference_runs!{{System}})",
+        "Description": "Minimum log scale in the observed data."
+      },
+      {
+        "name": "MaxLogScale",
+        "datatype": "number",
+        "type": "aggregation",
+        "formula": "=MAXIFS(observed_scales!{{LogScale}}, observed_scales!{{System}}, inference_runs!{{System}})",
+        "Description": "Maximum log scale in the observed data."
+      },
+      {
+        "name": "MinLogMeasure",
+        "datatype": "number",
+        "type": "aggregation",
+        "formula": "=MINIFS(observed_scales!{{LogMeasure}}, observed_scales!{{System}}, inference_runs!{{System}})",
+        "Description": "Minimum log measure in the observed data."
+      },
+      {
+        "name": "MaxLogMeasure",
+        "datatype": "number",
+        "type": "aggregation",
+        "formula": "=MAXIFS(observed_scales!{{LogMeasure}}, observed_scales!{{System}}, inference_runs!{{System}})",
+        "Description": "Maximum log measure in the observed data."
+      },
+      {
+        "name": "LogMeasureRange",
+        "datatype": "number",
+        "type": "calculated",
+        "formula": "={{MaxLogMeasure}} - {{MinLogMeasure}}",
+        "Description": "Range of log measure values."
+      },
+      {
+        "name": "AbsSlopeDelta",
+        "datatype": "number",
+        "type": "calculated",
+        "formula": "=ABS({{SlopeDelta}})",
+        "Description": "Absolute value of slope delta."
+      },
+      {
+        "name": "SlopeIsSignificant",
+        "datatype": "boolean",
+        "type": "calculated",
+        "formula": "={{AbsSlopeDelta}} > {{SlopeConfidenceInterval}}",
+        "Description": "True if deviation from theory exceeds confidence interval (statistically significant)."
+      },
+      {
+        "name": "OnePlusResidualRMS",
+        "datatype": "number",
+        "type": "calculated",
+        "formula": "=1 + {{ResidualRMS}}",
+        "Description": "One plus residual RMS for efficiency calculation."
+      },
+      {
+        "name": "FitEfficiency",
+        "datatype": "number",
+        "type": "calculated",
+        "formula": "={{R2}} / NULLIF({{OnePlusResidualRMS}}, 0)",
+        "Description": "Quality per unit error (higher is better)."
+      },
+      {
+        "name": "NormalizedRMSE",
+        "datatype": "number",
+        "type": "calculated",
+        "formula": "={{ResidualRMS}} / NULLIF({{LogMeasureRange}}, 0)",
+        "Description": "RMSE as fraction of total log measure range."
+      },
+      {
+        "name": "SlopeToTheoreticalRatio",
+        "datatype": "number",
+        "type": "calculated",
+        "formula": "={{FittedSlope}} / NULLIF({{TheoreticalLogLogSlope}}, 0)",
+        "Description": "Ratio of fitted to theoretical slope (1.0 = perfect match)."
+      },
+      {
+        "name": "OneMinusR2",
+        "datatype": "number",
+        "type": "calculated",
+        "formula": "=1 - {{R2}}",
+        "Description": "One minus R² for adjusted R² calculation."
+      },
+      {
+        "name": "PointCountMinusOne",
+        "datatype": "number",
+        "type": "calculated",
+        "formula": "={{PointCount}} - 1",
+        "Description": "Point count minus one (degrees of freedom)."
+      },
+      {
+        "name": "PointCountMinusTwo",
+        "datatype": "number",
+        "type": "calculated",
+        "formula": "={{PointCount}} - 2",
+        "Description": "Point count minus two (degrees of freedom for regression)."
+      },
+      {
+        "name": "AdjustedR2",
+        "datatype": "number",
+        "type": "calculated",
+        "formula": "=1 - {{OneMinusR2}} * {{PointCountMinusOne}} / NULLIF({{PointCountMinusTwo}}, 0)",
+        "Description": "R² adjusted for degrees of freedom."
+      },
+      {
+        "name": "ResidualRMSSquared",
+        "datatype": "number",
+        "type": "calculated",
+        "formula": "={{ResidualRMS}} * {{ResidualRMS}}",
+        "Description": "Squared residual RMS for BIC calculation."
+      },
+      {
+        "name": "LogResidualRMSSquared",
+        "datatype": "number",
+        "type": "calculated",
+        "formula": "=LOG({{ResidualRMSSquared}})",
+        "Description": "Log of squared residual RMS."
+      },
+      {
+        "name": "LogPointCount",
+        "datatype": "number",
+        "type": "calculated",
+        "formula": "=LOG({{PointCount}})",
+        "Description": "Natural log of point count."
+      },
+      {
+        "name": "BIC",
+        "datatype": "number",
+        "type": "calculated",
+        "formula": "={{PointCount}} * {{LogResidualRMSSquared}} + 2 * {{LogPointCount}}",
+        "Description": "Bayesian Information Criterion (lower is better fit)."
       }
     ],
     "data": [
@@ -2558,33 +3020,149 @@
     ]
   },
   "scale_regimes": {
+    "Description": "Multi-regime analysis defining different scale ranges within systems where different slope behaviors may occur.",
     "primary_key": [
       "RegimeID"
     ],
     "schema": [
       {
         "name": "RegimeID",
-        "datatype": "string"
+        "datatype": "string",
+        "type": "raw",
+        "is_primary_key": true,
+        "Description": "Primary key for this regime."
       },
       {
         "name": "System",
-        "datatype": "string"
+        "datatype": "string",
+        "type": "relationship",
+        "RelatedTo": "systems",
+        "Description": "FK to systems table."
       },
       {
         "name": "MinLogScale",
-        "datatype": "number"
+        "datatype": "number",
+        "type": "raw",
+        "Description": "Minimum log10(scale) boundary for this regime."
       },
       {
         "name": "MaxLogScale",
-        "datatype": "number"
+        "datatype": "number",
+        "type": "raw",
+        "Description": "Maximum log10(scale) boundary for this regime."
       },
       {
         "name": "ExpectedSlope",
-        "datatype": "number"
+        "datatype": "number",
+        "type": "raw",
+        "Description": "Expected log-log slope within this regime."
       },
       {
         "name": "RegimeType",
-        "datatype": "string"
+        "datatype": "string",
+        "type": "raw",
+        "Description": "Type of regime: 'early_scaling', 'mature_scaling', 'crossover', 'cutoff', etc."
+      },
+      {
+        "name": "RegimeSpan",
+        "datatype": "number",
+        "type": "calculated",
+        "formula": "={{MaxLogScale}} - {{MinLogScale}}",
+        "Description": "Width of regime in log-scale units (decades)."
+      },
+      {
+        "name": "RegimeCenter",
+        "datatype": "number",
+        "type": "calculated",
+        "formula": "=({{MinLogScale}} + {{MaxLogScale}}) / 2",
+        "Description": "Midpoint of regime in log-scale."
+      },
+      {
+        "name": "TheoreticalLogLogSlope",
+        "datatype": "number",
+        "type": "lookup",
+        "formula": "=INDEX(systems!{{TheoreticalLogLogSlope}}, MATCH(scale_regimes!{{System}}, systems!{{SystemID}}, 0))",
+        "Description": "Global theoretical slope from parent system."
+      },
+      {
+        "name": "SlopeDeviationFromGlobal",
+        "datatype": "number",
+        "type": "calculated",
+        "formula": "={{ExpectedSlope}} - {{TheoreticalLogLogSlope}}",
+        "Description": "Local expected slope deviation from global theoretical slope."
+      },
+      {
+        "name": "PointsInRegime",
+        "datatype": "integer",
+        "type": "aggregation",
+        "formula": "=COUNTIFS(scales!{{System}}, scale_regimes!{{System}}, scales!{{LogScale}}, \">=\"&scale_regimes!{{MinLogScale}}, scales!{{LogScale}}, \"<=\"&scale_regimes!{{MaxLogScale}})",
+        "Description": "Count of data points from scales table within this regime's range."
+      }
+    ],
+    "data": [
+      {
+        "RegimeID": "Sierpinski_early",
+        "System": "Sierpinski",
+        "MinLogScale": -0.3,
+        "MaxLogScale": -0.1,
+        "ExpectedSlope": -1.585,
+        "RegimeType": "early_scaling"
+      },
+      {
+        "RegimeID": "Sierpinski_mature",
+        "System": "Sierpinski",
+        "MinLogScale": -0.1,
+        "MaxLogScale": -0.85,
+        "ExpectedSlope": -1.585,
+        "RegimeType": "mature_scaling"
+      },
+      {
+        "RegimeID": "ZipfWords_full",
+        "System": "ZipfWords",
+        "MinLogScale": 0,
+        "MaxLogScale": 2.4,
+        "ExpectedSlope": -1.0,
+        "RegimeType": "full_range"
+      },
+      {
+        "RegimeID": "ScaleFreeNet_hub",
+        "System": "ScaleFreeNet",
+        "MinLogScale": 0,
+        "MaxLogScale": 1.5,
+        "ExpectedSlope": -2.5,
+        "RegimeType": "power_law_body"
+      },
+      {
+        "RegimeID": "ScaleFreeNet_tail",
+        "System": "ScaleFreeNet",
+        "MinLogScale": 1.5,
+        "MaxLogScale": 3.0,
+        "ExpectedSlope": -3.2,
+        "RegimeType": "finite_size_cutoff"
+      },
+      {
+        "RegimeID": "Earthquakes_main",
+        "System": "Earthquakes",
+        "MinLogScale": 0,
+        "MaxLogScale": 2.0,
+        "ExpectedSlope": -1.0,
+        "RegimeType": "gutenberg_richter"
+      },
+      {
+        "RegimeID": "ForestFires_small",
+        "System": "ForestFires",
+        "MinLogScale": 0,
+        "MaxLogScale": 1.2,
+        "ExpectedSlope": -1.3,
+        "RegimeType": "small_fires"
+      },
+      {
+        "RegimeID": "ForestFires_large",
+        "System": "ForestFires",
+        "MinLogScale": 1.2,
+        "MaxLogScale": 2.5,
+        "ExpectedSlope": -1.5,
+        "RegimeType": "large_fires"
       }
     ]
   }

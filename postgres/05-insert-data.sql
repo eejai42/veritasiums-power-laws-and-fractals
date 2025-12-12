@@ -430,3 +430,28 @@ VALUES ('Earthquakes_INF_OLS_LOG10', 'Earthquakes', 'measured', 'Earthquakes_MM1
 INSERT INTO inference_runs (inference_run_id, "system", data_regime, measurement_model, fit_method, fitted_slope, fitted_intercept, r2, residual_rms, residual_max_abs, orthogonal_rms)
 VALUES ('ForestFires_INF_OLS_LOG10', 'ForestFires', 'measured', 'ForestFires_MM1', 'OLS_loglog', -1.304367, 0.025399, 0.994038, 0.069674, 0.132325, 0.042392);
 
+-- Insert data for scale_regimes
+INSERT INTO scale_regimes (regime_id, "system", min_log_scale, max_log_scale, expected_slope, regime_type)
+VALUES ('Sierpinski_early', 'Sierpinski', -0.3, -0.1, -1.585, 'early_scaling');
+
+INSERT INTO scale_regimes (regime_id, "system", min_log_scale, max_log_scale, expected_slope, regime_type)
+VALUES ('Sierpinski_mature', 'Sierpinski', -0.1, -0.85, -1.585, 'mature_scaling');
+
+INSERT INTO scale_regimes (regime_id, "system", min_log_scale, max_log_scale, expected_slope, regime_type)
+VALUES ('ZipfWords_full', 'ZipfWords', 0, 2.4, -1.0, 'full_range');
+
+INSERT INTO scale_regimes (regime_id, "system", min_log_scale, max_log_scale, expected_slope, regime_type)
+VALUES ('ScaleFreeNet_hub', 'ScaleFreeNet', 0, 1.5, -2.5, 'power_law_body');
+
+INSERT INTO scale_regimes (regime_id, "system", min_log_scale, max_log_scale, expected_slope, regime_type)
+VALUES ('ScaleFreeNet_tail', 'ScaleFreeNet', 1.5, 3.0, -3.2, 'finite_size_cutoff');
+
+INSERT INTO scale_regimes (regime_id, "system", min_log_scale, max_log_scale, expected_slope, regime_type)
+VALUES ('Earthquakes_main', 'Earthquakes', 0, 2.0, -1.0, 'gutenberg_richter');
+
+INSERT INTO scale_regimes (regime_id, "system", min_log_scale, max_log_scale, expected_slope, regime_type)
+VALUES ('ForestFires_small', 'ForestFires', 0, 1.2, -1.3, 'small_fires');
+
+INSERT INTO scale_regimes (regime_id, "system", min_log_scale, max_log_scale, expected_slope, regime_type)
+VALUES ('ForestFires_large', 'ForestFires', 1.2, 2.5, -1.5, 'large_fires');
+
