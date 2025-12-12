@@ -162,863 +162,317 @@ A concrete, reproducible way to test scaling claims — using the exact issues r
 **Why this might be worth a follow-up video:**
 It shows what happens when “that straight line” is treated not as an endpoint, but as the beginning of a scientific workflow.
 
-============================
+---
 
-# From Veritasium’s Power Laws to a Working Lab: Fixed Points, Neighborhoods, and Log–Log Science
+## 0. Executive Summary
 
-Halfway through Veritasium’s power-law video, there’s a familiar move: take a messy distribution, go to log–log space, and the curve becomes a straight line.
+This repository turns power-law and fractal claims into **executable, testable models**.
 
-But the straight line isn’t the phenomenon. The phenomenon is the *cloud* around it: finite ranges, censoring, measurement noise, discretization, regime changes, and “toy model vs real world” mismatch. The line is the attractor; the data is the neighborhood.
+It implements a single, canonical specification for scaling systems and uses it to generate **independent computational engines** (Python, PostgreSQL, and Go). One command runs all engines, compares their results against a shared answer key, and produces a **single self-contained HTML report** with raw values, log–log scatter plots, theoretical expectations, fitted results, and residuals.
 
-So I built the thing I wished I had while watching: a repo where a power-law “theory” is a **row**, observations are a **neighborhood**, and validation is computed automatically.
+The purpose is not to argue that power laws exist. It is to show **how scaling claims can be represented, tested, and validated** under explicit assumptions about noise, finite ranges, and measurement — the exact issues raised in Veritasium’s *Power Laws* video.
 
-This repo’s core is a CMCC model (and a PostgreSQL implementation of it) that treats scaling laws like executable science: define the fixed point, load the data, query the fit, and compare “what you expected” to “what you got.” 
+If the same scaling claim survives:
+
+* noisy observations,
+* finite cutoffs,
+* multiple scale regimes,
+* and independent implementations,
+
+then it is at least operationally well-posed. If it fails, the failure is visible and localizable.
 
 ---
 
-## Power laws aren’t “a weird distribution.” They’re a different kind of world.
+## 1. From the Video to a Testable Claim
 
-The video opens by contrasting normal distributions (heights, IQ, apple sizes) with power-law worlds—worlds where extreme events aren’t just possible, they’re structurally important.
+Veritasium’s video makes a central move:
+take data spanning many orders of magnitude, transform to log–log space, and a straight line appears.
 
-In a normal distribution, the average is stable: outliers exist, but they don’t dominate the story. In a power-law distribution, outliers can dominate the average, and your intuition breaks: measuring more can increase your estimated “typical” value because the tail is heavy.
+That move is powerful — but incomplete.
 
-That difference isn’t just philosophical—it’s operational. If you’re playing a normal game, consistency wins. If you’re playing a power-law game, a small number of runaway outcomes can dominate everything.
+The straight line is not the phenomenon.
+It is a **fixed point**: a compact theoretical summary of expected behavior.
+The real phenomenon is the **distribution of observations around that line**, including:
 
-And the central visual move is Pareto’s: take income distributions spanning orders of magnitude, log-transform them, and suddenly the story becomes a line with a slope. In the video’s framing, the exponent is the absolute value of that slope.
+* finite-size effects,
+* censoring and cutoffs,
+* discretization,
+* noise,
+* and regime changes.
 
-That’s the moment most people stop: “cool, it’s a line.”
+Most discussions stop at “the data looks linear.”
+This repository starts where that discussion should continue.
 
-But the interesting part is what *doesn’t* become a line: the ways real data deviates from the line, and what that deviation means.
+It asks a stricter question:
 
----
+> Given a stated theoretical slope, how does observed data actually cluster around it, and how stable is that conclusion under realistic measurement conditions?
 
-## The missing piece: the *neighborhood*
-
-The video keeps weaving between:
-
-* **Toy mechanisms** (St. Petersburg paradox, sandpile rules, preferential attachment)
-* **Empirical data** (income, earthquakes, forest fires, network degrees)
-* **Big claims** (scale-free behavior, criticality, universality classes)
-
-That weave is exactly why it’s compelling—and exactly why it’s hard to “do science” with it without constantly rewriting bespoke analysis scripts.
-
-The repo’s premise is simple:
-
-> A scaling theory is not just an equation. It’s a computational object that should be able to host many observations, tolerate noise, and report back how well reality clusters around it.
-
-So the model makes a clean separation:
-
-* **Fixed point (theory)**: the minimal parameters you’re claiming generate the scaling behavior.
-* **Neighborhood (data)**: the actual observed points that orbit that theory in log–log space.
-* **Inference (validation)**: the fitted slope/intercept and quality metrics that tell you whether the neighborhood actually clusters around the fixed point.
-
-In this repo, that separation is not a metaphor. It’s schema.
+To answer that, theory, data, and validation must be separated — not blended into a single plot.
 
 ---
 
-## A schema for the video’s ideas
+## 2. What You See When You Run It (Evidence First)
 
-### Fixed points live in `systems`
-
-Each “system” is a power-law or fractal instance with a theoretical slope (your fixed point in log–log geometry). In the included model, systems include Sierpinski, Koch, Zipf-like word frequencies, scale-free networks, sandpile avalanches, earthquakes, and forest fires, all unified with the same log–log machinery. 
-
-The key field is:
-
-* `systems.TheoreticalLogLogSlope`
-
-This is the “one number” the video keeps returning to: the exponent that defines the straight line in log–log space.
-
-### Neighborhoods live in `observed_scales`
-
-The neighborhood is where reality shows up: noisy observations, finite ranges, discretization effects, etc. In the model, `observed_scales` mirrors the idealized `scales` table but explicitly represents measured data as its own dataset. 
-
-Crucially, the model doesn’t just store `(Scale, Measure)`; it stores the transformations too:
-
-* `observed_scales.LogScale`
-* `observed_scales.LogMeasure`
-
-That makes log–log space the “native geometry” of the entire system.
-
-### Validation lives in `inference_runs`
-
-This is where the repo turns “plot a line” into a reusable scientific primitive. For each system, `inference_runs` stores:
-
-* `TheoreticalLogLogSlope` (the fixed point)
-* `FittedSlope` (inferred from the neighborhood)
-* `R2`, residual RMS, slope delta, and other fit metrics 
-
-For example, the bundled data includes runs like:
-
-* `ZipfWords_INF_OLS_LOG10`: theoretical slope -1, fitted slope about -0.965, high R²
-* `ScaleFreeNet_INF_OLS_LOG10`: theoretical slope -2.5, fitted slope about -2.502, high R² 
-
-So instead of “the line looks straight,” you can say: “here is the fitted slope, here is its deviation from theory, and here is the quality of fit.”
-
----
-
-## Connecting the video’s greatest hits to the repo
-
-### 1) Pareto / Zipf: “curve becomes line”
-
-In the video, Pareto log-transforms income data, sees a line, and reads off a slope.
-
-In this repo, that move becomes a standard workflow:
-
-1. Define the theoretical slope for the system.
-2. Load observed points.
-3. Query the inference results.
-
-Zipf-style behavior is represented directly as a system with a theoretical slope of -1 (`ZipfWords.TheoreticalLogLogSlope = -1`). 
-The neighborhood is stored as noisy observed points (`ZipfWords_OBS_*`). 
-The model then stores the reconstruction (fitted slope, intercept, R²) in `inference_runs`. 
-
-That’s the video’s plot, but operational.
-
-### 2) The St. Petersburg paradox: “two exponentials dancing”
-
-The video shows how exponential payout growth and exponential probability decay combine to yield a power law.
-
-This repo doesn’t hardcode that derivation; instead, it gives you a place to *host it*:
-
-* the “theory” lives as the expected slope of the payout distribution in log–log space
-* the “neighborhood” is your sampled realizations
-* the “validation” is your recovered exponent and residual geometry
-
-The important shift is that you’re not arguing about a line—you’re storing the claim and letting inference repeatedly re-derive it from realizations.
-
-### 3) Self-organized criticality: “same process, all scales”
-
-The video’s SOC arc (forest fires, sandpiles, earthquakes) is really about *regimes* and *cutoffs*—the parts that ruin simplistic “one slope fits all” takes.
-
-This model makes those first-class:
-
-* measurement models include cutoffs (`CutoffMinScale`, `CutoffMaxScale`) and noise (`NoiseSigma`) 
-* there’s explicit scaffolding for multi-regime behavior via `scale_regimes` (e.g., “small fires” vs “large fires”) 
-
-That matters because in the real world, scaling is often only “clean” over some span, and then something changes: finite-size effects, saturation, censoring, or a genuine crossover.
-
-The repo isn’t just saying “power laws exist.” It’s giving you a place to say “power laws exist… *where* and *under what measurement assumptions*.”
-
----
-
-## The best part: it’s executable
-
-The CMCC model is accompanied by SQL that turns it into a working PostgreSQL database:
-
-* raw, normalized tables (`systems`, `scales`, `observed_scales`, `inference_runs`, etc.) 
-* calculation functions that mimic spreadsheet-like calculated fields 
-* views that present “raw + computed” as a clean interface (like `vw_inference_runs`) 
-* data inserts that load the example systems, points, and inference results 
-
-That means the “instrument panel” is literally a query away: select from the views and you see, side by side, the fixed point and the inferred slope, plus fit quality.
-
----
-
-## Why this is worth publishing
-
-The video makes an emotional argument: power laws show up across wildly different domains, and that’s weird and important.
-
-This repo makes a practical argument:
-
-> If you want to take that seriously, you need a way to represent scaling claims that separates theory from measurement, and measurement from validation—without rewriting the world each time.
-
-That’s what this does.
-
-It doesn’t “prove universality.” What it does is make universality *testable in a reusable way*: add a system, load observations, compute slope, inspect residuals, compare regimes.
-
-Power laws aren’t lines.
-
-They’re neighborhoods around fixed points.
-
-And once you build a place to store that distinction, you stop arguing about plots and start running experiments. 
-
-# Repository Implementation Details
-
-This document provides a comprehensive technical overview of the Power Laws & Fractals repository—its architecture, multi-platform implementations, and operational testing methodology.
-
----
-
-## 1. Repository Summary
-
-### Purpose
-
-This repository implements a **cross-platform validation system** for power-law and fractal mathematics. It takes a Single Source of Truth (SSoT) JSON file containing mathematical models of fractal/power-law systems and generates equivalent implementations across three execution environments:
-
-- **Python** (data processing)
-- **PostgreSQL** (database with calculated views)
-- **Golang** (compiled binary)
-
-Each platform must compute identical derived values from the same input data, and all results are validated against a canonical answer key.
-
-### Core Concept: The Entity Rule Book (ERB)
-
-The SSoT (`ssot/ERB_veritasium-power-laws-and-fractals.json`) follows the CMCC (Computed Measured Calculated Columns) pattern—a schema that clearly distinguishes:
-
-| Field Type | Description | Example |
-|------------|-------------|---------|
-| **Raw** | Direct input values | `Measure`, `Iteration`, `SystemID` |
-| **Lookup** | Values retrieved from parent tables | `BaseScale`, `ScaleFactor` |
-| **Calculated** | Derived from formulas | `Scale = BaseScale × ScaleFactorPower` |
-| **Aggregation** | Rolled up from child tables | `PointCount`, `MinLogScale` |
-
-### Mathematical Domain
-
-The repository models 7 systems from Veritasium's power-law video:
-
-| System | Class | Theoretical Slope |
-|--------|-------|-------------------|
-| Sierpinski Triangle | Fractal | -1.585 |
-| Koch Snowflake | Fractal | -0.262 |
-| Zipf Word Frequencies | Power Law | -1.0 |
-| Scale-Free Networks | Power Law | -2.5 |
-| Sandpile Avalanches | Power Law | -1.0 |
-| Earthquake Energies | Power Law | -1.0 |
-| Forest Fire Sizes | Power Law | -1.3 |
-
-Each system has 8 data points (iterations 0-7), where the log-log relationship between Scale and Measure should approximate a straight line with the theoretical slope.
-
----
-
-## 2. Directory Structure
+Running the repository is intentionally simple:
 
 ```
-ERB_veritasium-power-laws-and-fractals/
-├── ssot/                              # Source of Truth
-│   └── ERB_veritasium-power-laws-and-fractals.json
-│
-├── test-data/                         # Generated test artifacts
-│   ├── base-data.json                 # Iterations 0-3 (for platform init)
-│   ├── test-input.json                # Iterations 4-7 (raw facts only)
-│   └── answer-key.json                # All iterations with expected results
-│
-├── test-results/                      # Platform outputs
-│   ├── python-results.json
-│   ├── postgres-results.json
-│   └── golang-results.json
-│
-├── python/                            # Python implementation
-│   ├── run-tests.py
-│   ├── rulebook-to-python.py
-│   └── rulebook/                      # Generated models
-│       ├── models.py
-│       ├── data.py
-│       └── utils.py
-│
-├── postgres/                          # PostgreSQL implementation
-│   ├── run-tests.py
-│   ├── 01-drop-and-create-tables.sql
-│   ├── 02-create-functions.sql
-│   └── 03-create-views.sql
-│
-├── golang/                            # Go implementation
-│   ├── run-tests.go
-│   ├── go.mod
-│   └── pkg/rulebook/
-│       ├── models.go
-│       ├── data.go
-│       └── utils.go
-│
-├── visualizer/                        # Reporting tools
-│   ├── generate_report.py
-│   ├── console_output.py
-│   ├── compare.py
-│   └── report.html
-│
-├── start.sh                           # Interactive launcher
-├── orchestrator.py                    # Test orchestration
-├── generate-test-data.py              # Data generation from SSoT
-└── TESTING-PROTOCOL.md
-```
-
----
-
-## 3. Platform Architectures
-
-### 3.1 Python Implementation
-
-**Location:** `python/`
-
-**Architecture:**
-- Pure Python with dataclasses for type-safe models
-- Lazy calculation pattern (values computed on first access)
-- No external dependencies beyond standard library
-
-**Key Components:**
-
-```
-python/
-├── run-tests.py           # Test runner (entry point)
-├── rulebook-to-python.py  # Code generator from SSoT
-└── rulebook/
-    ├── __init__.py
-    ├── models.py          # System, Scale, SystemStats dataclasses
-    ├── data.py            # Embedded data from SSoT
-    └── utils.py           # Helper functions
-```
-
-**Calculation Flow:**
-
-```python
-# From models.py - Scale calculation chain
-@dataclass
-class Scale:
-    # Raw fields
-    scale_id: str
-    system: str
-    iteration: int
-    measure: float
-    
-    # Cached computed values (lazy)
-    _base_scale: Optional[float] = None
-    _scale_factor: Optional[float] = None
-    _scale_factor_power: Optional[float] = None
-    _scale: Optional[float] = None
-    _log_scale: Optional[float] = None
-    _log_measure: Optional[float] = None
-
-    def calculate_scale_factor_power(self) -> float:
-        """Formula: =POWER(ScaleFactor, Iteration)"""
-        if self._scale_factor_power is None:
-            self._scale_factor_power = math.pow(self._scale_factor, self.iteration)
-        return self._scale_factor_power
-```
-
-**Test Protocol:**
-1. Load `base-data.json` (systems config + iterations 0-3)
-2. Load `test-input.json` (raw facts for iterations 4-7)
-3. Compute all derived values using lookup chain
-4. Export to `test-results/python-results.json`
-5. Validate against `answer-key.json`
-
----
-
-### 3.2 PostgreSQL Implementation
-
-**Location:** `postgres/`
-
-**Architecture:**
-- Normalized tables store only raw data
-- SQL functions compute derived values
-- Views present "raw + computed" as a unified interface
-- Requires PostgreSQL (via Docker or native)
-
-**Key Components:**
-
-```
-postgres/
-├── run-tests.py                # Python wrapper for psql
-├── 01-drop-and-create-tables.sql   # Schema definition
-├── 02-create-functions.sql         # Calculation functions (~4000 lines)
-├── 03-create-views.sql             # vw_scales, vw_systems, etc.
-├── 04-create-policies.sql          # Row-level security (optional)
-└── 05-insert-data.sql              # Seed data from SSoT
-```
-
-**Table Schema (normalized):**
-
-```sql
--- systems: Only raw fields stored
-CREATE TABLE systems (
-  system_id                TEXT PRIMARY KEY,
-  display_name             TEXT,
-  class                    TEXT,
-  base_scale               INTEGER,
-  scale_factor             NUMERIC,
-  measure_name             TEXT,
-  fractal_dimension        NUMERIC,
-  theoretical_log_log_slope NUMERIC
-);
-
--- scales: Raw facts only (computed values via views)
-CREATE TABLE scales (
-  scale_id      TEXT PRIMARY KEY,
-  "system"      TEXT,
-  iteration     INTEGER,
-  measure       NUMERIC,
-  is_projected  BOOLEAN
-);
-```
-
-**Computed Views:**
-
-```sql
--- vw_scales: Raw + all calculated fields
-CREATE VIEW vw_scales AS
-SELECT 
-  s.scale_id,
-  s.system,
-  s.iteration,
-  s.measure,
-  -- Lookups from parent system
-  sys.base_scale,
-  sys.scale_factor,
-  -- Calculations
-  POWER(sys.scale_factor, s.iteration) AS scale_factor_power,
-  sys.base_scale * POWER(sys.scale_factor, s.iteration) AS scale,
-  LOG(sys.base_scale * POWER(sys.scale_factor, s.iteration)) AS log_scale,
-  LOG(s.measure) AS log_measure,
-  s.is_projected
-FROM scales s
-JOIN systems sys ON s.system = sys.system_id;
-```
-
-**Test Protocol:**
-1. Initialize schema (run SQL files in order)
-2. Insert systems from `base-data.json`
-3. Insert base scales (iterations 0-3)
-4. Insert test scales (iterations 4-7, raw facts only)
-5. Query `vw_scales` to retrieve PostgreSQL-computed values
-6. Export to `test-results/postgres-results.json`
-7. Validate against `answer-key.json`
-
----
-
-### 3.3 Golang Implementation
-
-**Location:** `golang/`
-
-**Architecture:**
-- Strongly typed structs with pointer-based lazy caching
-- Module-based organization (`pkg/rulebook`)
-- Single-file test runner with embedded visualization
-
-**Key Components:**
-
-```
-golang/
-├── run-tests.go          # Entry point (main)
-├── go.mod                 # Module definition
-└── pkg/rulebook/
-    ├── models.go          # System, Scale structs
-    ├── data.go            # JSON loaders and savers
-    └── utils.go           # Validation helpers
-```
-
-**Type Definitions:**
-
-```go
-// Scale with lazy-cached computed values
-type Scale struct {
-    ScaleID     string  `json:"ScaleID"`
-    System      string  `json:"System"`
-    Iteration   int     `json:"Iteration"`
-    Measure     float64 `json:"Measure"`
-    IsProjected bool    `json:"IsProjected"`
-
-    // Computed values (nil until calculated)
-    baseScale        *float64
-    scaleFactor      *float64
-    scaleFactorPower *float64
-    scale            *float64
-    logScale         *float64
-    logMeasure       *float64
-}
-
-// CalculateAllFields computes all derived values in dependency order
-func (s *Scale) CalculateAllFields(systems SystemsMap) {
-    s.CalculateBaseScale(systems)    // Lookup
-    s.CalculateScaleFactor(systems)  // Lookup
-    s.CalculateScaleFactorPower()    // math.Pow(ScaleFactor, Iteration)
-    s.CalculateScale()               // BaseScale × ScaleFactorPower
-    s.CalculateLogScale()            // math.Log10(Scale)
-    s.CalculateLogMeasure()          // math.Log10(Measure)
-}
-```
-
-**Test Protocol:**
-1. Load `base-data.json` via `rulebook.LoadBaseData()`
-2. Build systems map: `rulebook.BuildSystemsMap()`
-3. Load `test-input.json` via `rulebook.LoadTestInput()`
-4. Compute derived values: `scale.CalculateAllFields(systemsMap)`
-5. Export to `test-results/golang-results.json`
-6. Validate: `rulebook.ValidateAllScales(computed, answerKey)`
-
----
-
-### 3.4 HTML Visualizer
-
-**Location:** `visualizer/`
-
-**Architecture:**
-- Pure Python report generator (no web server)
-- Outputs static HTML with embedded Chart.js
-- Dark theme with color-coded validation status
-
-**Key Components:**
-
-```
-visualizer/
-├── generate_report.py     # HTML report generator
-├── console_output.py      # Shared ASCII visualization library
-├── compare.py             # Cross-platform comparison tool
-├── report.html            # Generated output
-└── index.html             # Static dashboard
-```
-
-**Report Features:**
-- Platform status cards (Python, PostgreSQL, Go)
-- Per-system tables with all 8 iterations
-- Color coding:
-  - 🟢 Green = Actual data (iterations 0-3)
-  - 🟣 Purple = Projected/computed (iterations 4-7)
-  - 🔴 Red = Validation failures
-- Interactive log-log scatter plots with Chart.js
-- Theoretical slope lines overlaid
-
----
-
-## 4. Operational Methodology
-
-### 4.1 The `start.sh` Interactive Launcher
-
-The entry point is a bash script providing a menu-driven interface:
-
-```
-╔════════════════════════════════════════════════════════════╗
-║     🔺 POWER LAWS & FRACTALS - Veritasium Edition         ║
-╚════════════════════════════════════════════════════════════╝
-
-  Run Tests:
-  1)  🧪  Run ALL Platform Tests   (+ opens report)
-  2)  🐍  Python Only
-  3)  🐹  Go Only
-  4)  🐘  PostgreSQL Only          (requires Docker)
-
-  View:
-  5)  📊  View Results Report      (opens in browser)
-
-  Utilities:
-  g)  🔄  Regenerate Test Data     (CANONICAL Python, 6dp)
-  s)  📄  View SSoT JSON
-  r)  📖  View README
-  j)  📓  Jupyter Notebook
-
-  q)  ❌  Quit
-```
-
-**Menu Actions:**
-
-| Option | Action |
-|--------|--------|
-| `1` | Runs `orchestrator.py --all`, then opens HTML report |
-| `2` | Runs `python/run-tests.py` directly |
-| `3` | Runs `cd golang && go run .` |
-| `4` | Runs `postgres/run-tests.py` (requires psql + Docker) |
-| `5` | Generates and opens `visualizer/report.html` |
-| `g` | Runs `generate-test-data.py` to rebuild test artifacts |
-
----
-
-### 4.2 Test Data Generation
-
-**Script:** `generate-test-data.py`
-
-This script reads the SSoT and produces three JSON files:
-
-```
-SSoT (ERB_veritasium-power-laws-and-fractals.json)
-                    │
-                    ▼
-    ┌───────────────┼───────────────┐
-    │               │               │
-    ▼               ▼               ▼
-base-data.json  test-input.json  answer-key.json
-(iters 0-3)     (iters 4-7)      (all iters)
-(all values)    (raw facts only) (all values)
-```
-
-**Key Design Decisions:**
-- All numeric values rounded to **6 decimal places** for cross-platform consistency
-- Base data contains full computed values (platforms don't recompute these)
-- Test input contains ONLY raw facts—platforms must compute derived values
-- Answer key is the **canonical reference** that all platforms must match
-
-**Data Split:**
-- Iterations 0-3: "Actual" data (IsProjected = false)
-- Iterations 4-7: "Projected" data (IsProjected = true, tested)
-
-**Measure Generation:**
-Uses the power-law relationship to generate synthetic measures:
-```python
-# log(Measure) = slope × log(Scale) + constant
-log_measure = slope * log_scale + constant
-measure = 10 ** log_measure
-```
-
----
-
-### 4.3 Test Orchestration
-
-**Script:** `orchestrator.py`
-
-The orchestrator is the central test coordinator:
-
-```bash
-# Run all platforms
-./orchestrator.py --all
-
-# Run specific platform
-./orchestrator.py --platform python
-
-# Regenerate test data first
-./orchestrator.py --all --regenerate
-
-# Generate HTML report after tests
-./orchestrator.py --all --report
-```
-
-**Orchestration Flow:**
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│                    orchestrator.py                          │
-│                                                             │
-│  1. [Optional] Regenerate test data                         │
-│     └── subprocess: python generate-test-data.py            │
-│                                                             │
-│  2. Run each platform's test runner                         │
-│     ├── python:   subprocess: python python/run-tests.py    │
-│     ├── postgres: subprocess: python postgres/run-tests.py  │
-│     └── golang:   subprocess: go run . (from golang/)       │
-│                                                             │
-│  3. Validate each platform's results                        │
-│     └── Compare test-results/{platform}-results.json        │
-│         against test-data/answer-key.json                   │
-│                                                             │
-│  4. Print summary                                           │
-│     ├── ✓ python: 28 scales validated                      │
-│     ├── ✓ postgres: 28 scales validated                    │
-│     └── ✓ golang: 28 scales validated                      │
-│                                                             │
-│  5. [Optional] Generate HTML report                         │
-│     └── subprocess: python visualizer/generate_report.py    │
-└─────────────────────────────────────────────────────────────┘
-```
-
-**Validation Logic:**
-
-```python
-# Tolerance for floating-point comparison
-TOLERANCE = 0.0000015  # Allows for 6dp rounding boundary
-
-# Fields validated for each scale
-COMPUTED_FIELDS = [
-    'BaseScale',       # Lookup from system
-    'ScaleFactor',     # Lookup from system
-    'ScaleFactorPower',# POWER(ScaleFactor, Iteration)
-    'Scale',           # BaseScale × ScaleFactorPower
-    'LogScale',        # LOG10(Scale)
-    'LogMeasure'       # LOG10(Measure)
-]
-```
-
----
-
-### 4.4 Console Visualization
-
-**Library:** `visualizer/console_output.py`
-
-All three platform runners use this shared library for consistent output:
-
-```
-================================================================================
-  🐍 POWER LAWS & FRACTALS - Python Test Runner
-================================================================================
-
-All Computed Values (from Python):
-  ● Green = Actual Data (iterations 0-3)
-  ◌ Magenta = Projected/Computed (iterations 4-7)
-────────────────────────────────────────────────────────────────────────────────
-
-🔺 Sierpinski Triangle
-  Theoretical slope: -1.585
-
-  Iter       Measure           Scale     LogScale    LogMeasure        Type
-  ──────────────────────────────────────────────────────────────────────────
-     0      1.000000      1.00000000     0.00000       0.00000  ● actual
-     1      3.000000      0.50000000    -0.30103       0.47712  ● actual
-     2      9.000000      0.25000000    -0.60206       0.95424  ● actual
-     3     27.000000      0.12500000    -0.90309       1.43136  ● actual
-     4     82.500000      0.06250000    -1.20412       1.91645  ◌ projected
-     5    246.200000      0.03125000    -1.50515       2.39129  ◌ projected
-     6    711.000000      0.01562500    -1.80618       2.85187  ◌ projected
-     7   2225.000000      0.00781250    -2.10721       3.34733  ◌ projected
-
-  Log-Log Plot:
-  log(Measure)
-     3.35 ┤
-        │                                        ◌
-        │                                   ◌
-        │                              ◌
-        │                         ◌
-        │                    ●
-        │               ●
-        │          ●
-        │     ●
-     0.00 ┤●··········································
-         └──────────────────────────────────────────────
-         -2.11                                      0.00
-                          log(Scale)
-  ● Actual   ◌ Projected   · Theoretical (slope=-1.585)
-```
-
----
-
-### 4.5 HTML Report Generation
-
-**Script:** `visualizer/generate_report.py`
-
-Produces a comprehensive dark-themed HTML report:
-
-**Features:**
-- Status banner (ALL PASSED or FAILURES DETECTED)
-- Platform status cards (🐍 Python, 🐘 PostgreSQL, 🐹 Go)
-- Per-system sections with:
-  - Data tables showing all 8 iterations
-  - Expected vs. actual values for each platform
-  - Failed values highlighted in red
-  - Interactive Chart.js log-log scatter plots
-  - Failed points rendered as red X markers
-
-**Sample output structure:**
-
-```html
-<div class="status-banner passed">
-    ✓ ALL PLATFORMS PASSED
-</div>
-
-<div class="platform-grid">
-    <div class="platform-card passed">
-        <div class="platform-name">🐍 Python</div>
-        <div class="platform-status passed">✓ PASSED</div>
-        <div class="platform-counts">28 passed, 0 failed</div>
-    </div>
-    <!-- ... -->
-</div>
-```
-
----
-
-## 5. The Calculation Chain
-
-All three platforms must implement the same calculation chain:
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│                    RAW FACTS (Input)                        │
-│   ScaleID, System, Iteration, Measure, IsProjected          │
-└─────────────────────────────────────────────────────────────┘
-                              │
-                              ▼
-┌─────────────────────────────────────────────────────────────┐
-│                    LOOKUP (From System)                     │
-│   BaseScale ← systems[System].BaseScale                     │
-│   ScaleFactor ← systems[System].ScaleFactor                 │
-└─────────────────────────────────────────────────────────────┘
-                              │
-                              ▼
-┌─────────────────────────────────────────────────────────────┐
-│                    CALCULATED                               │
-│   ScaleFactorPower = ScaleFactor ^ Iteration                │
-│   Scale = BaseScale × ScaleFactorPower                      │
-│   LogScale = log₁₀(Scale)                                   │
-│   LogMeasure = log₁₀(Measure)                               │
-└─────────────────────────────────────────────────────────────┘
-                              │
-                              ▼
-┌─────────────────────────────────────────────────────────────┐
-│                    OUTPUT (JSON)                            │
-│   All values rounded to 6 decimal places                    │
-└─────────────────────────────────────────────────────────────┘
-```
-
----
-
-## 6. Running the Tests
-
-### Prerequisites
-
-| Platform | Requirements |
-|----------|-------------|
-| Python | Python 3.8+ |
-| PostgreSQL | `psql` CLI + Docker (or native PostgreSQL) |
-| Go | Go 1.21+ |
-
-### Quick Start
-
-```bash
-# Make executable
-chmod +x start.sh
-
-# Run interactive launcher
 ./start.sh
-
-# Or run all tests directly
-./orchestrator.py --all
-
-# Or run individual platforms
-python python/run-tests.py
-cd golang && go run .
-python postgres/run-tests.py  # Requires PostgreSQL
+→ Run ALL Platform Tests
 ```
 
-### PostgreSQL Setup (Docker)
+This produces **one HTML file**.
 
-```bash
-# Start PostgreSQL in Docker
-docker run -d -p 5432:5432 \
-  -e POSTGRES_HOST_AUTH_METHOD=trust \
-  --name power-laws-postgres \
-  postgres
+That file is the primary artifact.
 
-# Run tests
-python postgres/run-tests.py
-```
+It contains, for each modeled system:
 
----
+* raw and derived numerical values,
+* log–log scatter plots of scale vs measure,
+* the theoretical slope overlaid,
+* fitted slopes from observed data,
+* residuals and fit-quality metrics,
+* and explicit pass/fail validation across platforms.
 
-## 7. Key Files Reference
+Nothing in the report is decorative.
+Every value shown is either:
 
-| File | Purpose |
-|------|---------|
-| `ssot/ERB_*.json` | Source of Truth - defines all data models and schemas |
-| `generate-test-data.py` | Creates test artifacts from SSoT |
-| `orchestrator.py` | Master test coordinator |
-| `start.sh` | Interactive menu launcher |
-| `python/run-tests.py` | Python platform test runner |
-| `postgres/run-tests.py` | PostgreSQL platform test runner |
-| `golang/run-tests.go` | Go platform test runner |
-| `visualizer/generate_report.py` | HTML report generator |
-| `visualizer/console_output.py` | Shared ASCII visualization |
-| `test-data/answer-key.json` | Canonical expected results |
+* a raw input,
+* a mechanically derived quantity,
+* or the output of a declared inference step.
+
+If something is wrong, it shows up as:
+
+* a numerical mismatch,
+* a degraded fit,
+* or a visible deviation in log–log space.
+
+The rest of the repository exists to make this report **trustworthy and reproducible**.
 
 ---
 
-## 8. Validation Criteria
+## 3. Systems Modeled (Why These Examples)
 
-A platform **PASSES** when all projected scales (iterations 4-7) match the answer key within tolerance:
+The repository models a small set of canonical systems:
 
-- **Tolerance:** 0.0000015 (accounts for 6 decimal place rounding)
-- **Fields validated:** BaseScale, ScaleFactor, ScaleFactorPower, Scale, LogScale, LogMeasure
-- **Total validated scales:** 28 (7 systems × 4 projected iterations)
+* **Geometric fractals**
+  Sierpinski triangle, Koch snowflake
 
-A platform **FAILS** if:
-- Any computed value differs beyond tolerance
-- Results file is not generated
-- Scale records are missing
-- Execution times out (120s limit)
+* **Statistical power laws**
+  Zipf word frequencies
+  Earthquake energies
+  Forest fire sizes
+  Sandpile avalanches
+  Scale-free network degrees
+
+These were chosen for three reasons:
+
+1. They are explicitly discussed or strongly implied in the video.
+2. They span both **idealized constructions** and **noisy empirical domains**.
+3. They arise from very different mechanisms but are commonly described using the same log–log language.
+
+All systems are evaluated using **the same machinery**:
+
+* a declared theoretical log–log slope,
+* observed data points (idealized or noisy),
+* and a standardized validation pipeline.
+
+This is intentional.
+
+The repository is not comparing domains.
+It is testing whether the *way we talk about scaling* can be made precise, portable, and falsifiable across domains.
+
+
+## 4. How the Repo Operationalizes the Video’s Ideas
+
+The core ideas in the video are not treated as metaphors here — they are encoded as structure.
+
+**Fixed points (theory)**
+Each system declares a single theoretical quantity: its expected slope in log–log space. This is the claim being tested, not inferred. It lives as data, not prose.
+
+**Neighborhoods (observations)**
+Observed values are stored separately from theory. They may be idealized or noisy, finite or truncated, discretized or continuous. The model does not assume cleanliness — it records assumptions explicitly.
+
+**Validation (geometry, not vibes)**
+Fitting, residuals, slope deviation, and fit quality are computed and stored as first-class outputs. Agreement is numeric and inspectable, not visual or rhetorical.
+
+This directly mirrors the conceptual arc of the video:
+
+* scaling laws as attractors,
+* real data as imperfect realizations,
+* and insight living in the *deviation structure*, not just the line.
 
 ---
 
-## Summary
+## 5. Single Source of Truth (Why This Is Reproducible)
 
-This repository demonstrates a practical implementation of the "Single Source of Truth" pattern for mathematical models:
+All logic in the repository originates from a single specification: an **Entity Rule Book (ERB)** JSON file.
 
-1. **One SSoT** → Multiple equivalent implementations
-2. **Automated code generation** for each platform
-3. **Unified test protocol** ensuring consistency
-4. **Rich visualization** for validation and debugging
-5. **Interactive launcher** for easy operation
+That file defines:
 
-The architecture ensures that the mathematical truth (power-law relationships, fractal dimensions) is defined once and computed identically across Python, PostgreSQL, and Go.
+* entities (systems, scales, observations, inference runs),
+* field types (raw, lookup, calculated, aggregated),
+* and the exact formulas linking them.
 
+Nothing is “re-implemented by hand” in downstream code.
+
+From this single source:
+
+* Python classes are generated,
+* PostgreSQL tables, functions, and views are created,
+* Go structs and calculation chains are built.
+
+The consequence is simple but important:
+
+> If two implementations disagree, the disagreement is a bug — not an interpretation.
+
+This removes an entire class of ambiguity that usually plagues cross-domain scaling discussions.
+
+---
+
+## 6. Cross-Platform Computational Engines
+
+The same model is executed independently in three environments.
+
+### Python
+
+* Pure standard-library Python
+* Lazy evaluation of derived values
+* Serves as the canonical generator and validator
+
+Python is used to generate test data, produce the answer key, and orchestrate validation.
+
+### PostgreSQL
+
+* Normalized tables store only raw facts
+* All derived values are computed via SQL functions and exposed through views
+* Demonstrates that the model works inside a database, not just scripts
+
+This matters for real datasets that already live in relational systems.
+
+### Go
+
+* Strongly typed structs
+* Explicit calculation order
+* Compiled execution
+
+Go provides an additional check: the math must survive strict typing and compilation.
+
+The engines are not optimized for performance.
+They are optimized for **agreement**.
+
+---
+
+## 7. The Test Regime (Why the Results Are Credible)
+
+The repository includes an explicit, automated test protocol.
+
+**Generated artifacts**
+
+* **Base data**: known-good values used to initialize systems
+* **Test input**: raw facts only (no derived fields)
+* **Answer key**: canonical derived results for all fields
+
+**What is tested**
+Each engine must:
+
+1. Load identical raw inputs
+2. Compute all derived quantities using the declared formulas
+3. Match the answer key within a fixed numeric tolerance
+
+Fields validated include:
+
+* scale construction,
+* log transforms,
+* fitted slopes,
+* and other derived quantities.
+
+**Why this matters**
+This turns scaling claims into something closer to **numerical verification** than exploratory analysis.
+
+The question is no longer:
+
+> “Does this look like a power law?”
+
+It becomes:
+
+> “Does this implementation reproduce the same derived structure, under the same assumptions, as every other implementation?”
+
+Only after that question is answered does interpretation make sense.
+
+## 8. Measurement Models and Scale Regimes (Where Reality Enters)
+
+Real-world data does not fail to follow power laws randomly — it fails *systematically*.
+
+This repository treats those failure modes as **explicit model components**, not caveats.
+
+**Measurement models** encode how data is produced or observed:
+
+* noise type and magnitude (e.g. lognormal noise),
+* finite-size cutoffs (minimum and maximum observable scales),
+* discretization and rounding effects.
+
+These parameters are stored alongside the data they affect, so deviations can be interpreted in context rather than dismissed as “messy data.”
+
+**Scale regimes** allow a single system to declare multiple expected behaviors over different scale ranges:
+
+* early vs mature scaling,
+* power-law body vs finite-size cutoff,
+* small-event vs large-event regimes.
+
+This directly reflects what the video emphasizes but cannot formalize on screen:
+that scaling behavior is often *local in scale*, not global.
+
+The result is a system that does not just ask *whether* a power law fits, but *where*, *under what conditions*, and *how robustly*.
+
+---
+
+## 9. Extending the System (What This Is For)
+
+The repository is structured so new data does not require new analysis code.
+
+To evaluate a new scaling claim:
+
+1. Define the system and its theoretical slope.
+2. Load observed measurements (from any source).
+3. Declare measurement assumptions if needed.
+4. Run the inference and validation pipeline.
+
+The same machinery applies whether the data comes from:
+
+* published datasets,
+* simulations,
+* scraped empirical measurements,
+* or future experiments.
+
+Because theory, observation, and validation are already separated, new domains plug into an existing workflow rather than creating a bespoke one.
+
+This is deliberate: the repo is meant to support *comparison across claims*, not just demonstration of individual ones.
+
+---
+
+## 10. Conclusion
+
+This repository does not claim that power laws are universal.
+
+It claims something narrower and more useful:
+
+> Scaling laws can be represented as executable objects, tested under explicit assumptions, and validated across independent implementations.
+
+The Veritasium video raises the right questions:
+
+* Why do these patterns appear so often?
+* How much trust should we place in straight lines on log–log plots?
+* Where do these models break?
+
+This project answers by building infrastructure, not arguments.
+
+It shows what happens when:
+
+* the straight line is treated as a hypothesis,
+* deviations are treated as data,
+* and reproducibility is treated as a requirement.
+
+If power laws are as fundamental as they seem, they should survive this treatment.
+If they are not, the failures will be visible — and informative.
+
+That is the point of the repo.
