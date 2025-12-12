@@ -1,7 +1,7 @@
 {
   "$schema": "https://example.com/cmcc-schema/v1",
   "model_name": "ERB_veritasium-power-laws-and-fractals",
-  "Description": "Unifies several classic fractal / power-law phenomena into a single CMCC pattern with clean separation between fractal dimension and log\u2013log slope.",
+  "Description": "Unifies several classic fractal / power-law phenomena into a single CMCC pattern with clean separation between fractal dimension and log–log slope.",
   "systems": {
     "Description": "Each row is a fractal or power-law system described in a common schema.",
     "primary_key": [
@@ -188,7 +188,7 @@
     ]
   },
   "scales": {
-    "Description": "Generic log\u2013log points for each system at multiple iterations / scales.",
+    "Description": "Generic log–log points for each system at multiple iterations / scales.",
     "primary_key": [
       "ScaleID"
     ],
@@ -785,7 +785,7 @@
         "ScaleID": "ScaleFreeNet_6",
         "System": "ScaleFreeNet",
         "Iteration": 6,
-        "Measure": 3.18e-05,
+        "Measure": 0.0000318,
         "BaseScale": 1,
         "ScaleFactor": 2,
         "ScaleFactorPower": 64,
@@ -800,7 +800,7 @@
         "ScaleID": "ScaleFreeNet_7",
         "System": "ScaleFreeNet",
         "Iteration": 7,
-        "Measure": 5.21e-06,
+        "Measure": 0.00000521,
         "BaseScale": 1,
         "ScaleFactor": 2,
         "ScaleFactorPower": 128,
@@ -1489,10 +1489,10 @@
       }
     ]
   },
-  "_CMCC_Summary": "Fractal dimension (where defined) lives in systems.FractalDimension. All scaling laws share the same log\u2013log slope machinery via systems.TheoreticalLogLogSlope and system_stats.EmpiricalLogLogSlope.",
+  "_CMCC_Summary": "Fractal dimension (where defined) lives in systems.FractalDimension. All scaling laws share the same log–log slope machinery via systems.TheoreticalLogLogSlope and system_stats.EmpiricalLogLogSlope.",
   "_meta": {
     "name": "ERB_veritasium-power-laws-and-fractals",
-    "description": "Unifies several classic fractal / power-law phenomena into a single CMCC pattern with clean separation between fractal dimension and log\u2013log slope.",
+    "description": "Unifies several classic fractal / power-law phenomena into a single CMCC pattern with clean separation between fractal dimension and log–log slope.",
     "version": "1.0.0"
   },
   "measurement_models": {
@@ -1637,7 +1637,8 @@
         "CutoffMinScale": 1.0,
         "CutoffMaxScale": 0.0078125,
         "DiscretizationType": "rounding",
-        "DiscretizationParam": "decimals=4"
+        "DiscretizationParam": "decimals=4",
+        "ScaleRegime": null
       },
       {
         "MeasurementModelID": "Koch_MM1",
@@ -1648,7 +1649,8 @@
         "CutoffMinScale": 1.0,
         "CutoffMaxScale": 0.0004572473705075444,
         "DiscretizationType": "rounding",
-        "DiscretizationParam": "decimals=4"
+        "DiscretizationParam": "decimals=4",
+        "ScaleRegime": null
       },
       {
         "MeasurementModelID": "ZipfWords_MM1",
@@ -1671,7 +1673,8 @@
         "CutoffMinScale": 1,
         "CutoffMaxScale": 128,
         "DiscretizationType": "rounding",
-        "DiscretizationParam": "decimals=4"
+        "DiscretizationParam": "decimals=4",
+        "ScaleRegime": null
       },
       {
         "MeasurementModelID": "Sandpile_MM1",
@@ -1682,7 +1685,8 @@
         "CutoffMinScale": 1,
         "CutoffMaxScale": 128,
         "DiscretizationType": "rounding",
-        "DiscretizationParam": "decimals=4"
+        "DiscretizationParam": "decimals=4",
+        "ScaleRegime": null
       },
       {
         "MeasurementModelID": "Earthquakes_MM1",
@@ -1693,7 +1697,8 @@
         "CutoffMinScale": 1,
         "CutoffMaxScale": 128,
         "DiscretizationType": "rounding",
-        "DiscretizationParam": "decimals=4"
+        "DiscretizationParam": "decimals=4",
+        "ScaleRegime": null
       },
       {
         "MeasurementModelID": "ForestFires_MM1",
@@ -1704,7 +1709,8 @@
         "CutoffMinScale": 1,
         "CutoffMaxScale": 128,
         "DiscretizationType": "rounding",
-        "DiscretizationParam": "decimals=4"
+        "DiscretizationParam": "decimals=4",
+        "ScaleRegime": null
       }
     ]
   },
@@ -1878,7 +1884,7 @@
         "ScaleFactorPower": 1,
         "Scale": 1,
         "LogScale": 0,
-        "LogMeasure": 4e-05,
+        "LogMeasure": 0.00004,
         "DataRegime": "measured"
       },
       {
@@ -2292,7 +2298,7 @@
         "System": "ScaleFreeNet",
         "MeasurementModel": "ScaleFreeNet_MM1",
         "Iteration": 6,
-        "Measure": 2.4144143656495023e-05,
+        "Measure": 0.000024144143656495023,
         "BaseScale": 1,
         "ScaleFactor": 2,
         "ScaleFactorPower": 64,
@@ -2306,7 +2312,7 @@
         "System": "ScaleFreeNet",
         "MeasurementModel": "ScaleFreeNet_MM1",
         "Iteration": 7,
-        "Measure": 4.780687028940912e-06,
+        "Measure": 0.000004780687028940912,
         "BaseScale": 1,
         "ScaleFactor": 2,
         "ScaleFactorPower": 128,
@@ -2695,15 +2701,13 @@
       {
         "name": "PointCount",
         "datatype": "integer",
-        "type": "aggregation",
-        "formula": "=COUNTIF(observed_scales!{{System}}, {{System}})",
+        "type": "raw",
         "Description": "Count of observed points used in fit (measured)."
       },
       {
         "name": "TheoreticalLogLogSlope",
         "datatype": "number",
-        "type": "lookup",
-        "formula": "=INDEX(systems!{{TheoreticalLogLogSlope}}, MATCH(inference_runs!{{System}}, systems!{{SystemID}}, 0))",
+        "type": "raw",
         "Description": "Fixed-point slope for the system."
       },
       {
@@ -2721,8 +2725,7 @@
       {
         "name": "SlopeDelta",
         "datatype": "number",
-        "type": "calculated",
-        "formula": "={{FittedSlope}} - {{TheoreticalLogLogSlope}}",
+        "type": "raw",
         "Description": "Difference between fitted slope and fixed-point slope."
       },
       {
@@ -2752,8 +2755,7 @@
       {
         "name": "DeviationScore",
         "datatype": "number",
-        "type": "calculated",
-        "formula": "=SQRT(POWER({{ResidualRMS}}, 2) + POWER({{SlopeDelta}}, 2))",
+        "type": "raw",
         "Description": "Composite deviation score combining residual RMS and slope delta (units: log10 + slope)."
       },
       {

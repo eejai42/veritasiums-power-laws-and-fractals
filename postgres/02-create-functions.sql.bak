@@ -29,7 +29,7 @@ $$ LANGUAGE plpgsql;
 CREATE OR REPLACE FUNCTION calc_systems_empirical_slope_deviation(p_system_id TEXT)
 RETURNS NUMERIC AS $$
 BEGIN
-  RETURN (SELECT slope_delta::numeric FROM inference_runs WHERE inference_run_id = (SELECT system_id FROM systems WHERE system_id = p_system_id));
+  RETURN calc_inference_runs_slope_delta((SELECT system_id FROM systems WHERE system_id = p_system_id));
 END;
 $$ LANGUAGE plpgsql;
 
@@ -53,7 +53,7 @@ $$ LANGUAGE plpgsql;
 CREATE OR REPLACE FUNCTION calc_systems_relative_slope_error(p_system_id TEXT)
 RETURNS NUMERIC AS $$
 BEGIN
-  RETURN (SELECT slope_delta::numeric FROM inference_runs WHERE inference_run_id = (SELECT system_id FROM systems WHERE system_id = p_system_id));
+  RETURN calc_inference_runs_slope_delta((SELECT system_id FROM systems WHERE system_id = p_system_id));
 END;
 $$ LANGUAGE plpgsql;
 
@@ -101,26 +101,6 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- get_inference_runs_point_count
--- Helper function: Get PointCount from inference_runs by InferenceRunID
--- Used for join-free cross-table references in aggregations
-CREATE OR REPLACE FUNCTION get_inference_runs_point_count(p_inference_run_id TEXT)
-RETURNS INTEGER AS $$
-BEGIN
-  RETURN (SELECT point_count FROM inference_runs WHERE inference_run_id = p_inference_run_id);
-END;
-$$ LANGUAGE plpgsql;
-
--- get_inference_runs_theoretical_log_log_slope
--- Helper function: Get TheoreticalLogLogSlope from inference_runs by InferenceRunID
--- Used for join-free cross-table references in aggregations
-CREATE OR REPLACE FUNCTION get_inference_runs_theoretical_log_log_slope(p_inference_run_id TEXT)
-RETURNS NUMERIC AS $$
-BEGIN
-  RETURN (SELECT theoretical_log_log_slope FROM inference_runs WHERE inference_run_id = p_inference_run_id);
-END;
-$$ LANGUAGE plpgsql;
-
 -- get_inference_runs_fitted_slope
 -- Helper function: Get FittedSlope from inference_runs by InferenceRunID
 -- Used for join-free cross-table references in aggregations
@@ -138,16 +118,6 @@ CREATE OR REPLACE FUNCTION get_inference_runs_fitted_intercept(p_inference_run_i
 RETURNS NUMERIC AS $$
 BEGIN
   RETURN (SELECT fitted_intercept FROM inference_runs WHERE inference_run_id = p_inference_run_id);
-END;
-$$ LANGUAGE plpgsql;
-
--- get_inference_runs_slope_delta
--- Helper function: Get SlopeDelta from inference_runs by InferenceRunID
--- Used for join-free cross-table references in aggregations
-CREATE OR REPLACE FUNCTION get_inference_runs_slope_delta(p_inference_run_id TEXT)
-RETURNS NUMERIC AS $$
-BEGIN
-  RETURN (SELECT slope_delta FROM inference_runs WHERE inference_run_id = p_inference_run_id);
 END;
 $$ LANGUAGE plpgsql;
 
@@ -188,16 +158,6 @@ CREATE OR REPLACE FUNCTION get_inference_runs_orthogonal_rms(p_inference_run_id 
 RETURNS NUMERIC AS $$
 BEGIN
   RETURN (SELECT orthogonal_rms FROM inference_runs WHERE inference_run_id = p_inference_run_id);
-END;
-$$ LANGUAGE plpgsql;
-
--- get_inference_runs_deviation_score
--- Helper function: Get DeviationScore from inference_runs by InferenceRunID
--- Used for join-free cross-table references in aggregations
-CREATE OR REPLACE FUNCTION get_inference_runs_deviation_score(p_inference_run_id TEXT)
-RETURNS NUMERIC AS $$
-BEGIN
-  RETURN (SELECT deviation_score FROM inference_runs WHERE inference_run_id = p_inference_run_id);
 END;
 $$ LANGUAGE plpgsql;
 
@@ -1055,7 +1015,7 @@ $$ LANGUAGE plpgsql;
 CREATE OR REPLACE FUNCTION calc_system_stats_deviation_score(p_system_stats_id TEXT)
 RETURNS NUMERIC AS $$
 BEGIN
-  RETURN (SELECT deviation_score::numeric FROM inference_runs WHERE inference_run_id = (SELECT "system" FROM system_stats WHERE system_stats_id = p_system_stats_id));
+  RETURN calc_inference_runs_deviation_score((SELECT "system" FROM system_stats WHERE system_stats_id = p_system_stats_id));
 END;
 $$ LANGUAGE plpgsql;
 
@@ -1289,26 +1249,6 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- get_inference_runs_point_count
--- Helper function: Get PointCount from inference_runs by InferenceRunID
--- Used for join-free cross-table references in aggregations
-CREATE OR REPLACE FUNCTION get_inference_runs_point_count(p_inference_run_id TEXT)
-RETURNS INTEGER AS $$
-BEGIN
-  RETURN (SELECT point_count FROM inference_runs WHERE inference_run_id = p_inference_run_id);
-END;
-$$ LANGUAGE plpgsql;
-
--- get_inference_runs_theoretical_log_log_slope
--- Helper function: Get TheoreticalLogLogSlope from inference_runs by InferenceRunID
--- Used for join-free cross-table references in aggregations
-CREATE OR REPLACE FUNCTION get_inference_runs_theoretical_log_log_slope(p_inference_run_id TEXT)
-RETURNS NUMERIC AS $$
-BEGIN
-  RETURN (SELECT theoretical_log_log_slope FROM inference_runs WHERE inference_run_id = p_inference_run_id);
-END;
-$$ LANGUAGE plpgsql;
-
 -- get_inference_runs_fitted_slope
 -- Helper function: Get FittedSlope from inference_runs by InferenceRunID
 -- Used for join-free cross-table references in aggregations
@@ -1326,16 +1266,6 @@ CREATE OR REPLACE FUNCTION get_inference_runs_fitted_intercept(p_inference_run_i
 RETURNS NUMERIC AS $$
 BEGIN
   RETURN (SELECT fitted_intercept FROM inference_runs WHERE inference_run_id = p_inference_run_id);
-END;
-$$ LANGUAGE plpgsql;
-
--- get_inference_runs_slope_delta
--- Helper function: Get SlopeDelta from inference_runs by InferenceRunID
--- Used for join-free cross-table references in aggregations
-CREATE OR REPLACE FUNCTION get_inference_runs_slope_delta(p_inference_run_id TEXT)
-RETURNS NUMERIC AS $$
-BEGIN
-  RETURN (SELECT slope_delta FROM inference_runs WHERE inference_run_id = p_inference_run_id);
 END;
 $$ LANGUAGE plpgsql;
 
@@ -1376,16 +1306,6 @@ CREATE OR REPLACE FUNCTION get_inference_runs_orthogonal_rms(p_inference_run_id 
 RETURNS NUMERIC AS $$
 BEGIN
   RETURN (SELECT orthogonal_rms FROM inference_runs WHERE inference_run_id = p_inference_run_id);
-END;
-$$ LANGUAGE plpgsql;
-
--- get_inference_runs_deviation_score
--- Helper function: Get DeviationScore from inference_runs by InferenceRunID
--- Used for join-free cross-table references in aggregations
-CREATE OR REPLACE FUNCTION get_inference_runs_deviation_score(p_inference_run_id TEXT)
-RETURNS NUMERIC AS $$
-BEGIN
-  RETURN (SELECT deviation_score FROM inference_runs WHERE inference_run_id = p_inference_run_id);
 END;
 $$ LANGUAGE plpgsql;
 
@@ -1409,26 +1329,6 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- get_inference_runs_point_count
--- Helper function: Get PointCount from inference_runs by InferenceRunID
--- Used for join-free cross-table references in aggregations
-CREATE OR REPLACE FUNCTION get_inference_runs_point_count(p_inference_run_id TEXT)
-RETURNS INTEGER AS $$
-BEGIN
-  RETURN (SELECT point_count FROM inference_runs WHERE inference_run_id = p_inference_run_id);
-END;
-$$ LANGUAGE plpgsql;
-
--- get_inference_runs_theoretical_log_log_slope
--- Helper function: Get TheoreticalLogLogSlope from inference_runs by InferenceRunID
--- Used for join-free cross-table references in aggregations
-CREATE OR REPLACE FUNCTION get_inference_runs_theoretical_log_log_slope(p_inference_run_id TEXT)
-RETURNS NUMERIC AS $$
-BEGIN
-  RETURN (SELECT theoretical_log_log_slope FROM inference_runs WHERE inference_run_id = p_inference_run_id);
-END;
-$$ LANGUAGE plpgsql;
-
 -- get_inference_runs_fitted_slope
 -- Helper function: Get FittedSlope from inference_runs by InferenceRunID
 -- Used for join-free cross-table references in aggregations
@@ -1446,16 +1346,6 @@ CREATE OR REPLACE FUNCTION get_inference_runs_fitted_intercept(p_inference_run_i
 RETURNS NUMERIC AS $$
 BEGIN
   RETURN (SELECT fitted_intercept FROM inference_runs WHERE inference_run_id = p_inference_run_id);
-END;
-$$ LANGUAGE plpgsql;
-
--- get_inference_runs_slope_delta
--- Helper function: Get SlopeDelta from inference_runs by InferenceRunID
--- Used for join-free cross-table references in aggregations
-CREATE OR REPLACE FUNCTION get_inference_runs_slope_delta(p_inference_run_id TEXT)
-RETURNS NUMERIC AS $$
-BEGIN
-  RETURN (SELECT slope_delta FROM inference_runs WHERE inference_run_id = p_inference_run_id);
 END;
 $$ LANGUAGE plpgsql;
 
@@ -1496,16 +1386,6 @@ CREATE OR REPLACE FUNCTION get_inference_runs_orthogonal_rms(p_inference_run_id 
 RETURNS NUMERIC AS $$
 BEGIN
   RETURN (SELECT orthogonal_rms FROM inference_runs WHERE inference_run_id = p_inference_run_id);
-END;
-$$ LANGUAGE plpgsql;
-
--- get_inference_runs_deviation_score
--- Helper function: Get DeviationScore from inference_runs by InferenceRunID
--- Used for join-free cross-table references in aggregations
-CREATE OR REPLACE FUNCTION get_inference_runs_deviation_score(p_inference_run_id TEXT)
-RETURNS NUMERIC AS $$
-BEGIN
-  RETURN (SELECT deviation_score FROM inference_runs WHERE inference_run_id = p_inference_run_id);
 END;
 $$ LANGUAGE plpgsql;
 
@@ -1529,26 +1409,6 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- get_inference_runs_point_count
--- Helper function: Get PointCount from inference_runs by InferenceRunID
--- Used for join-free cross-table references in aggregations
-CREATE OR REPLACE FUNCTION get_inference_runs_point_count(p_inference_run_id TEXT)
-RETURNS INTEGER AS $$
-BEGIN
-  RETURN (SELECT point_count FROM inference_runs WHERE inference_run_id = p_inference_run_id);
-END;
-$$ LANGUAGE plpgsql;
-
--- get_inference_runs_theoretical_log_log_slope
--- Helper function: Get TheoreticalLogLogSlope from inference_runs by InferenceRunID
--- Used for join-free cross-table references in aggregations
-CREATE OR REPLACE FUNCTION get_inference_runs_theoretical_log_log_slope(p_inference_run_id TEXT)
-RETURNS NUMERIC AS $$
-BEGIN
-  RETURN (SELECT theoretical_log_log_slope FROM inference_runs WHERE inference_run_id = p_inference_run_id);
-END;
-$$ LANGUAGE plpgsql;
-
 -- get_inference_runs_fitted_slope
 -- Helper function: Get FittedSlope from inference_runs by InferenceRunID
 -- Used for join-free cross-table references in aggregations
@@ -1566,16 +1426,6 @@ CREATE OR REPLACE FUNCTION get_inference_runs_fitted_intercept(p_inference_run_i
 RETURNS NUMERIC AS $$
 BEGIN
   RETURN (SELECT fitted_intercept FROM inference_runs WHERE inference_run_id = p_inference_run_id);
-END;
-$$ LANGUAGE plpgsql;
-
--- get_inference_runs_slope_delta
--- Helper function: Get SlopeDelta from inference_runs by InferenceRunID
--- Used for join-free cross-table references in aggregations
-CREATE OR REPLACE FUNCTION get_inference_runs_slope_delta(p_inference_run_id TEXT)
-RETURNS NUMERIC AS $$
-BEGIN
-  RETURN (SELECT slope_delta FROM inference_runs WHERE inference_run_id = p_inference_run_id);
 END;
 $$ LANGUAGE plpgsql;
 
@@ -1616,16 +1466,6 @@ CREATE OR REPLACE FUNCTION get_inference_runs_orthogonal_rms(p_inference_run_id 
 RETURNS NUMERIC AS $$
 BEGIN
   RETURN (SELECT orthogonal_rms FROM inference_runs WHERE inference_run_id = p_inference_run_id);
-END;
-$$ LANGUAGE plpgsql;
-
--- get_inference_runs_deviation_score
--- Helper function: Get DeviationScore from inference_runs by InferenceRunID
--- Used for join-free cross-table references in aggregations
-CREATE OR REPLACE FUNCTION get_inference_runs_deviation_score(p_inference_run_id TEXT)
-RETURNS NUMERIC AS $$
-BEGIN
-  RETURN (SELECT deviation_score FROM inference_runs WHERE inference_run_id = p_inference_run_id);
 END;
 $$ LANGUAGE plpgsql;
 
@@ -1729,26 +1569,6 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- get_inference_runs_point_count
--- Helper function: Get PointCount from inference_runs by InferenceRunID
--- Used for join-free cross-table references in aggregations
-CREATE OR REPLACE FUNCTION get_inference_runs_point_count(p_inference_run_id TEXT)
-RETURNS INTEGER AS $$
-BEGIN
-  RETURN (SELECT point_count FROM inference_runs WHERE inference_run_id = p_inference_run_id);
-END;
-$$ LANGUAGE plpgsql;
-
--- get_inference_runs_theoretical_log_log_slope
--- Helper function: Get TheoreticalLogLogSlope from inference_runs by InferenceRunID
--- Used for join-free cross-table references in aggregations
-CREATE OR REPLACE FUNCTION get_inference_runs_theoretical_log_log_slope(p_inference_run_id TEXT)
-RETURNS NUMERIC AS $$
-BEGIN
-  RETURN (SELECT theoretical_log_log_slope FROM inference_runs WHERE inference_run_id = p_inference_run_id);
-END;
-$$ LANGUAGE plpgsql;
-
 -- get_inference_runs_fitted_slope
 -- Helper function: Get FittedSlope from inference_runs by InferenceRunID
 -- Used for join-free cross-table references in aggregations
@@ -1766,16 +1586,6 @@ CREATE OR REPLACE FUNCTION get_inference_runs_fitted_intercept(p_inference_run_i
 RETURNS NUMERIC AS $$
 BEGIN
   RETURN (SELECT fitted_intercept FROM inference_runs WHERE inference_run_id = p_inference_run_id);
-END;
-$$ LANGUAGE plpgsql;
-
--- get_inference_runs_slope_delta
--- Helper function: Get SlopeDelta from inference_runs by InferenceRunID
--- Used for join-free cross-table references in aggregations
-CREATE OR REPLACE FUNCTION get_inference_runs_slope_delta(p_inference_run_id TEXT)
-RETURNS NUMERIC AS $$
-BEGIN
-  RETURN (SELECT slope_delta FROM inference_runs WHERE inference_run_id = p_inference_run_id);
 END;
 $$ LANGUAGE plpgsql;
 
@@ -1816,16 +1626,6 @@ CREATE OR REPLACE FUNCTION get_inference_runs_orthogonal_rms(p_inference_run_id 
 RETURNS NUMERIC AS $$
 BEGIN
   RETURN (SELECT orthogonal_rms FROM inference_runs WHERE inference_run_id = p_inference_run_id);
-END;
-$$ LANGUAGE plpgsql;
-
--- get_inference_runs_deviation_score
--- Helper function: Get DeviationScore from inference_runs by InferenceRunID
--- Used for join-free cross-table references in aggregations
-CREATE OR REPLACE FUNCTION get_inference_runs_deviation_score(p_inference_run_id TEXT)
-RETURNS NUMERIC AS $$
-BEGIN
-  RETURN (SELECT deviation_score FROM inference_runs WHERE inference_run_id = p_inference_run_id);
 END;
 $$ LANGUAGE plpgsql;
 
@@ -2192,26 +1992,6 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- get_inference_runs_point_count
--- Helper function: Get PointCount from inference_runs by InferenceRunID
--- Used for join-free cross-table references in aggregations
-CREATE OR REPLACE FUNCTION get_inference_runs_point_count(p_inference_run_id TEXT)
-RETURNS INTEGER AS $$
-BEGIN
-  RETURN (SELECT point_count FROM inference_runs WHERE inference_run_id = p_inference_run_id);
-END;
-$$ LANGUAGE plpgsql;
-
--- get_inference_runs_theoretical_log_log_slope
--- Helper function: Get TheoreticalLogLogSlope from inference_runs by InferenceRunID
--- Used for join-free cross-table references in aggregations
-CREATE OR REPLACE FUNCTION get_inference_runs_theoretical_log_log_slope(p_inference_run_id TEXT)
-RETURNS NUMERIC AS $$
-BEGIN
-  RETURN (SELECT theoretical_log_log_slope FROM inference_runs WHERE inference_run_id = p_inference_run_id);
-END;
-$$ LANGUAGE plpgsql;
-
 -- get_inference_runs_fitted_slope
 -- Helper function: Get FittedSlope from inference_runs by InferenceRunID
 -- Used for join-free cross-table references in aggregations
@@ -2229,16 +2009,6 @@ CREATE OR REPLACE FUNCTION get_inference_runs_fitted_intercept(p_inference_run_i
 RETURNS NUMERIC AS $$
 BEGIN
   RETURN (SELECT fitted_intercept FROM inference_runs WHERE inference_run_id = p_inference_run_id);
-END;
-$$ LANGUAGE plpgsql;
-
--- get_inference_runs_slope_delta
--- Helper function: Get SlopeDelta from inference_runs by InferenceRunID
--- Used for join-free cross-table references in aggregations
-CREATE OR REPLACE FUNCTION get_inference_runs_slope_delta(p_inference_run_id TEXT)
-RETURNS NUMERIC AS $$
-BEGIN
-  RETURN (SELECT slope_delta FROM inference_runs WHERE inference_run_id = p_inference_run_id);
 END;
 $$ LANGUAGE plpgsql;
 
@@ -2279,16 +2049,6 @@ CREATE OR REPLACE FUNCTION get_inference_runs_orthogonal_rms(p_inference_run_id 
 RETURNS NUMERIC AS $$
 BEGIN
   RETURN (SELECT orthogonal_rms FROM inference_runs WHERE inference_run_id = p_inference_run_id);
-END;
-$$ LANGUAGE plpgsql;
-
--- get_inference_runs_deviation_score
--- Helper function: Get DeviationScore from inference_runs by InferenceRunID
--- Used for join-free cross-table references in aggregations
-CREATE OR REPLACE FUNCTION get_inference_runs_deviation_score(p_inference_run_id TEXT)
-RETURNS NUMERIC AS $$
-BEGIN
-  RETURN (SELECT deviation_score FROM inference_runs WHERE inference_run_id = p_inference_run_id);
 END;
 $$ LANGUAGE plpgsql;
 
@@ -2791,26 +2551,6 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- get_inference_runs_point_count
--- Helper function: Get PointCount from inference_runs by InferenceRunID
--- Used for join-free cross-table references in aggregations
-CREATE OR REPLACE FUNCTION get_inference_runs_point_count(p_inference_run_id TEXT)
-RETURNS INTEGER AS $$
-BEGIN
-  RETURN (SELECT point_count FROM inference_runs WHERE inference_run_id = p_inference_run_id);
-END;
-$$ LANGUAGE plpgsql;
-
--- get_inference_runs_theoretical_log_log_slope
--- Helper function: Get TheoreticalLogLogSlope from inference_runs by InferenceRunID
--- Used for join-free cross-table references in aggregations
-CREATE OR REPLACE FUNCTION get_inference_runs_theoretical_log_log_slope(p_inference_run_id TEXT)
-RETURNS NUMERIC AS $$
-BEGIN
-  RETURN (SELECT theoretical_log_log_slope FROM inference_runs WHERE inference_run_id = p_inference_run_id);
-END;
-$$ LANGUAGE plpgsql;
-
 -- get_inference_runs_fitted_slope
 -- Helper function: Get FittedSlope from inference_runs by InferenceRunID
 -- Used for join-free cross-table references in aggregations
@@ -2828,16 +2568,6 @@ CREATE OR REPLACE FUNCTION get_inference_runs_fitted_intercept(p_inference_run_i
 RETURNS NUMERIC AS $$
 BEGIN
   RETURN (SELECT fitted_intercept FROM inference_runs WHERE inference_run_id = p_inference_run_id);
-END;
-$$ LANGUAGE plpgsql;
-
--- get_inference_runs_slope_delta
--- Helper function: Get SlopeDelta from inference_runs by InferenceRunID
--- Used for join-free cross-table references in aggregations
-CREATE OR REPLACE FUNCTION get_inference_runs_slope_delta(p_inference_run_id TEXT)
-RETURNS NUMERIC AS $$
-BEGIN
-  RETURN (SELECT slope_delta FROM inference_runs WHERE inference_run_id = p_inference_run_id);
 END;
 $$ LANGUAGE plpgsql;
 
@@ -2878,16 +2608,6 @@ CREATE OR REPLACE FUNCTION get_inference_runs_orthogonal_rms(p_inference_run_id 
 RETURNS NUMERIC AS $$
 BEGIN
   RETURN (SELECT orthogonal_rms FROM inference_runs WHERE inference_run_id = p_inference_run_id);
-END;
-$$ LANGUAGE plpgsql;
-
--- get_inference_runs_deviation_score
--- Helper function: Get DeviationScore from inference_runs by InferenceRunID
--- Used for join-free cross-table references in aggregations
-CREATE OR REPLACE FUNCTION get_inference_runs_deviation_score(p_inference_run_id TEXT)
-RETURNS NUMERIC AS $$
-BEGIN
-  RETURN (SELECT deviation_score FROM inference_runs WHERE inference_run_id = p_inference_run_id);
 END;
 $$ LANGUAGE plpgsql;
 
@@ -2911,26 +2631,6 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- get_inference_runs_point_count
--- Helper function: Get PointCount from inference_runs by InferenceRunID
--- Used for join-free cross-table references in aggregations
-CREATE OR REPLACE FUNCTION get_inference_runs_point_count(p_inference_run_id TEXT)
-RETURNS INTEGER AS $$
-BEGIN
-  RETURN (SELECT point_count FROM inference_runs WHERE inference_run_id = p_inference_run_id);
-END;
-$$ LANGUAGE plpgsql;
-
--- get_inference_runs_theoretical_log_log_slope
--- Helper function: Get TheoreticalLogLogSlope from inference_runs by InferenceRunID
--- Used for join-free cross-table references in aggregations
-CREATE OR REPLACE FUNCTION get_inference_runs_theoretical_log_log_slope(p_inference_run_id TEXT)
-RETURNS NUMERIC AS $$
-BEGIN
-  RETURN (SELECT theoretical_log_log_slope FROM inference_runs WHERE inference_run_id = p_inference_run_id);
-END;
-$$ LANGUAGE plpgsql;
-
 -- get_inference_runs_fitted_slope
 -- Helper function: Get FittedSlope from inference_runs by InferenceRunID
 -- Used for join-free cross-table references in aggregations
@@ -2948,16 +2648,6 @@ CREATE OR REPLACE FUNCTION get_inference_runs_fitted_intercept(p_inference_run_i
 RETURNS NUMERIC AS $$
 BEGIN
   RETURN (SELECT fitted_intercept FROM inference_runs WHERE inference_run_id = p_inference_run_id);
-END;
-$$ LANGUAGE plpgsql;
-
--- get_inference_runs_slope_delta
--- Helper function: Get SlopeDelta from inference_runs by InferenceRunID
--- Used for join-free cross-table references in aggregations
-CREATE OR REPLACE FUNCTION get_inference_runs_slope_delta(p_inference_run_id TEXT)
-RETURNS NUMERIC AS $$
-BEGIN
-  RETURN (SELECT slope_delta FROM inference_runs WHERE inference_run_id = p_inference_run_id);
 END;
 $$ LANGUAGE plpgsql;
 
@@ -2998,16 +2688,6 @@ CREATE OR REPLACE FUNCTION get_inference_runs_orthogonal_rms(p_inference_run_id 
 RETURNS NUMERIC AS $$
 BEGIN
   RETURN (SELECT orthogonal_rms FROM inference_runs WHERE inference_run_id = p_inference_run_id);
-END;
-$$ LANGUAGE plpgsql;
-
--- get_inference_runs_deviation_score
--- Helper function: Get DeviationScore from inference_runs by InferenceRunID
--- Used for join-free cross-table references in aggregations
-CREATE OR REPLACE FUNCTION get_inference_runs_deviation_score(p_inference_run_id TEXT)
-RETURNS NUMERIC AS $$
-BEGIN
-  RETURN (SELECT deviation_score FROM inference_runs WHERE inference_run_id = p_inference_run_id);
 END;
 $$ LANGUAGE plpgsql;
 
@@ -3031,26 +2711,6 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- get_inference_runs_point_count
--- Helper function: Get PointCount from inference_runs by InferenceRunID
--- Used for join-free cross-table references in aggregations
-CREATE OR REPLACE FUNCTION get_inference_runs_point_count(p_inference_run_id TEXT)
-RETURNS INTEGER AS $$
-BEGIN
-  RETURN (SELECT point_count FROM inference_runs WHERE inference_run_id = p_inference_run_id);
-END;
-$$ LANGUAGE plpgsql;
-
--- get_inference_runs_theoretical_log_log_slope
--- Helper function: Get TheoreticalLogLogSlope from inference_runs by InferenceRunID
--- Used for join-free cross-table references in aggregations
-CREATE OR REPLACE FUNCTION get_inference_runs_theoretical_log_log_slope(p_inference_run_id TEXT)
-RETURNS NUMERIC AS $$
-BEGIN
-  RETURN (SELECT theoretical_log_log_slope FROM inference_runs WHERE inference_run_id = p_inference_run_id);
-END;
-$$ LANGUAGE plpgsql;
-
 -- get_inference_runs_fitted_slope
 -- Helper function: Get FittedSlope from inference_runs by InferenceRunID
 -- Used for join-free cross-table references in aggregations
@@ -3068,16 +2728,6 @@ CREATE OR REPLACE FUNCTION get_inference_runs_fitted_intercept(p_inference_run_i
 RETURNS NUMERIC AS $$
 BEGIN
   RETURN (SELECT fitted_intercept FROM inference_runs WHERE inference_run_id = p_inference_run_id);
-END;
-$$ LANGUAGE plpgsql;
-
--- get_inference_runs_slope_delta
--- Helper function: Get SlopeDelta from inference_runs by InferenceRunID
--- Used for join-free cross-table references in aggregations
-CREATE OR REPLACE FUNCTION get_inference_runs_slope_delta(p_inference_run_id TEXT)
-RETURNS NUMERIC AS $$
-BEGIN
-  RETURN (SELECT slope_delta FROM inference_runs WHERE inference_run_id = p_inference_run_id);
 END;
 $$ LANGUAGE plpgsql;
 
@@ -3118,16 +2768,6 @@ CREATE OR REPLACE FUNCTION get_inference_runs_orthogonal_rms(p_inference_run_id 
 RETURNS NUMERIC AS $$
 BEGIN
   RETURN (SELECT orthogonal_rms FROM inference_runs WHERE inference_run_id = p_inference_run_id);
-END;
-$$ LANGUAGE plpgsql;
-
--- get_inference_runs_deviation_score
--- Helper function: Get DeviationScore from inference_runs by InferenceRunID
--- Used for join-free cross-table references in aggregations
-CREATE OR REPLACE FUNCTION get_inference_runs_deviation_score(p_inference_run_id TEXT)
-RETURNS NUMERIC AS $$
-BEGIN
-  RETURN (SELECT deviation_score FROM inference_runs WHERE inference_run_id = p_inference_run_id);
 END;
 $$ LANGUAGE plpgsql;
 
@@ -3310,6 +2950,18 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+-- calc_inference_runs_theoretical_log_log_slope
+-- Field: inference_runs.TheoreticalLogLogSlope
+-- Type: lookup | DataType: decimal | Returns: NUMERIC
+-- Lookup: TheoreticalLogLogSlope from related systems
+-- Formula: =INDEX(systems!{{TheoreticalLogLogSlope}}, MATCH(inference_runs!{{System}}, systems!{{SystemID}}, 0))
+CREATE OR REPLACE FUNCTION calc_inference_runs_theoretical_log_log_slope(p_inference_run_id TEXT)
+RETURNS NUMERIC AS $$
+BEGIN
+  RETURN (SELECT theoretical_log_log_slope::numeric FROM systems WHERE system_id = (SELECT "system" FROM inference_runs WHERE inference_run_id = p_inference_run_id));
+END;
+$$ LANGUAGE plpgsql;
+
 -- get_systems_display_name
 -- Helper function: Get DisplayName from systems by SystemID
 -- Used for join-free cross-table references in aggregations
@@ -3460,6 +3112,125 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+-- get_systems_display_name
+-- Helper function: Get DisplayName from systems by SystemID
+-- Used for join-free cross-table references in aggregations
+CREATE OR REPLACE FUNCTION get_systems_display_name(p_system_id TEXT)
+RETURNS TEXT AS $$
+BEGIN
+  RETURN (SELECT display_name FROM systems WHERE system_id = p_system_id);
+END;
+$$ LANGUAGE plpgsql;
+
+-- get_systems_class
+-- Helper function: Get Class from systems by SystemID
+-- Used for join-free cross-table references in aggregations
+CREATE OR REPLACE FUNCTION get_systems_class(p_system_id TEXT)
+RETURNS TEXT AS $$
+BEGIN
+  RETURN (SELECT class FROM systems WHERE system_id = p_system_id);
+END;
+$$ LANGUAGE plpgsql;
+
+-- get_systems_base_scale
+-- Helper function: Get BaseScale from systems by SystemID
+-- Used for join-free cross-table references in aggregations
+CREATE OR REPLACE FUNCTION get_systems_base_scale(p_system_id TEXT)
+RETURNS INTEGER AS $$
+BEGIN
+  RETURN (SELECT base_scale FROM systems WHERE system_id = p_system_id);
+END;
+$$ LANGUAGE plpgsql;
+
+-- get_systems_scale_factor
+-- Helper function: Get ScaleFactor from systems by SystemID
+-- Used for join-free cross-table references in aggregations
+CREATE OR REPLACE FUNCTION get_systems_scale_factor(p_system_id TEXT)
+RETURNS NUMERIC AS $$
+BEGIN
+  RETURN (SELECT scale_factor FROM systems WHERE system_id = p_system_id);
+END;
+$$ LANGUAGE plpgsql;
+
+-- get_systems_measure_name
+-- Helper function: Get MeasureName from systems by SystemID
+-- Used for join-free cross-table references in aggregations
+CREATE OR REPLACE FUNCTION get_systems_measure_name(p_system_id TEXT)
+RETURNS TEXT AS $$
+BEGIN
+  RETURN (SELECT measure_name FROM systems WHERE system_id = p_system_id);
+END;
+$$ LANGUAGE plpgsql;
+
+-- get_systems_fractal_dimension
+-- Helper function: Get FractalDimension from systems by SystemID
+-- Used for join-free cross-table references in aggregations
+CREATE OR REPLACE FUNCTION get_systems_fractal_dimension(p_system_id TEXT)
+RETURNS NUMERIC AS $$
+BEGIN
+  RETURN (SELECT fractal_dimension FROM systems WHERE system_id = p_system_id);
+END;
+$$ LANGUAGE plpgsql;
+
+-- get_systems_theoretical_log_log_slope
+-- Helper function: Get TheoreticalLogLogSlope from systems by SystemID
+-- Used for join-free cross-table references in aggregations
+CREATE OR REPLACE FUNCTION get_systems_theoretical_log_log_slope(p_system_id TEXT)
+RETURNS NUMERIC AS $$
+BEGIN
+  RETURN (SELECT theoretical_log_log_slope FROM systems WHERE system_id = p_system_id);
+END;
+$$ LANGUAGE plpgsql;
+
+-- calc_inference_runs_point_count
+-- Field: inference_runs.PointCount
+-- Type: aggregation | DataType: integer | Returns: INTEGER
+-- Formula: =COUNTIF(observed_scales!{{System}}, {{System}})
+-- ============================================================================
+-- CRITICAL FUNCTION VALIDATION CODE - DO NOT REMOVE
+-- Original Excel Formula: =COUNTIF(observed_scales!{{System}}, {{System}})
+-- This formula is preserved for validation and debugging purposes
+-- ============================================================================
+CREATE OR REPLACE FUNCTION calc_inference_runs_point_count(p_inference_run_id TEXT)
+RETURNS INTEGER AS $$
+BEGIN
+  RETURN ((SELECT COUNT(*) FROM observed_scales WHERE "system" = (SELECT NULLIF("system", '') FROM inference_runs WHERE inference_run_id = p_inference_run_id)))::integer;
+END;
+$$ LANGUAGE plpgsql;
+
+-- calc_inference_runs_slope_delta
+-- Field: inference_runs.SlopeDelta
+-- Type: calculated | DataType: number | Returns: NUMERIC
+-- Formula: ={{FittedSlope}} - {{TheoreticalLogLogSlope}}
+-- ============================================================================
+-- CRITICAL FUNCTION VALIDATION CODE - DO NOT REMOVE
+-- Original Excel Formula: ={{FittedSlope}} - {{TheoreticalLogLogSlope}}
+-- This formula is preserved for validation and debugging purposes
+-- ============================================================================
+CREATE OR REPLACE FUNCTION calc_inference_runs_slope_delta(p_inference_run_id TEXT)
+RETURNS NUMERIC AS $$
+BEGIN
+  RETURN (((COALESCE((SELECT fitted_slope FROM inference_runs WHERE inference_run_id = p_inference_run_id), 0))::numeric - (COALESCE(calc_inference_runs_theoretical_log_log_slope(p_inference_run_id), 0))::numeric))::numeric;
+END;
+$$ LANGUAGE plpgsql;
+
+-- calc_inference_runs_deviation_score
+-- Field: inference_runs.DeviationScore
+-- Type: calculated | DataType: number | Returns: NUMERIC
+-- Formula: =SQRT(POWER({{ResidualRMS}}, 2) + POWER({{SlopeDelta}}, 2))
+-- WARNING: Formula translation failed: Function 'SQRT' is not supported yet
+-- ============================================================================
+-- CRITICAL FUNCTION VALIDATION CODE - DO NOT REMOVE
+-- Original Excel Formula: =SQRT(POWER({{ResidualRMS}}, 2) + POWER({{SlopeDelta}}, 2))
+-- This formula is preserved for validation and debugging purposes
+-- ============================================================================
+CREATE OR REPLACE FUNCTION calc_inference_runs_deviation_score(p_inference_run_id TEXT)
+RETURNS NUMERIC AS $$
+BEGIN
+  RETURN NULL; -- Formula translation failed
+END;
+$$ LANGUAGE plpgsql;
+
 -- calc_inference_runs_slope_confidence_interval
 -- Field: inference_runs.SlopeConfidenceInterval
 -- Type: calculated | DataType: number | Returns: NUMERIC
@@ -3472,7 +3243,7 @@ $$ LANGUAGE plpgsql;
 CREATE OR REPLACE FUNCTION calc_inference_runs_slope_confidence_interval(p_inference_run_id TEXT)
 RETURNS NUMERIC AS $$
 BEGIN
-  RETURN (((COALESCE(1.96, 0))::numeric * (COALESCE(((SELECT residual_rms FROM inference_runs WHERE inference_run_id = p_inference_run_id) / NULLIF(SQRT((SELECT point_count FROM inference_runs WHERE inference_run_id = p_inference_run_id)), 0)), 0))::numeric))::numeric;
+  RETURN (((COALESCE(1.96, 0))::numeric * (COALESCE(((SELECT residual_rms FROM inference_runs WHERE inference_run_id = p_inference_run_id) / NULLIF(SQRT(calc_inference_runs_point_count(p_inference_run_id)), 0)), 0))::numeric))::numeric;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -3684,7 +3455,7 @@ $$ LANGUAGE plpgsql;
 CREATE OR REPLACE FUNCTION calc_inference_runs_point_count_minus_one(p_inference_run_id TEXT)
 RETURNS NUMERIC AS $$
 BEGIN
-  RETURN (((COALESCE((SELECT point_count FROM inference_runs WHERE inference_run_id = p_inference_run_id), 0))::numeric - (COALESCE(1, 0))::numeric))::numeric;
+  RETURN (((COALESCE(calc_inference_runs_point_count(p_inference_run_id), 0))::numeric - (COALESCE(1, 0))::numeric))::numeric;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -3700,7 +3471,7 @@ $$ LANGUAGE plpgsql;
 CREATE OR REPLACE FUNCTION calc_inference_runs_point_count_minus_two(p_inference_run_id TEXT)
 RETURNS NUMERIC AS $$
 BEGIN
-  RETURN (((COALESCE((SELECT point_count FROM inference_runs WHERE inference_run_id = p_inference_run_id), 0))::numeric - (COALESCE(2, 0))::numeric))::numeric;
+  RETURN (((COALESCE(calc_inference_runs_point_count(p_inference_run_id), 0))::numeric - (COALESCE(2, 0))::numeric))::numeric;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -3783,7 +3554,7 @@ $$ LANGUAGE plpgsql;
 CREATE OR REPLACE FUNCTION calc_inference_runs_bic(p_inference_run_id TEXT)
 RETURNS NUMERIC AS $$
 BEGIN
-  RETURN (((COALESCE(((COALESCE((SELECT point_count FROM inference_runs WHERE inference_run_id = p_inference_run_id), 0))::numeric * (COALESCE(calc_inference_runs_log_residual_rmssquared(p_inference_run_id), 0))::numeric), 0))::numeric + (COALESCE(((COALESCE(2, 0))::numeric * (COALESCE(calc_inference_runs_log_point_count(p_inference_run_id), 0))::numeric), 0))::numeric))::numeric;
+  RETURN (((COALESCE(((COALESCE(calc_inference_runs_point_count(p_inference_run_id), 0))::numeric * (COALESCE(calc_inference_runs_log_residual_rmssquared(p_inference_run_id), 0))::numeric), 0))::numeric + (COALESCE(((COALESCE(2, 0))::numeric * (COALESCE(calc_inference_runs_log_point_count(p_inference_run_id), 0))::numeric), 0))::numeric))::numeric;
 END;
 $$ LANGUAGE plpgsql;
 

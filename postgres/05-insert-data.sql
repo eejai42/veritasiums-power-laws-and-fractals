@@ -118,10 +118,10 @@ INSERT INTO scales (scale_id, "system", iteration, measure, is_projected, data_r
 VALUES ('ScaleFreeNet_5', 'ScaleFreeNet', 5, 0.000168, TRUE, 'ideal', NULL);
 
 INSERT INTO scales (scale_id, "system", iteration, measure, is_projected, data_regime, measurement_model)
-VALUES ('ScaleFreeNet_6', 'ScaleFreeNet', 6, 3.18e-05, TRUE, 'ideal', NULL);
+VALUES ('ScaleFreeNet_6', 'ScaleFreeNet', 6, 0.0000318, TRUE, 'ideal', NULL);
 
 INSERT INTO scales (scale_id, "system", iteration, measure, is_projected, data_regime, measurement_model)
-VALUES ('ScaleFreeNet_7', 'ScaleFreeNet', 7, 5.21e-06, TRUE, 'ideal', NULL);
+VALUES ('ScaleFreeNet_7', 'ScaleFreeNet', 7, 0.00000521, TRUE, 'ideal', NULL);
 
 INSERT INTO scales (scale_id, "system", iteration, measure, is_projected, data_regime, measurement_model)
 VALUES ('Sandpile_0', 'Sandpile', 0, 1, FALSE, 'ideal', NULL);
@@ -331,10 +331,10 @@ INSERT INTO observed_scales (observed_scale_id, "system", measurement_model, ite
 VALUES ('ScaleFreeNet_OBS_5', 'ScaleFreeNet', 'ScaleFreeNet_MM1', 5, 0.0002, 'measured');
 
 INSERT INTO observed_scales (observed_scale_id, "system", measurement_model, iteration, measure, data_regime)
-VALUES ('ScaleFreeNet_OBS_6', 'ScaleFreeNet', 'ScaleFreeNet_MM1', 6, 2.4144143656495023e-05, 'measured');
+VALUES ('ScaleFreeNet_OBS_6', 'ScaleFreeNet', 'ScaleFreeNet_MM1', 6, 0.000024144143656495023, 'measured');
 
 INSERT INTO observed_scales (observed_scale_id, "system", measurement_model, iteration, measure, data_regime)
-VALUES ('ScaleFreeNet_OBS_7', 'ScaleFreeNet', 'ScaleFreeNet_MM1', 7, 4.780687028940912e-06, 'measured');
+VALUES ('ScaleFreeNet_OBS_7', 'ScaleFreeNet', 'ScaleFreeNet_MM1', 7, 0.000004780687028940912, 'measured');
 
 INSERT INTO observed_scales (observed_scale_id, "system", measurement_model, iteration, measure, data_regime)
 VALUES ('Sandpile_OBS_0', 'Sandpile', 'Sandpile_MM1', 0, 0.8385, 'measured');
@@ -409,26 +409,26 @@ INSERT INTO observed_scales (observed_scale_id, "system", measurement_model, ite
 VALUES ('ForestFires_OBS_7', 'ForestFires', 'ForestFires_MM1', 7, 0.002, 'measured');
 
 -- Insert data for inference_runs
-INSERT INTO inference_runs (inference_run_id, "system", data_regime, measurement_model, fit_method, fitted_slope, fitted_intercept, r2, residual_rms, residual_max_abs, orthogonal_rms)
-VALUES ('Sierpinski_INF_OLS_LOG10', 'Sierpinski', 'measured', 'Sierpinski_MM1', 'OLS_loglog', -1.599205, -0.019658, 0.998968, 0.035459, 0.066978, 0.0188);
+INSERT INTO inference_runs (inference_run_id, "system", data_regime, measurement_model, fit_method, point_count, theoretical_log_log_slope, fitted_slope, fitted_intercept, slope_delta, r2, residual_rms, residual_max_abs, orthogonal_rms, deviation_score)
+VALUES ('Sierpinski_INF_OLS_LOG10', 'Sierpinski', 'measured', 'Sierpinski_MM1', 'OLS_loglog', 8, -1.585, -1.599205, -0.019658, -0.014205, 0.998968, 0.035459, 0.066978, 0.0188, 0.038198);
 
-INSERT INTO inference_runs (inference_run_id, "system", data_regime, measurement_model, fit_method, fitted_slope, fitted_intercept, r2, residual_rms, residual_max_abs, orthogonal_rms)
-VALUES ('Koch_INF_OLS_LOG10', 'Koch', 'measured', 'Koch_MM1', 'OLS_loglog', -0.270086, -0.016264, 0.991272, 0.027705, 0.058497, 0.026747);
+INSERT INTO inference_runs (inference_run_id, "system", data_regime, measurement_model, fit_method, point_count, theoretical_log_log_slope, fitted_slope, fitted_intercept, slope_delta, r2, residual_rms, residual_max_abs, orthogonal_rms, deviation_score)
+VALUES ('Koch_INF_OLS_LOG10', 'Koch', 'measured', 'Koch_MM1', 'OLS_loglog', 8, -0.262, -0.270086, -0.016264, -0.008086, 0.991272, 0.027705, 0.058497, 0.026747, 0.028861);
 
-INSERT INTO inference_runs (inference_run_id, "system", data_regime, measurement_model, fit_method, fitted_slope, fitted_intercept, r2, residual_rms, residual_max_abs, orthogonal_rms)
-VALUES ('ZipfWords_INF_OLS_LOG10', 'ZipfWords', 'measured', 'ZipfWords_MM1', 'OLS_loglog', -0.965319, -0.115438, 0.995247, 0.046013, 0.069258, 0.033105);
+INSERT INTO inference_runs (inference_run_id, "system", data_regime, measurement_model, fit_method, point_count, theoretical_log_log_slope, fitted_slope, fitted_intercept, slope_delta, r2, residual_rms, residual_max_abs, orthogonal_rms, deviation_score)
+VALUES ('ZipfWords_INF_OLS_LOG10', 'ZipfWords', 'measured', 'ZipfWords_MM1', 'OLS_loglog', 8, -1, -0.965319, -0.115438, 0.034681, 0.995247, 0.046013, 0.069258, 0.033105, 0.057619);
 
-INSERT INTO inference_runs (inference_run_id, "system", data_regime, measurement_model, fit_method, fitted_slope, fitted_intercept, r2, residual_rms, residual_max_abs, orthogonal_rms)
-VALUES ('ScaleFreeNet_INF_OLS_LOG10', 'ScaleFreeNet', 'measured', 'ScaleFreeNet_MM1', 'OLS_loglog', -2.502179, -0.037924, 0.998115, 0.074995, 0.156764, 0.027831);
+INSERT INTO inference_runs (inference_run_id, "system", data_regime, measurement_model, fit_method, point_count, theoretical_log_log_slope, fitted_slope, fitted_intercept, slope_delta, r2, residual_rms, residual_max_abs, orthogonal_rms, deviation_score)
+VALUES ('ScaleFreeNet_INF_OLS_LOG10', 'ScaleFreeNet', 'measured', 'ScaleFreeNet_MM1', 'OLS_loglog', 8, -2.5, -2.502179, -0.037924, -0.002179, 0.998115, 0.074995, 0.156764, 0.027831, 0.075026);
 
-INSERT INTO inference_runs (inference_run_id, "system", data_regime, measurement_model, fit_method, fitted_slope, fitted_intercept, r2, residual_rms, residual_max_abs, orthogonal_rms)
-VALUES ('Sandpile_INF_OLS_LOG10', 'Sandpile', 'measured', 'Sandpile_MM1', 'OLS_loglog', -0.976376, -0.038839, 0.992746, 0.057567, 0.107546, 0.041189);
+INSERT INTO inference_runs (inference_run_id, "system", data_regime, measurement_model, fit_method, point_count, theoretical_log_log_slope, fitted_slope, fitted_intercept, slope_delta, r2, residual_rms, residual_max_abs, orthogonal_rms, deviation_score)
+VALUES ('Sandpile_INF_OLS_LOG10', 'Sandpile', 'measured', 'Sandpile_MM1', 'OLS_loglog', 8, -1, -0.976376, -0.038839, 0.023624, 0.992746, 0.057567, 0.107546, 0.041189, 0.062225);
 
-INSERT INTO inference_runs (inference_run_id, "system", data_regime, measurement_model, fit_method, fitted_slope, fitted_intercept, r2, residual_rms, residual_max_abs, orthogonal_rms)
-VALUES ('Earthquakes_INF_OLS_LOG10', 'Earthquakes', 'measured', 'Earthquakes_MM1', 'OLS_loglog', -0.987955, -0.014117, 0.988159, 0.074595, 0.131502, 0.053065);
+INSERT INTO inference_runs (inference_run_id, "system", data_regime, measurement_model, fit_method, point_count, theoretical_log_log_slope, fitted_slope, fitted_intercept, slope_delta, r2, residual_rms, residual_max_abs, orthogonal_rms, deviation_score)
+VALUES ('Earthquakes_INF_OLS_LOG10', 'Earthquakes', 'measured', 'Earthquakes_MM1', 'OLS_loglog', 8, -1, -0.987955, -0.014117, 0.012045, 0.988159, 0.074595, 0.131502, 0.053065, 0.075561);
 
-INSERT INTO inference_runs (inference_run_id, "system", data_regime, measurement_model, fit_method, fitted_slope, fitted_intercept, r2, residual_rms, residual_max_abs, orthogonal_rms)
-VALUES ('ForestFires_INF_OLS_LOG10', 'ForestFires', 'measured', 'ForestFires_MM1', 'OLS_loglog', -1.304367, 0.025399, 0.994038, 0.069674, 0.132325, 0.042392);
+INSERT INTO inference_runs (inference_run_id, "system", data_regime, measurement_model, fit_method, point_count, theoretical_log_log_slope, fitted_slope, fitted_intercept, slope_delta, r2, residual_rms, residual_max_abs, orthogonal_rms, deviation_score)
+VALUES ('ForestFires_INF_OLS_LOG10', 'ForestFires', 'measured', 'ForestFires_MM1', 'OLS_loglog', 8, -1.3, -1.304367, 0.025399, -0.004367, 0.994038, 0.069674, 0.132325, 0.042392, 0.069811);
 
 -- Insert data for scale_regimes
 INSERT INTO scale_regimes (regime_id, "system", min_log_scale, max_log_scale, expected_slope, regime_type)
