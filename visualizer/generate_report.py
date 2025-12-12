@@ -4,10 +4,10 @@ Comprehensive HTML Report Generator with Validation
 
 Generates a full data report with:
 - Platform validation status (pass/fail for each scale)
-- Failures highlighted in RED
+- Failures highlighted in RED (table AND graph)
 - All 8 iterations per system (actual + projected)
-- Full data tables with computed values
-- Large interactive log-log charts
+- Full data tables with all computed values
+- Interactive log-log charts with failed points in red
 """
 
 import json
@@ -40,7 +40,7 @@ def compare_values(expected, actual):
     return expected == actual
 
 def validate_platform(platform_name, answer_key):
-    """Validate platform results against answer key, return dict of scale_id -> {field -> {expected, actual, match}}"""
+    """Validate platform results against answer key"""
     results_path = TEST_RESULTS_DIR / f'{platform_name}-results.json'
     if not results_path.exists():
         return None
@@ -52,6 +52,7 @@ def validate_platform(platform_name, answer_key):
     projected_scales = [s for s in answer_key.get('scales', []) if s.get('IsProjected', False)]
     
     validation = {}
+    # All fields to validate
     fields = ['Scale', 'ScaleFactorPower', 'LogScale', 'LogMeasure']
     
     for expected in projected_scales:
@@ -77,7 +78,8 @@ def validate_platform(platform_name, answer_key):
         validation[scale_id] = {
             'fields': field_results,
             'all_match': all_match,
-            'missing': actual is None
+            'missing': actual is None,
+            'actual_record': actual
         }
     
     return validation
@@ -118,7 +120,16 @@ def generate_report():
     
     system_lookup = {s['SystemID']: s for s in systems}
     
-    # Build chart data JSON
+    # Collect failed scale IDs
+    failed_scale_ids = set()
+    for name in platform_names:
+        v = platform_validations.get(name)
+        if v:
+            for scale_id, data in v.items():
+                if not data['all_match']:
+                    failed_scale_ids.add(scale_id)
+    
+    # Build chart data JSON - with failed points separate
     chart_data = {}
     for sys_id, sys_scales in scales_by_system.items():
         sorted_scales = sorted(sys_scales, key=lambda x: x.get('Iteration', 0))
@@ -126,9 +137,15 @@ def generate_report():
         
         actual = []
         projected = []
+        failed = []
+        
         for s in sorted_scales:
-            pt = {'x': s.get('LogScale', 0), 'y': s.get('LogMeasure', 0), 'iter': s.get('Iteration', 0)}
-            if s.get('IsProjected', False):
+            scale_id = s['ScaleID']
+            pt = {'x': s.get('LogScale', 0), 'y': s.get('LogMeasure', 0), 'iter': s.get('Iteration', 0), 'id': scale_id}
+            
+            if scale_id in failed_scale_ids:
+                failed.append(pt)
+            elif s.get('IsProjected', False):
                 projected.append(pt)
             else:
                 actual.append(pt)
@@ -136,6 +153,7 @@ def generate_report():
         chart_data[sys_id] = {
             'actual': actual,
             'projected': projected,
+            'failed': failed,
             'slope': system_info.get('TheoreticalLogLogSlope', 0),
             'name': system_info.get('DisplayName', sys_id)
         }
@@ -164,7 +182,6 @@ def generate_report():
             --red: #f85149;
             --purple: #a371f7;
             --blue: #58a6ff;
-            --yellow: #d29922;
         }}
         * {{ margin: 0; padding: 0; box-sizing: border-box; }}
         body {{
@@ -174,7 +191,7 @@ def generate_report():
             padding: 2rem;
             line-height: 1.5;
         }}
-        .container {{ max-width: 1800px; margin: 0 auto; }}
+        .container {{ max-width: 1900px; margin: 0 auto; }}
         
         header {{
             text-align: center;
@@ -189,7 +206,6 @@ def generate_report():
             background: linear-gradient(135deg, var(--blue), var(--purple));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            margin-bottom: 0.5rem;
         }}
         .timestamp {{ color: var(--muted); font-size: 0.875rem; }}
         
@@ -227,9 +243,7 @@ def generate_report():
         }}
         .platform-card.passed {{ border-left: 4px solid var(--green); }}
         .platform-card.failed {{ border-left: 4px solid var(--red); }}
-        .platform-card.not_run {{ border-left: 4px solid var(--muted); opacity: 0.6; }}
         .platform-name {{ font-size: 1.5rem; margin-bottom: 0.5rem; }}
-        .platform-status {{ font-size: 0.875rem; font-weight: 600; }}
         .platform-status.passed {{ color: var(--green); }}
         .platform-status.failed {{ color: var(--red); }}
         .platform-counts {{ margin-top: 0.5rem; color: var(--muted); font-size: 0.8rem; }}
@@ -241,6 +255,7 @@ def generate_report():
             padding: 1.5rem;
             margin-bottom: 2rem;
         }}
+        .system.has-failures {{ border-left: 4px solid var(--red); }}
         .system-header {{
             display: flex;
             align-items: center;
@@ -257,10 +272,11 @@ def generate_report():
             font-size: 0.75rem;
             color: var(--muted);
         }}
+        .badge-fail {{ background: var(--red); color: white; }}
         
         .system-content {{
             display: grid;
-            grid-template-columns: 1fr 450px;
+            grid-template-columns: 1fr 400px;
             gap: 2rem;
         }}
         @media (max-width: 1200px) {{
@@ -275,13 +291,14 @@ def generate_report():
             height: 350px;
         }}
         
+        .table-wrap {{ overflow-x: auto; }}
         table {{
             width: 100%;
             border-collapse: collapse;
-            font-size: 0.75rem;
+            font-size: 0.7rem;
         }}
         th, td {{
-            padding: 0.4rem 0.5rem;
+            padding: 0.35rem 0.4rem;
             text-align: right;
             border-bottom: 1px solid var(--border);
         }}
@@ -289,33 +306,19 @@ def generate_report():
             color: var(--muted);
             font-weight: 500;
             text-transform: uppercase;
-            font-size: 0.65rem;
-            position: sticky;
-            top: 0;
+            font-size: 0.6rem;
             background: var(--card);
         }}
         th:first-child, td:first-child {{ text-align: center; }}
-        tr:hover {{ background: rgba(255,255,255,0.03); }}
         
         .row-actual {{ color: var(--green); }}
         .row-projected {{ color: var(--purple); }}
-        .row-marker {{ font-size: 0.9rem; }}
+        .row-failed {{ background: rgba(248,81,73,0.15); }}
+        .row-marker {{ font-size: 0.8rem; }}
         
         .val-match {{ color: var(--green); }}
-        .val-fail {{ color: var(--red); font-weight: 700; background: rgba(248,81,73,0.15); }}
-        .val-missing {{ color: var(--muted); font-style: italic; }}
-        
-        .validation-section {{
-            margin-top: 1.5rem;
-            padding-top: 1rem;
-            border-top: 1px solid var(--border);
-        }}
-        .validation-title {{
-            font-size: 1rem;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-            color: var(--blue);
-        }}
+        .val-fail {{ color: var(--red); font-weight: 700; }}
+        .val-na {{ color: var(--muted); }}
         
         footer {{
             text-align: center;
@@ -347,12 +350,9 @@ def generate_report():
     for name in platform_names:
         summary = platform_summaries[name]
         status = summary['status']
-        icon = platform_icons[name]
-        display = platform_display[name]
-        
         html += f'''            <div class="platform-card {status}">
-                <div class="platform-name">{icon} {display}</div>
-                <div class="platform-status {status}">{'✓ PASSED' if status == 'passed' else ('✗ FAILED' if status == 'failed' else '○ NOT RUN')}</div>
+                <div class="platform-name">{platform_icons[name]} {platform_display[name]}</div>
+                <div class="platform-status {status}">{'✓ PASSED' if status == 'passed' else '✗ FAILED'}</div>
                 <div class="platform-counts">{summary['pass']} passed, {summary['fail']} failed</div>
             </div>
 '''
@@ -360,7 +360,7 @@ def generate_report():
     html += '''        </div>
 '''
     
-    # Generate each system section with validation
+    # Generate each system section
     for sys_id in sorted(scales_by_system.keys()):
         sys_scales = sorted(scales_by_system[sys_id], key=lambda x: x.get('Iteration', 0))
         system = system_lookup.get(sys_id, {})
@@ -369,56 +369,50 @@ def generate_report():
         type_label = 'Fractal' if system.get('Class') == 'fractal' else 'Power Law'
         slope = system.get('TheoreticalLogLogSlope', 0)
         
-        # Check for any failures in this system
-        system_has_failures = False
-        for s in sys_scales:
-            if s.get('IsProjected', False):
-                for name in platform_names:
-                    v = platform_validations.get(name, {})
-                    if v and s['ScaleID'] in v and not v[s['ScaleID']]['all_match']:
-                        system_has_failures = True
-                        break
+        # Check for failures in this system
+        system_has_failures = any(s['ScaleID'] in failed_scale_ids for s in sys_scales)
         
         html += f'''
-        <div class="system" style="{'border-left: 4px solid var(--red);' if system_has_failures else ''}">
+        <div class="system {'has-failures' if system_has_failures else ''}">
             <div class="system-header">
                 <span class="system-icon">{icon}</span>
                 <span class="system-name">{system.get('DisplayName', sys_id)}</span>
                 <span class="system-badge">{type_label}</span>
                 <span class="system-badge">Slope: {slope}</span>
-                {'<span class="system-badge" style="background: var(--red); color: white;">⚠ HAS FAILURES</span>' if system_has_failures else ''}
+                {'<span class="system-badge badge-fail">⚠ HAS FAILURES</span>' if system_has_failures else ''}
             </div>
             
             <div class="system-content">
-                <div>
+                <div class="table-wrap">
                     <table>
                         <thead>
                             <tr>
                                 <th></th>
                                 <th>Iter</th>
                                 <th>Measure</th>
-                                <th>Scale</th>
-                                <th>log(Scale)</th>
-                                <th>log(Measure)</th>
-                                <th>🐍 Py</th>
-                                <th>🐘 PG</th>
-                                <th>🐹 Go</th>
+                                <th>Scale<br>(expected)</th>
+                                <th>log(S)</th>
+                                <th>log(M)<br>(expected)</th>
+                                <th>🐍 log(M)</th>
+                                <th>🐘 log(M)</th>
+                                <th>🐹 log(M)</th>
                             </tr>
                         </thead>
                         <tbody>
 '''
         
-        # Show ALL scales (actual + projected)
         for s in sys_scales:
             scale_id = s['ScaleID']
             iteration = s.get('Iteration', 0)
             is_projected = s.get('IsProjected', False)
+            is_failed = scale_id in failed_scale_ids
             
-            row_class = 'row-projected' if is_projected else 'row-actual'
-            marker = '◌' if is_projected else '●'
+            row_class = 'row-failed' if is_failed else ('row-projected' if is_projected else 'row-actual')
+            marker = '✗' if is_failed else ('◌' if is_projected else '●')
+            marker_style = 'color: var(--red);' if is_failed else ''
             
             html += f'''                            <tr class="{row_class}">
-                                <td class="row-marker">{marker}</td>
+                                <td class="row-marker" style="{marker_style}">{marker}</td>
                                 <td>{iteration}</td>
                                 <td>{s.get('Measure', 0):.6f}</td>
                                 <td>{s.get('Scale', 0):.6f}</td>
@@ -426,28 +420,27 @@ def generate_report():
                                 <td>{s.get('LogMeasure', 0):.6f}</td>
 '''
             
-            # Show platform validation only for projected scales
+            # Show platform LogMeasure values for projected scales
             if is_projected:
                 for name in platform_names:
                     v = platform_validations.get(name, {})
                     if v and scale_id in v:
                         scale_v = v[scale_id]
                         if scale_v['missing']:
-                            html += '                                <td class="val-missing">MISSING</td>\n'
+                            html += '                                <td class="val-fail">MISS</td>\n'
                         else:
                             lm = scale_v['fields'].get('LogMeasure', {})
                             actual = lm.get('actual')
                             match = lm.get('match', False)
-                            css_class = 'val-match' if match else 'val-fail'
-                            val_str = f"{actual:.6f}" if actual is not None else "-"
-                            html += f'                                <td class="{css_class}">{val_str}</td>\n'
+                            css = 'val-match' if match else 'val-fail'
+                            val = f"{actual:.6f}" if actual is not None else "-"
+                            html += f'                                <td class="{css}">{val}</td>\n'
                     else:
-                        html += '                                <td class="val-missing">-</td>\n'
+                        html += '                                <td class="val-na">-</td>\n'
             else:
-                # Actual scales (0-3) - no platform validation, just show dashes
-                html += '                                <td class="val-missing">-</td>\n'
-                html += '                                <td class="val-missing">-</td>\n'
-                html += '                                <td class="val-missing">-</td>\n'
+                html += '                                <td class="val-na">-</td>\n'
+                html += '                                <td class="val-na">-</td>\n'
+                html += '                                <td class="val-na">-</td>\n'
             
             html += '                            </tr>\n'
         
@@ -461,12 +454,12 @@ def generate_report():
         </div>
 '''
     
-    # Add JavaScript for charts
+    # JavaScript for charts with failed points in RED
     chart_json = json.dumps(chart_data)
     html += f'''
         <footer>
             <p>🔺 Power Laws & Fractals — ERB Testing Protocol</p>
-            <p>Validating {len([s for s in all_scales if s.get('IsProjected')])} projected scales across {len(systems)} systems</p>
+            <p>Validating {len([s for s in all_scales if s.get('IsProjected')])} projected scales</p>
         </footer>
     </div>
     
@@ -479,7 +472,7 @@ def generate_report():
             if (!canvas) return;
             
             const ctx = canvas.getContext('2d');
-            const all = [...data.actual, ...data.projected];
+            const all = [...data.actual, ...data.projected, ...data.failed];
             if (all.length === 0) return;
             
             const xMin = Math.min(...all.map(p => p.x));
@@ -493,38 +486,52 @@ def generate_report():
                 theory.push({{x, y}});
             }}
             
+            const datasets = [
+                {{
+                    label: 'Actual (0-3)',
+                    data: data.actual,
+                    backgroundColor: '#3fb950',
+                    borderColor: '#3fb950',
+                    pointRadius: 8,
+                    pointHoverRadius: 10
+                }},
+                {{
+                    label: 'Projected (4-7)',
+                    data: data.projected,
+                    backgroundColor: '#a371f7',
+                    borderColor: '#a371f7',
+                    pointRadius: 8,
+                    pointHoverRadius: 10
+                }},
+                {{
+                    label: 'Theoretical (slope=' + data.slope.toFixed(3) + ')',
+                    data: theory,
+                    type: 'line',
+                    borderColor: 'rgba(139, 148, 158, 0.6)',
+                    borderDash: [5, 5],
+                    borderWidth: 2,
+                    pointRadius: 0,
+                    fill: false
+                }}
+            ];
+            
+            // Add failed points as separate red dataset
+            if (data.failed && data.failed.length > 0) {{
+                datasets.splice(2, 0, {{
+                    label: '✗ FAILED',
+                    data: data.failed,
+                    backgroundColor: '#f85149',
+                    borderColor: '#f85149',
+                    borderWidth: 3,
+                    pointRadius: 12,
+                    pointHoverRadius: 14,
+                    pointStyle: 'crossRot'
+                }});
+            }}
+            
             new Chart(ctx, {{
                 type: 'scatter',
-                data: {{
-                    datasets: [
-                        {{
-                            label: 'Actual (0-3)',
-                            data: data.actual,
-                            backgroundColor: '#3fb950',
-                            borderColor: '#3fb950',
-                            pointRadius: 8,
-                            pointHoverRadius: 10
-                        }},
-                        {{
-                            label: 'Projected (4-7)',
-                            data: data.projected,
-                            backgroundColor: '#a371f7',
-                            borderColor: '#a371f7',
-                            pointRadius: 8,
-                            pointHoverRadius: 10
-                        }},
-                        {{
-                            label: 'Theoretical (slope=' + data.slope.toFixed(3) + ')',
-                            data: theory,
-                            type: 'line',
-                            borderColor: 'rgba(139, 148, 158, 0.6)',
-                            borderDash: [5, 5],
-                            borderWidth: 2,
-                            pointRadius: 0,
-                            fill: false
-                        }}
-                    ]
-                }},
+                data: {{ datasets }},
                 options: {{
                     responsive: true,
                     maintainAspectRatio: false,
@@ -538,6 +545,14 @@ def generate_report():
                             text: data.name + ' - Log-Log Plot',
                             color: '#c9d1d9',
                             font: {{ size: 13 }}
+                        }},
+                        tooltip: {{
+                            callbacks: {{
+                                label: function(ctx) {{
+                                    const pt = ctx.raw;
+                                    return 'Iter ' + pt.iter + ': (' + pt.x.toFixed(3) + ', ' + pt.y.toFixed(3) + ')';
+                                }}
+                            }}
                         }}
                     }},
                     scales: {{
@@ -575,10 +590,10 @@ def generate_report():
                 failures = [sid for sid, data in v.items() if not data['all_match']]
                 if failures:
                     print(f"  {name}: {len(failures)} failures")
-                    for sid in failures[:3]:
+                    for sid in failures[:5]:
                         print(f"    • {sid}")
-                    if len(failures) > 3:
-                        print(f"    ... and {len(failures) - 3} more")
+                    if len(failures) > 5:
+                        print(f"    ... and {len(failures) - 5} more")
     
     return report_path
 
