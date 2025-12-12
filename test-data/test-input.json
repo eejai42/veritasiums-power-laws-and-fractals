@@ -1,6 +1,6 @@
 {
   "description": "Test input with only raw facts (platforms must compute derived values)",
-  "generated": "2025-12-11T23:59:04.436353+00:00",
+  "generated": "2025-12-12T00:04:05.472062+00:00",
   "source": "ssot/ERB_veritasium-power-laws-and-fractals.json",
   "scales": [
     {
@@ -28,7 +28,7 @@
       "ScaleID": "Sierpinski_7",
       "System": "Sierpinski",
       "Iteration": 7,
-      "Measure": 2225,
+      "Measure": 1500,
       "IsProjected": true
     },
     {
