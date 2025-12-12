@@ -1,273 +1,571 @@
-Yes — makes perfect sense.
-What you want is **not a technical rewrite**, it’s a **narrative rewrite with delayed revelation**.
+# Power Laws & Fractals  
+### Why You’ve Probably Been Playing the Game of Life Wrong
 
-Below is a **full rewritten README** that:
+Most of the games we think we’re playing in life are “nice” games:
 
-* **Leads with Veritasium, intuition, and curiosity**
-* **Hints** that something stronger is coming (without naming ERB, test harnesses, or engines yet)
-* **Turns the page on Section 5** and *then* drops the receipts
-* Keeps everything true to the repo you already built
+- work hard → move up a bit  
+- publish regularly → build a solid career  
+- post consistently → slowly grow an audience  
 
-Think of this as:
-**“hook → tension → promise → proof.”**
+That’s what a **normal** (Gaussian) world feels like: lots of small nudges, very few wild swings.
 
----
+But a lot of the real world is not that game.
 
-# Power Laws & Fractals
+In a **power-law** world, most of the probability mass lives in the tail. A few earthquakes, a few videos, a few research papers, a few fires, a few hubs in a network can dominate the entire outcome. The “average” is almost a lie. :contentReference[oaicite:0]{index=0}  
 
-### A concrete follow-through on Veritasium’s *Power Laws* video
+Veritasium’s *Power Laws* video is one of the cleanest explanations of this idea. This repository is what happens if you watch that video, pause halfway, and ask:
+
+> “Okay, but if this is really how the world works…  
+> how would I actually *check* those claims, end-to-end, without hand-waving?”
+
+This project is aimed at people who explain science for a living:
+
+- science YouTubers and podcasters,  
+- writers and newsletter authors,  
+- teachers and lecturers,  
+- technically-inclined viewers who don’t want to stop at “look, it’s a straight line.”
+
+We start in the same world as the video—Zipf, earthquakes, forest fires, sandpiles, scale-free networks, Sierpinski, Koch—and then build something the video can’t:  
+a **small, reproducible, multi-language lab** where those stories can be tested, not just plotted. :contentReference[oaicite:1]{index=1}  
+
+We’ll hint at that up front, then bring the receipts in the middle of this README.
 
 ---
 
 ## Table of Contents
 
-1. Why This Exists
-2. The Claim the Video Makes (Explicitly or Not)
-3. Where Intuition Runs Out
-4. What This Repo Lets You Actually Do
-5. The Receipts (Where the Numbers Come From)
-6. The Systems From the Video
-7. Executing the Same Claim Multiple Ways
-8. Measurement, Noise, and Where Power Laws Break
-9. Extending the Question
-10. What This Is — and Is Not
+1. [Why This Exists (Who This Is For)](#1-why-this-exists-who-this-is-for)  
+2. [The Veritasium Move: Straight Lines in Log–Log Space](#2-the-veritasium-move-straight-lines-in-loglog-space)  
+3. [Where That Story Starts to Creak](#3-where-that-story-starts-to-creak)  
+4. [What This Repo Actually Is (For a Science Communicator)](#4-what-this-repo-actually-is-for-a-science-communicator)  
+5. [The Receipts: One Source of Truth, Explicit Formulas](#5-the-receipts-one-source-of-truth-explicit-formulas)  
+6. [Executing the Same Claim in Python, PostgreSQL, and Go](#6-executing-the-same-claim-in-python-postgresql-and-go)  
+7. [The Test Harness: Base Data, Answer Keys, and Running It](#7-the-test-harness-base-data-answer-keys-and-running-it)  
+8. [Measurement Models, Noise, and Where Power Laws Break](#8-measurement-models-noise-and-where-power-laws-break)  
+9. [Extending the Question to New Domains](#9-extending-the-question-to-new-domains)  
+10. [What This Is (and Is Not)](#10-what-this-is-and-is-not)  
 
 ---
 
-## 1. Why This Exists
+## 1. Why This Exists (Who This Is For)
 
-Veritasium’s *Power Laws* video is compelling for a simple reason:
-it shows the **same mathematical shape** appearing in places that seem to have nothing to do with each other.
+This repository is a **direct response** to Veritasium’s *Power Laws* video. :contentReference[oaicite:2]{index=2}  
 
-Word frequencies.
-Earthquakes.
-Forest fires.
-Networks.
-Fractals.
+The video does a hard thing well: it shows that the **same mathematical pattern** keeps appearing in wildly different places:
 
-You zoom out, take logs, and suddenly chaos collapses into a straight line.
+- word frequencies (Zipf law),  
+- earthquakes (Gutenberg–Richter),  
+- forest fires,  
+- sandpile avalanches,  
+- scale-free networks,  
+- geometric fractals like Sierpinski and Koch.   
 
-That moment sticks.
+The beats are familiar:
 
-But if you’re paying close attention, it also leaves you with a quiet, unresolved question:
+1. You take messy counts over many orders of magnitude.  
+2. You plot them in log–log space.  
+3. A curve straightens into a line.  
+4. The slope of that line becomes your “one number to rule them all.”
 
-> *Okay… but how would I actually check this?*
+If you’re a science communicator, this is gold: it compresses a lot of complexity into a single visual and a single exponent.
 
-Not “can I plot something similar.”
-Not “does this look kind of right.”
+But if you keep thinking about it, an annoying follow-up question appears:
 
-But:
+> “If this is really how the world works,  
+> what would it take to treat those log–log lines like *lab results*, not just plots?”
 
-> **What would it take to treat these claims as something I can actually run, test, and verify — end to end?**
-
-That’s what this repository is about.
-
----
-
-## 2. The Claim the Video Makes (Explicitly or Not)
-
-The video never says *“power laws are universal”* outright.
-
-But it strongly implies something like this:
-
-> Across wildly different domains, the same scaling structure keeps appearing — and that’s not an accident.
-
-The visual evidence is the log–log straight line.
-
-The intuition is that the underlying mechanisms don’t matter as much as we think — what matters is the scaling behavior.
-
-This repo takes that implication seriously.
-
-Not to prove it right.
-Not to prove it wrong.
-
-But to ask a sharper question:
-
-> **What does it mean, concretely, for a scaling claim like this to hold up?**
+This repo is built for that moment.
 
 ---
 
-## 3. Where Intuition Runs Out
+## 2. The Veritasium Move: Straight Lines in Log–Log Space
 
-A straight line on a log–log plot is persuasive — but it’s not evidence by itself.
+The central move in the video is simple and powerful:
 
-Real data is messy:
+1. Take a distribution that spans orders of magnitude.  
+2. Transform both axes to log₁₀.  
+3. Watch a messy curve become “basically a straight line.”
 
-* finite-size effects
-* censoring and cutoffs
-* discretization
-* noise
-* regime changes
+In that picture:
 
-These aren’t edge cases.
-They’re the rule.
+- the x-axis is typically some notion of **scale** (rank, size, degree, iteration),  
+- the y-axis is some **measure** (frequency, count, energy, perimeter, etc.),  
+- and the line’s **slope** is your power-law exponent.
 
-Most discussions stop at *“yeah, but it’s approximately linear.”*
-That’s where intuition runs out.
+This move works, visually, for:
 
-If power laws are more than visual coincidences, they should survive contact with those realities — or fail in ways we can clearly see and explain.
+- the rank-frequency distribution of words (ZipfWords),  
+- the count of nodes by degree in a scale-free network (ScaleFreeNet),  
+- distributions of earthquake energies and forest fire sizes,  
+- the number of black triangles in Sierpinski and the perimeter of the Koch snowflake as iteration increases.   
 
----
+It’s compelling because it suggests something like:
 
-## 4. What This Repo Lets You Actually Do
+> “These systems have different mechanisms, but they share the *same kind* of scaling structure.”
 
-This repository takes the exact kinds of systems discussed in the video and treats each one as a **claim**, not a picture.
+This repo leans into that shared structure.  
+It uses a **common log–log “machine”** to model all of those systems side by side.   
 
-When you run it, you don’t just get plots.
-
-You get a single artifact that shows:
-
-* the raw values
-* the log–log geometry
-* the theoretical expectation
-* the fitted result
-* the residuals
-* and whether independent executions agree
-
-You don’t have to trust the visuals.
-
-You can inspect the numbers.
-
-At first glance, this feels like “just another analysis.”
-
-It isn’t.
-
-The difference becomes clear on the next page.
+But it also asks:  
+**When is that line actually telling the truth, and when is it just fooling our eyes?**
 
 ---
 
-## 5. The Receipts (Where the Numbers Come From)
+## 3. Where That Story Starts to Creak
 
-Everything in this repo is driven from a **single, explicit specification** of:
+If you’ve ever tried to fit a power law to real data, you know what lives behind the scenes:
 
-* what each system is,
-* what quantities are measured,
-* how scale is constructed,
-* and how comparisons are computed.
+- the line only looks straight over *some* range,  
+- the tail is short because the world is finite,  
+- small events are censored or under-reported,  
+- rounding and binning distort the low end,  
+- estimated slopes change when you slide the window. :contentReference[oaicite:6]{index=6}  
 
-That specification is not prose.
-It is not implicit.
-It is executable.
+In other words:
 
-From that one source:
+> The straight line is not the phenomenon.  
+> It’s a **fixed point**.
 
-* all derived values are computed,
-* all fits are defined,
-* and every number in the output can be traced back to a declared formula.
+The *phenomenon* is the **neighborhood around that fixed point** in log–log space:
 
-There is no hidden math in notebooks.
-No hand-copied equations.
-No “trust me, I did the regression.”
+- how tightly observations cluster,  
+- how they deviate,  
+- where they bend,  
+- how robust the slope is to noise, cutoffs, and discretization.
 
-If two results disagree, something is wrong — and you can point to *where*.
+If you only ever show the line, you’re leaving the most interesting part of the story—and the part that might be wrong—off screen.
 
-This is the difference between *showing* a power law and **accounting for one**.
+For a video, that’s a reasonable trade-off.
 
----
+For someone who wants to be able to say “yes, we checked this properly,” it’s not.
 
-## 6. The Systems From the Video
+This repo is structured to turn that “fixed point vs neighborhood” idea into an actual **computational object**:
 
-The examples here are intentionally unexotic.
-
-They are the same “greatest hits” everyone uses:
-
-* Sierpinski triangle
-* Koch snowflake
-* Zipf word frequencies
-* Earthquake energies
-* Forest fire sizes
-* Sandpile avalanches
-* Scale-free network degrees
-
-They span:
-
-* geometric vs statistical systems
-* idealized vs noisy domains
-* clean constructions vs empirical measurements
-
-And they are all evaluated using the **same machinery**.
-
-That is the point.
+- the fixed point = theoretical slope definition,  
+- the neighborhood = observed data (idealized and measured),  
+- the validation = fitted slopes, residual geometry, quality metrics.   
 
 ---
 
-## 7. Executing the Same Claim Multiple Ways
+## 4. What This Repo Actually Is (For a Science Communicator)
 
-If a scaling claim is meaningful, it shouldn’t depend on *how* you compute it.
+Short version:
 
-This repo executes the same definitions in:
+> This repository turns the power-law stories from Veritasium’s *Power Laws* video into a **small, reproducible, multi-platform lab** where those stories can be tested, not just plotted.   
 
-* Python
-* PostgreSQL
-* Go
+Specifically, it gives you:
 
-Each environment:
+- **The same cast of systems as the video (plus a bit of structure around them):**  
+  - Sierpinski Triangle (fractal)  
+  - Koch Snowflake (fractal)  
+  - Zipf word frequencies  
+  - Scale-free network degrees  
+  - Sandpile avalanches  
+  - Earthquake energies  
+  - Forest fire sizes   
 
-* loads the same raw inputs
-* computes the same derived quantities
-* and is checked against the same expected results
+- **A clear separation between:**
+  - theoretical slopes (“what the math derivation predicts”),  
+  - idealized log–log points (“what the toy model says should happen”),  
+  - noisy measured data (“what a seismometer / corpus / sensor might actually record”),  
+  - inferred fits and residuals (“what happens when we actually run the regression”).   
 
-Agreement is not assumed.
-It is verified.
+- **A single, canonical definition of the math**, written once in a JSON “Entity Rule Book” (ERB), and then auto-translated into:
+  - Python models and calculations,  
+  - PostgreSQL tables, functions, and views,  
+  - Go structs and execution logic.   
 
-This isn’t about performance or language wars.
+- **A test harness** that:
+  - generates test datasets from that single definition,  
+  - runs all three platforms,  
+  - compares their derived results to a canonical answer key,  
+  - and produces a single HTML report summarizing everything.   
 
-It’s about removing an entire class of ambiguity.
+From a communicator’s perspective, this means:
 
----
+- you can still use log–log plots and straight lines as storytelling tools,  
+- but you know there is an actual, executable, cross-checked model backing them up,  
+- and if someone asks “how do you *know* those slopes are right?”, there is a concrete answer.
 
-## 8. Measurement, Noise, and Where Power Laws Break
-
-Power laws don’t usually fail loudly.
-
-They fail subtly:
-
-* slopes drift
-* residuals inflate
-* regimes change
-* cutoffs dominate
-
-This repo treats those failures as **first-class data**, not inconveniences.
-
-Noise models, cutoffs, discretization, and scale regimes are explicit — so when a fit degrades, you can see *why*.
-
-That’s where the interesting information lives.
-
----
-
-## 9. Extending the Question
-
-The point of this repo is not to freeze these examples in amber.
-
-It’s to make the *question* portable.
-
-If someone claims a new power law:
-
-* define the system
-* load the observations
-* run the same machinery
-* inspect where it holds — or doesn’t
-
-No bespoke analysis scripts required.
+The rest of this README explains how that works.
 
 ---
 
-## 10. What This Is — and Is Not
+## 5. The Receipts: One Source of Truth, Explicit Formulas
 
-This is **not**:
+This is where the math stops being implied.
 
-* a proof of universality
-* a visualization project
-* a statistical trick
+### 5.1 The Entity Rule Book (ERB) JSON
 
-It **is**:
+At the heart of the repo is:
 
-* a concrete follow-through on the questions raised in Veritasium’s video
-* a way to turn “that looks like a power law” into something inspectable
-* a demonstration of what it takes to actually bring receipts
+```text
+ssot/ERB_veritasium-power-laws-and-fractals.json
+````
 
-If power laws are as fundamental as they appear, they should survive this treatment.
+This file defines the **entire** model:
 
-If they aren’t, the failures will be visible — and informative.
+* tables: `systems`, `scales`, `observed_scales`, `inference_runs`, `system_stats`, `measurement_models`, `scale_regimes` and more,
+* columns (fields) for each table,
+* relationships between tables,
+* and, critically, the **formulas** that connect fields. 
 
-That’s the point of the repo.
+Every field is tagged as one of:
+
+* `raw` – directly stored input (e.g. `Measure`, `Iteration`, `SystemID`),
+* `relationship` – foreign key to another table (e.g. `System` on `scales`),
+* `lookup` – something you pull from a parent table via an Excel-style `INDEX/MATCH` formula,
+* `calculated` – a formula combining other fields (`Scale = BaseScale * ScaleFactorPower`),
+* `aggregation` – a rollup over many rows (`MinLogScale`, `PointCount`, etc.).
+
+Example (simplified) from the ERB:
+
+```json
+{
+  "name": "ScaleFactorPower",
+  "datatype": "number",
+  "type": "calculated",
+  "formula": "=POWER({{ScaleFactor}}, {{Iteration}})",
+  "Description": "ScaleFactor raised to the Iteration power."
+},
+{
+  "name": "Scale",
+  "datatype": "number",
+  "type": "calculated",
+  "formula": "={{BaseScale}} * {{ScaleFactorPower}}",
+  "Description": "X-axis variable: BaseScale multiplied by ScaleFactorPower."
+},
+{
+  "name": "LogScale",
+  "datatype": "number",
+  "type": "calculated",
+  "formula": "=LOG10({{Scale}})",
+  "Description": "log10 of Scale."
+}
+```
+
+Those formulas are the **source of truth** for every platform.
+
+### 5.2 CMCC: raw → lookup → calculated → aggregated
+
+Because each field has a type, you get a clean pipeline:
+
+1. **Raw facts** — what’s observed or declared:
+
+   * `SystemID`, `Iteration`, `Measure`, `IsProjected`
+2. **Lookups** — what’s inherited from definitions:
+
+   * `BaseScale` and `ScaleFactor` from `systems`
+   * `TheoreticalLogLogSlope` from `systems`
+3. **Calculated** — what depends on both:
+
+   * `ScaleFactorPower = ScaleFactor^Iteration`
+   * `Scale = BaseScale * ScaleFactorPower`
+   * `LogScale = log10(Scale)`
+   * `LogMeasure = log10(Measure)`
+4. **Aggregations** — what summarizes:
+
+   * `MinLogScale`, `MaxLogScale`, `EmpiricalLogLogSlope`, `R2`, etc.
+
+That separation isn’t just tidy—it answers uncomfortable questions:
+
+* “Is that number measured or derived?”
+* “Is that slope theoretical or fitted?”
+* “Is that range an artifact of truncation?”
+
+The ERB forces you to encode those distinctions explicitly.
+
+### 5.3 Concrete systems and slopes (the Veritasium cast)
+
+The ERB encodes the canonical systems from the video with their theoretical slopes:
+
+| System       | Class     | Theoretical slope | BaseScale | ScaleFactor |
+| ------------ | --------- | ----------------- | --------- | ----------- |
+| Sierpinski   | fractal   | −1.585            | 1         | 0.5         |
+| Koch         | fractal   | −0.262            | 1         | 1/3         |
+| ZipfWords    | power_law | −1.0              | 1         | 2           |
+| ScaleFreeNet | power_law | −2.5              | 1         | 2           |
+| Sandpile     | power_law | −1.0              | 1         | 2           |
+| Earthquakes  | power_law | −1.0              | 1         | 2           |
+| ForestFires  | power_law | −1.3              | 1         | 2           |
+
+Those aren’t just names and numbers; they drive every calculation downstream.
+
+---
+
+## 6. Executing the Same Claim in Python, PostgreSQL, and Go
+
+Once the ERB exists, the rest of the repo is “just” making that definition real in different environments.
+
+### 6.1 Code generation: formulas → real code
+
+From the ERB, the repo generates:
+
+* **Python** dataclasses and helpers in `python/rulebook/` via `rulebook-to-python.py`,
+* **Go** structs and helpers in `golang/pkg/rulebook/` via a Go generator,
+* **PostgreSQL** functions and views via `postgres/02-create-functions*.sql` and `03-create-views*.sql`.
+
+The generator:
+
+* parses the ERB,
+* builds a dependency graph of fields,
+* converts Excel-style formulas (`POWER`, `LOG10`, `INDEX/MATCH`) into Python, Go, and SQL expressions,
+* and writes out platform-native code.
+
+So the same ERB snippet:
+
+```text
+=POWER({{ScaleFactor}}, {{Iteration}})
+```
+
+turns into:
+
+* Python: `math.pow(self._scale_factor, self.iteration)`
+* Go: `math.Pow(*s.scaleFactor, float64(s.Iteration))`
+* SQL: `POWER(calc_scales_scale_factor(p_scale_id), (SELECT iteration FROM scales WHERE scale_id = p_scale_id))`
+
+You never hand-copy formulas across languages.
+
+### 6.2 Python engine
+
+* Lives in `python/`
+* Generated models in `python/rulebook/` (e.g. `models.py`, `data.py`)
+* Test runner: `python/run-tests.py`
+
+It:
+
+1. Loads generated data from the ERB-derived JSON.
+2. Lazily computes derived fields when accessed.
+3. Writes `test-results/python-results.json` for validation.
+
+### 6.3 PostgreSQL engine
+
+* Schema: `postgres/01-drop-and-create-tables*.sql`
+* Functions: `postgres/02-create-functions*.sql`
+* Views: `postgres/03-create-views*.sql`
+* Data loads: `postgres/05-insert-data*.sql`
+
+The DB stores only **raw** fields in base tables.
+Everything computed (scale, logs, slopes, residuals, etc.) appears through views like:
+
+* `vw_scales`
+* `vw_observed_scales`
+* `vw_inference_runs`
+
+That means you can run queries like:
+
+```sql
+SELECT * FROM vw_scales WHERE system = 'ZipfWords';
+SELECT * FROM vw_inference_runs;
+```
+
+and see the same numbers that drive the plots, directly inside PostgreSQL.
+
+### 6.4 Go engine
+
+* Lives in `golang/`
+* Generated core in `golang/pkg/rulebook/`
+* Test runner: `golang/run-tests.go` 
+
+The Go runner:
+
+1. Loads shared test data files (`base-data.json`, `test-input.json`, `answer-key.json`).
+2. Computes derived values with carefully ordered method calls.
+3. Writes `test-results/golang-results.json`.
+4. Prints per-system tables and an ASCII log–log plot (● actual, ◌ projected, · theoretical).
+
+From a “show this in a talk” perspective, that ASCII plot is a nice trick: you can demonstrate log–log geometry live in a terminal.
+
+---
+
+## 7. The Test Harness: Base Data, Answer Keys, and Running It
+
+All three engines are wired into a single test protocol.
+
+### 7.1 Test data split: base vs projected
+
+A script, `generate-test-data.py`, reads the ERB and creates three JSON files in `test-data/`: 
+
+* `base-data.json`
+
+  * iterations 0–3,
+  * with all fields filled in,
+  * used to initialize systems consistently.
+
+* `test-input.json`
+
+  * iterations 4–7,
+  * *only* raw fields (System, Iteration, Measure, IsProjected),
+  * forces each platform to recompute all derived fields from scratch.
+
+* `answer-key.json`
+
+  * the canonical “this is what you should get” for all systems and iterations,
+  * used for cross-platform validation.
+
+### 7.2 Orchestrator and start script
+
+At the top level:
+
+* `orchestrator.py` coordinates the whole test regime.
+* `start.sh` is an interactive launcher with options like:
+
+  * “Run ALL Platform Tests”,
+  * “Python only”,
+  * “Go only”,
+  * “PostgreSQL only”,
+  * “View Results Report”.
+
+Typical command-line flows:
+
+```bash
+# Interactive menu
+./start.sh
+
+# Or scripted:
+./orchestrator.py --all        # run all platforms
+./orchestrator.py --all --report   # run and generate HTML report
+```
+
+Each platform’s results live in `test-results/`:
+
+* `python-results.json`
+* `postgres-results.json`
+* `golang-results.json`
+
+### 7.3 Validation
+
+Validation is simple and strict:
+
+* every projected scale (iterations 4–7) across the 7 systems is compared to the `answer-key.json`,
+* key fields (BaseScale, ScaleFactor, ScaleFactorPower, Scale, LogScale, LogMeasure) must match within a tight numeric tolerance,
+* there are 28 such projected scales (7 systems × 4 iterations).
+
+If everything matches, the platform passes.
+
+### 7.4 The report (the artifact you actually care about)
+
+A visualizer in `visualizer/` generates a single HTML report:
+
+* `visualizer/generate_report.py` produces `visualizer/report.html`,
+* with:
+
+  * per-system tables for all 8 iterations,
+  * Chart.js log–log scatter plots,
+  * theoretical lines overlaid,
+  * fitted slopes and R²,
+  * cross-platform pass/fail indicators.
+
+That HTML file is the thing you can hand to someone and say:
+
+> “Here is exactly how well these systems behave like power laws, under explicit assumptions, across three independent implementations.”
+
+---
+
+## 8. Measurement Models, Noise, and Where Power Laws Break
+
+The ERB doesn’t only encode “perfect” power laws; it also encodes how they get messed up by reality.
+
+### 8.1 Measurement models
+
+The `measurement_models` table specifies, for each system:
+
+* noise type (e.g. lognormal),
+* noise strength (`NoiseSigma`),
+* minimum and maximum observable scales (`CutoffMinScale`, `CutoffMaxScale`),
+* how measurements are discretized (rounding, binning),
+* residual and outlier metrics computed from observed data.
+
+This is where you say things like:
+
+* “earthquakes are measured above a certain threshold,”
+* “word frequencies are rounded,”
+* “forest fire sizes are log-noisy.”
+
+### 8.2 Observed vs idealized scales
+
+For each system there are two parallel tables:
+
+* `scales` — idealized points (what the perfect scaling construction says),
+* `observed_scales` — noisy points (what a real instrument or simulation might give you).
+
+Observed points carry:
+
+* the same scale calculations (Scale, LogScale),
+* log-space measures (LogMeasure),
+* predicted log measures from fitted slopes,
+* residuals, squared residuals, standardized residuals, outlier flags.
+
+### 8.3 Regimes and cutoffs
+
+The `scale_regimes` table lets you define different ranges where different slopes are expected:
+
+* e.g. “small fires” vs “large fires” regimes for forest fire sizes,
+* “body” vs “tail” regimes for scale-free networks,
+* or “early” vs “mature” scaling in a fractal construction.
+
+This lines up with a key theme of the video:
+that scaling behavior is often **local** in scale, not global.
+
+Instead of talking about “does this follow a power law?” in a yes/no way, you can ask:
+
+* *where* does it behave like one,
+* *how long* does that regime last,
+* and *how strong* is the evidence, given noise and finite size.
+
+---
+
+## 9. Extending the Question to New Domains
+
+This repo is not meant to be frozen to “just the Veritasium examples.”
+
+The whole point of the ERB + generator + test harness stack is that adding a new scaling claim looks like:
+
+1. **Define the system** in the ERB:
+
+   * give it a SystemID, DisplayName, class (`fractal` vs `power_law`),
+   * declare `BaseScale`, `ScaleFactor`, `MeasureName`,
+   * specify a theoretical log–log slope. 
+
+2. **Add idealized `scales`** if you have a clean construction.
+
+3. **Add noisy `observed_scales`** if you have real or simulated data.
+
+4. **Add an `inference_runs` row** describing the fit (OLS/log–log, number of points, etc.). 
+
+5. Regenerate test data + code, run the orchestrator, and inspect the new system in the report.
+
+You don’t have to:
+
+* rewrite plotting code,
+* reinvent the calculation chain,
+* or decide ad-hoc how to handle log transforms, slopes, and residuals.
+
+You just define the claim and let the lab run.
+
+---
+
+## 10. What This Is (and Is Not)
+
+This repo does **not** claim:
+
+* that power laws are universal,
+* that every phenomenon in the video is perfectly described by a single slope,
+* or that this is the final word on how to fit heavy-tailed data.
+
+What it *does* claim is narrower and, hopefully, more useful:
+
+> Scaling laws can be represented as explicit, executable objects;
+> their assumptions can be written down;
+> their behavior can be tested across independent implementations;
+> and their failures can be made visible and interesting, not hidden.
+
+For science communicators, that means:
+
+* you can keep telling the intuitive story of power laws and fractals,
+* while having a concrete, inspectable backing for the plots you show,
+* and a place to experiment when you want to go one step further than the video.
+
+If we’ve been “playing the game of life wrong” by assuming we live in a Gaussian world,
+this repo is one small attempt to show what it looks like to **take the power-law world seriously**—
+not just in animations and plots, but in code, queries, and tests anyone can rerun.
