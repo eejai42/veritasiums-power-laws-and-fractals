@@ -12,13 +12,20 @@ That’s what a **normal** (Gaussian) world feels like: lots of small nudges, ve
 
 But a lot of the real world is not that game.
 
-In a **power-law** world, most of the probability mass lives in the tail. A few earthquakes, a few videos, a few research papers, a few fires, a few hubs in a network can dominate the entire outcome. The “average” is almost a lie. ([Zenodo][1])
+In a **power-law** world, most of the probability mass lives in the tail. A few earthquakes, a few videos, a few research papers, a few fires, a few hubs in a network can dominate the entire outcome. The “average” is almost a lie.
 
 Veritasium’s *Power Laws* video is one of the cleanest explanations of this idea. I watched it, got obsessed in the productive way, and wanted to see what it would look like to treat those claims like something you can actually run end-to-end:
 
 > “Okay, but if this is really how the world works…
 > how would I actually *check* those claims, end-to-end, without hand-waving?”
 
+### Two Layers: Scaling Lab Now, [Physics Unification Next](/physics-model/README.md)
+
+This repo currently ships a scaling-focused lab: a single JSON Single Source of Truth defines several classic log–log systems (fractal and power-law), and the same rulebook is executed in PostgreSQL, Python, and Go with shared test data + cross-platform validation. 
+
+A second layer is still planned: a physics-first extension adds connective tissue for “why these log–log laws relate,” providing a single, unifying bridge across physics → chemistry → biology → astro/finance/etc. That work lives in physics-model/ and is currently in a “design + patch spec” state:
+
+**Intended Audience:**
 This project is aimed at people who explain science for a living:
 
 * science YouTubers and podcasters,
@@ -27,7 +34,7 @@ This project is aimed at people who explain science for a living:
 * technically-inclined viewers who don’t want to stop at “look, it’s a straight line.”
 
 We start in the same world as the video—Zipf, earthquakes, forest fires, sandpiles, scale-free networks, Sierpinski, Koch—and then build a companion thing the video doesn’t try to be:
-a **small, reproducible, multi-language lab** where those stories can be tested, not just plotted. ([Zenodo][1])
+a **small, reproducible, multi-language lab** where those stories can be tested, not just plotted.
 
 (If you’re curious why this “one rulebook → many runtimes” approach is even plausible, it leans on the **Conceptual Model Completeness Conjecture (CMCC)**—I’ll touch it briefly at the very end.)
 
@@ -218,7 +225,7 @@ This is where the math stops being implied.
 At the heart of the repo is:
 
 ```text
-ssot/ERB_veritasium-power-laws-and-fractals.json
+ssot/effortless-rulebook.json
 ```
 
 This file defines the **entire** model:
@@ -266,7 +273,7 @@ Those formulas are the **source of truth** for every platform.
 
 ### 5.2 CMCC: raw → lookup → calculated → aggregated
 
-This “raw / lookup / calculated / aggregated” shape is the same five-primitive decomposition CMCC points at (Schema, Data, Lookups, Aggregations, Formulas)—we’re using it here purely as a practical organizing principle. ([Zenodo][1])
+This “raw / lookup / calculated / aggregated” shape is the same five-primitive decomposition CMCC points at (Schema, Data, Lookups, Aggregations, Formulas)—we’re using it here purely as a practical organizing principle.
 
 Because each field has a type, you get a clean pipeline:
 
@@ -592,11 +599,190 @@ not just in animations and plots, but in code, queries, and tests anyone can rer
 
 ---
 
-## 11. CMCC (Briefly): Why “One Rulebook → Many Runtimes” Works
+## 11. Two Layers: Scaling Lab Now, [Physics Unification Next](/physics-model/README.md)
+
+This repo currently ships a **scaling-focused lab**: a single ERB/SSOT defines several classic log–log systems (fractal and power-law), and the same rulebook is executed in **PostgreSQL, Python, and Go** with shared test data + cross-platform validation.  
+
+A second layer is planned: a **physics-first extension** that adds connective tissue for “why these log–log laws relate,” and (eventually) a unifying bridge across physics → chemistry → biology → astro/finance/etc. That work lives in `physics-model/` and is currently in a “design + patch spec” state:
+
+---
+
+# The Physics-Model Extension
+
+The physics-model folder defines a **physics-first extension** to the existing “Power Laws & Fractals” ERB in the [/physics-model/ssot/physics-model.json](/physics-model/ssot/physics-model.json)
+
+The base repo already treats “straight lines in log–log space” as executable, testable objects across multiple runtimes. The goal here is to add **connective tissue** that:
+
+1. lets multiple log–log systems relate to each other explicitly (at any scale), and
+2. introduces a physics extension that can unify higher-level fields using the same CMCC/ERB machinery.
+
+This extension is intentionally designed to be **additive**: it should not require changes to the existing SSOT tables/fields to keep the current model stable and reproducible. 
+
+---
+
+## What exists today
+
+This is the current base SSOT (source of truth):
+
+> [/physics-model/ssot/physics-model.json](/physics-model/ssot/physics-model.json)
+
+It defines the systems, scales, observed scales, measurement models, inference runs, and regime machinery used to generate:
+
+* PostgreSQL schema + functions/views
+* Python model + evaluator
+* Go structs + evaluator
+* Cross-platform test harness + report
+
+The physics extension builds on that—without breaking it. 
+
+---
+
+## What will be added
+
+### 1) A patch SSOT
+
+A new patch file will be introduced here:
+
+```
+physics-model/ssot/physics-model-patch.json
+
+```
+> [/physics-model/ssot/physics-model-patch.json](physics-model/ssot/physics-model-patch.json)
+
+
+This patch will **add** physics-oriented entities/fields (and optional relationships) to the base SSOT.
+
+The patch is not a fork. It is a structured “delta” that can be merged into the base ERB.
+
+### 2) A merged “hybrid” SSOT
+
+A build step will produce:
+
+```
+physics-model/ssot/physics-model.json
+```
+
+This file is the **hybrid** of:
+
+* the base SSOT: `../ssot/effortless-rulebook.json`
+* plus the patch: `physics-model/ssot/physics-model-patch.json`
+
+Conceptually:
+
+```text
+physics-model.json = merge(base ERB, physics-model-patch)
+```
+
+The merged SSOT is the *single* source of truth for the physics extension.
+
+---
+
+## The build pipeline
+
+### Step A — Merge
+
+A small merge utility (language-agnostic; could be Python first) will:
+
+* load the base ERB JSON
+* load the patch JSON
+* validate patch operations (additive-only by default)
+* emit the merged ERB as `physics-model/ssot/physics-model.json`
+
+**Design goal:** “add-only” merging should be the default mode to reduce risk:
+
+* add new tables
+* add new columns (optionally nullable)
+* add new formulas / aggregations / lookups
+* add new systems or regimes
+* add new relationships
+
+Optional “override” operations can exist later, but should require explicit flags.
+
+### Step B — Generate runtimes from the merged ERB (same generic tools)
+
+Once `physics-model.json` exists, the extension should replicate the base behavior using the same generator/toolchain approach:
+
+* PostgreSQL artifacts from the ERB (tables + functions + views)
+* Python artifacts from the ERB (models + evaluator)
+* Go artifacts from the ERB (structs + evaluator)
+
+In other words: no bespoke physics engine.
+
+The physics model is still “just” ERB:
+
+* schema
+* data
+* lookups
+* calculations
+* aggregations
+
+So the same generic compilation path applies.
+
+---
+
+## What the physics extension will *do*
+
+### A) Unify different log–log systems at any scale
+
+The base model already compares systems via shared log–log machinery (scale/measure/log transforms, theoretical slopes, empirical fits, residuals, regimes). 
+
+The physics extension will add explicit bridges so that “system A and system B both look linear in log–log space” becomes something you can query structurally, not just observe.
+
+Examples of the kinds of connective tissue to encode (as ERB entities + formulas):
+
+* shared “scale” semantics across domains (rank vs length vs energy vs degree)
+* mappings between measures when a domain provides a derivation (e.g., energy ↔ magnitude proxies, perimeter ↔ iteration rules)
+* regime/crossover descriptors that can be compared across systems
+* explicit “what is being measured” metadata that survives translation into SQL/Python/Go
+
+### B) Provide a physics-first extension that can unify fields
+
+This extension is about making “physics” an explicit, queryable layer—while staying inside the same ERB/CMCC primitives.
+
+At a high level, the patch will introduce tables/fields that let you express:
+
+* quantities (typed meaning of numeric fields)
+* dimensional/unit metadata (so derived fields can be checked/annotated)
+* optional state/dynamics descriptors where relevant (without forcing every system into the same mold)
+* constraints/invariants expressed as computed/aggregated checks (so “admissible explanations” can be filtered)
+
+This is not intended to replace the base log–log scaffold. It’s intended to **sit above it** and **connect through it**, so the “scaling lab” remains the common observable layer.
+
+---
+
+## Output artifacts
+
+When implemented, this folder should generate its own artifacts parallel to the base model, derived from `physics-model/ssot/physics-model.json`:
+
+* `physics-model/postgres/…`
+* `physics-model/python/…`
+* `physics-model/golang/…`
+
+…with the same philosophy:
+
+> one rulebook → many runtimes
+
+---
+
+## Current state of affairs
+
+* The base model exists and runs end-to-end.  
+* This `physics-model/` folder defines the plan to:
+
+  * create a patch SSOT,
+  * merge it into a hybrid SSOT,
+  * and run the same generic generators to produce Postgres/Python/Go SDKs from the merged ERB.
+
+Until the patch and merge step are implemented, this folder is a **design + specification** for how physics becomes an additive extension of the existing SSOT.
+
+
+---
+
+## 12. CMCC (Briefly): Why “One Rulebook → Many Runtimes” Works
 
 This repo isn’t *about* CMCC. But the reason the ERB approach works as cleanly as it does is basically the CMCC bet:
 
-> A lot of domain logic can be expressed declaratively using a small set of primitives—**schema, data, lookups, aggregations, and formulas**—so the “meaning” lives in a rulebook you can translate, not in hand-copied implementations. ([Zenodo][1])
+> A lot of domain logic can be expressed declaratively using a small set of primitives—**schema, data, lookups, aggregations, and formulas**—so the “meaning” lives in a rulebook you can translate, not in hand-copied implementations.
 
 In this repository, that shows up as:
 
