@@ -688,3 +688,4 @@ This repository demonstrates a practical implementation of the "Single Source of
 
 The architecture ensures that the mathematical truth (power-law relationships, fractal dimensions) is defined once and computed identically across Python, PostgreSQL, and Go.
 
+
